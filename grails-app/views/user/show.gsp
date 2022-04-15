@@ -19,7 +19,24 @@
             <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
             </g:if>
-            <f:display bean="user" />
+            <ol class="property-list user">
+                <li class="fieldcontain">
+                    <span id="name-label" class="property-label"><g:message code="user.name.label" default="Name" /></span>
+                    <div class="property-value" aria-labelledby="name-label"><f:display bean="user" property="name"/></div>
+                </li>
+                <li class="fieldcontain">
+                    <span id="uuid-label" class="property-label"><g:message code="user.uuid.label" default="UUID" /></span>
+                    <div class="property-value" aria-labelledby="uuid-label"><f:display bean="user" property="uuid"/></div>
+                </li>
+                <li class="fieldcontain">
+                    <span id="organization-label" class="property-label"><g:message code="user.organization.label" default="Organization" /></span>
+                    <div class="property-value" aria-labelledby="organization-label"><f:display bean="user" property="organization"/></div>
+                </li>
+                <li class="fieldcontain">
+                    <span id="roles-label" class="property-label"><g:message code="user.roles.label" default="Roles" /></span>
+                    <div class="property-value" aria-labelledby="roles-label"><f:display bean="user" property="roles"/></div>
+                </li>
+            </ol>
             <g:form resource="${this.user}" method="DELETE">
                 <fieldset class="buttons">
                     <g:link class="edit" action="edit" resource="${this.user}"><g:message code="default.button.edit.label" default="Edit" /></g:link>

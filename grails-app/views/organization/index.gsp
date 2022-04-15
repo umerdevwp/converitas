@@ -18,8 +18,29 @@
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
-            <f:table collection="${organizationList}" />
+            <table>
+                <thead>
+                <tr>
+                    <g:sortableColumn property="name" title="Name" />
+                    <g:sortableColumn property="users" title="Users" />
+                    <g:sortableColumn property="country" title="Country" />
+                    <g:sortableColumn property="uuid" title="UUID" />
+                    <g:sortableColumn property="created" title="Created" />
+                </tr>
+                </thead>
+                <tbody>
 
+                <g:each in="${organizationList}" var="bean" status="i">
+                    <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                        <td><g:link method="GET" resource="${bean}"><f:display bean="${bean}" property="name" displayStyle="table"/></g:link></td>
+                        <td><f:display bean="${bean}" property="users"  displayStyle="${'table'}" /></td>
+                        <td><f:display bean="${bean}" property="country"  displayStyle="${'table'}" /></td>
+                        <td><f:display bean="${bean}" property="uuid"  displayStyle="${'table'}" /></td>
+                        <td><f:display bean="${bean}" property="created"  displayStyle="${'table'}" /></td>
+                    </tr>
+                </g:each>
+                </tbody>
+            </table>
             <div class="pagination">
                 <g:paginate total="${organizationCount ?: 0}" />
             </div>

@@ -20,9 +20,6 @@ class OrganizationController {
     }
 
     def create() {
-        //todo create org with mad and get UUID
-        //todo put UUID in params
-
         respond new Organization(params)
     }
 
@@ -35,7 +32,7 @@ class OrganizationController {
         try {
             Organization.withTransaction { status ->
                 // create org with mad and get UUID
-                UUID userID = session['userID'] as UUID
+                Long userID = session['userID'] as Long
                 User user = User.get(userID)
                 Map<String,Object> result =  httpClientService.postParamsExpectMap('organization', [userUUID:user.uuid, userOrgUUID:user.organization.uuid])
                 String orgUUID = result.orgdUUID
@@ -44,7 +41,7 @@ class OrganizationController {
                     Date now = new Date()
                     organization.uuid = orgUUID
                     organizationService.save(organization)
-                    User.create(adminUUID, "admin", organization, "@dm1n!", [Role.findByName('Admin')] as Set<Role>)
+                    User.create(adminUUID, "admin", organization, "@dm1n!", [Role.findByName(Role.ADMIN)] as Set<Role>)
                 }
             }
         } catch (ValidationException e) {
@@ -80,7 +77,7 @@ class OrganizationController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'organization.label', default: 'Organization'), organization.id])
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'organization.label', default: 'Organization'), organization.name])
                 redirect organization
             }
             '*'{ respond organization, [status: OK] }

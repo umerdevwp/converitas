@@ -20,6 +20,7 @@
         <div class="message" role="status">${flash.message}</div>
     </g:if>
     <g:form controller="auth" action="authentication" method="POST">
+        <g:hiddenField name="url" value="${url}"></g:hiddenField>
         <div class="form-group">
             <label for="name">Username</label>
             <g:field type="text" name="name"/>

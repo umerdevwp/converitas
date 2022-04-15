@@ -30,17 +30,25 @@ class UserController {
         }
 
         try {
-            UUID userID = session['userID'] as UUID
+            Long userID = session['userID'] as Long
             User u = User.get(userID)
-            if ( u.roles.contains(Role.findByName('Admin')) ) {
+            if ((user.organization==null && u.isAdmin()) ||
+                    u.isAdmin(user.organization) || u.isSysAdmin()) {
                 Map<String, Object> result = httpClientService.postParamsExpectMap('user', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, isAdmin: true])
                 String uuid = result.uuid
                 if (uuid) {
                     Date now = new Date()
                     user.uuid = uuid
-                    user.organization = u.organization
+                    if (user.organization.name!="CoVeritas") {
+                        user.organization = u.organization
+                    }
                     user.created = now
                     user.lastUpdated = now
+                    String password = params.password
+                    //todo check password
+                    if (password != null && password.size()>0) {
+                        user.setPassword( password )
+                    }
                     user.roles = [Role.findByName('User')]
                     userService.save(user)
                 } // else //todo throw Validation Exception and set error
@@ -52,7 +60,7 @@ class UserController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])
+                flash.message = message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.name])
                 redirect user
             }
             '*' { respond user, [status: CREATED] }
@@ -70,7 +78,16 @@ class UserController {
         }
 
         try {
-            userService.save(user)
+            Long userID = session['userID'] as Long
+            User u = User.get(userID)
+            if ( u.isAdmin(user.organization)||u.isSysAdmin()||u.id==user.id) {
+                String password = params.password
+                //todo check password
+                if (password != null && password.size() > 0) {
+                    user.setPassword(password)
+                }
+                userService.save(user)
+            }
         } catch (ValidationException e) {
             respond user.errors, view:'edit'
             return

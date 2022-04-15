@@ -1,3 +1,4 @@
+<%@ page import="com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -29,7 +30,12 @@
             <g:form resource="${this.user}" method="PUT">
                 <g:hiddenField name="version" value="${this.user?.version}" />
                 <fieldset class="form">
-                    <f:all bean="user"/>
+                    <f:field bean="user" property="name"/>
+                    <f:field bean="user" property="uuid" widget-readonly="true"/>
+                    <g:if test="${User.get(session["userID"]).isSysAdmin()}">
+                        <f:field bean="user" property="organization"/>
+                    </g:if>
+                    <f:field bean="user" property="roles"/>
                 </fieldset>
                 <fieldset class="buttons">
                     <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />

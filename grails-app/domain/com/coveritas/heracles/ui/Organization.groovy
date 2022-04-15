@@ -1,10 +1,11 @@
 package com.coveritas.heracles.ui
 
 class Organization {
+    public static final String COVERITAS_UUID = "ADSJDHAO123987asdkj"
     def httpClientService
 
     static hasMany = [users:User]
-    UUID   id
+    Long   id
     String uuid
     String name
     String country
@@ -28,7 +29,7 @@ class Organization {
 
     static mapping = {
         table name: 'ma_organization'
-        id generator : 'uuid2', type: 'pg-uuid'
+        id generator : 'increment'
     }
 
     static constraints = {
@@ -36,5 +37,11 @@ class Organization {
         users lazy: false
         country nullable: true
         uuid unique: true
+    }
+
+
+    @Override
+    public String toString() {
+        return "Organization{name='" + name + ((country==null)?"":("', country='" + country)) + "'}";
     }
 }

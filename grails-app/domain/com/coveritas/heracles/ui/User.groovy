@@ -4,9 +4,11 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 
 class User {
+    public static final String SYS_ADMIN_UUID = "asdjA12364SDUHADIh"
+
     static belongsTo = [organization:Organization]
     static hasMany = [roles:Role]
-    UUID id
+    Long id
     String uuid
     String name
     byte[] passwordHash
@@ -37,7 +39,7 @@ class User {
     static constraints = {
         roles lazy: false
         name blank: false, minSize: 3, unique: ['organization']
-        id generator : 'uuid2', type: 'pg-uuid'
+        id generator : 'increment'
     }
 
     private static final Random RANDOM = new SecureRandom()
@@ -53,15 +55,14 @@ class User {
     }
 
     def setPassword(String password) {
-        byte[] bSalt = new byte[32]
-        RANDOM.nextBytes(bSalt)
+        //todo check password
+        byte[] bSalt = salt()
         this.salt = bSalt
         passwordHash = passwordHash(password, bSalt)
     }
 
     static User create(String uuid, String name, Organization org, String password, Set<Role> roles) {
-        byte[] salt = new byte[32]
-        RANDOM.nextBytes(salt)
+        byte[] salt = salt()
         User user = new User(uuid: uuid, name: name, salt:salt, passwordHash: passwordHash(password, salt))
         Date now = new Date()
         user.created = now
@@ -72,7 +73,30 @@ class User {
         user
     }
 
+    private static byte[] salt() {
+        byte[] salt = new byte[32]
+        RANDOM.nextBytes(salt)
+        salt
+    }
+
     boolean authenticate(String password) {
         passwordHash == passwordHash(password, salt)
+    }
+
+    @Override
+    public String toString() {
+        return "User{name='" + name + "', organization='" + organization + "'}";
+    }
+
+    boolean isSysAdmin() {
+        return uuid== SYS_ADMIN_UUID
+    }
+
+    boolean isAdmin(Organization o) {
+        return isAdmin() && this.organization.id == o.id
+    }
+
+    boolean isAdmin() {
+        return roles.contains(Role.admin())
     }
 }

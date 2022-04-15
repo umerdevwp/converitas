@@ -1,3 +1,4 @@
+<%@ page import="com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -27,7 +28,17 @@
             </g:hasErrors>
             <g:form resource="${this.user}" method="POST">
                 <fieldset class="form">
-                    <f:all bean="user"/>
+                    <f:field bean="user" property="name"/>
+                    <g:if test="${User.get(session["userID"]).isSysAdmin()}">
+                        <f:field bean="user" property="organization"/>
+                    </g:if>
+                    <f:field bean="user" property="roles"/>
+                    <div class="fieldcontain required">
+                        <label for="password">Password
+                            <span class="required-indicator">*</span>
+                        </label>
+                        <g:passwordField name="password"/>
+                    </div>
                 </fieldset>
                 <fieldset class="buttons">
                     <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
