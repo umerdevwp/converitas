@@ -12,7 +12,7 @@ class AuthController {
         User user = User.findByNameAndOrganization(name, org)
         if (user.authenticate( password )) {
             session['userID'] = user.id
-            render( view:url?:"/organization/index" )
+            redirect controller: "organization", action: "index"
         } else {
             render(view:'login')
         }
@@ -20,6 +20,7 @@ class AuthController {
 
     def logout(){
         session.invalidate()
+        redirect controller: "auth", action: "login"
     }
 
 }

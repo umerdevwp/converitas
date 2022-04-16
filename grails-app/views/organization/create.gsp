@@ -1,3 +1,4 @@
+<%@ page import="com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -25,18 +26,22 @@
                 </g:eachError>
             </ul>
             </g:hasErrors>
-            <g:form resource="${this.organization}" method="POST">
-                <fieldset class="form">
-                    <f:field bean="organization" property="name"/>
-                    <f:field bean="organization" property="users"/>
-                    <f:field bean="organization" property="country"/>
-%{--                    <f:field bean="organization" property="uuid"/>--}%
-%{--                    <f:field bean="organization" property="created"/>--}%
-                </fieldset>
-                <fieldset class="buttons">
-                    <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-                </fieldset>
-            </g:form>
+            <g:set var="u" value="${User.get(session["userID"])}"/>
+            <g:if test="${u.isSysAdmin()}">
+                <g:form resource="${this.organization}" method="POST">
+                    <fieldset class="form">
+                        <f:field bean="organization" property="name"/>
+                        <f:field bean="organization" property="users"/>
+                        <f:field bean="organization" property="country"/>
+                    </fieldset>
+                    <fieldset class="buttons">
+                        <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
+                    </fieldset>
+                </g:form>
+            </g:if>
+            <g:else>
+                UNAUTHORIZED ACCESS
+            </g:else>
         </div>
     </body>
 </html>

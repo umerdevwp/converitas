@@ -1,3 +1,4 @@
+<%@ page import="com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -25,14 +26,21 @@
                 </g:eachError>
             </ul>
             </g:hasErrors>
-            <g:form resource="${this.role}" method="POST">
-                <fieldset class="form">
-                    <f:all bean="role"/>
-                </fieldset>
-                <fieldset class="buttons">
-                    <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-                </fieldset>
-            </g:form>
+            <g:set var="u" value="${User.get(session["userID"])}"/>
+            <g:if test="${u.isSysAdmin()}">
+                <g:form resource="${this.role}" method="POST">
+                    <fieldset class="form">
+                        <f:field bean="role" property="name"/>
+                        <f:field bean="role" property="users"/>
+                    </fieldset>
+                    <fieldset class="buttons">
+                        <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
+                    </fieldset>
+                </g:form>
+            </g:if>
+            <g:else>
+                UNAUTHORIZED ACCESS
+            </g:else>
         </div>
     </body>
 </html>

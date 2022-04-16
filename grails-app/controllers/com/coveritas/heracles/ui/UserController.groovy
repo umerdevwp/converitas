@@ -2,6 +2,8 @@ package com.coveritas.heracles.ui
 
 import com.coveritas.heracles.HttpClientService
 import grails.validation.ValidationException
+import org.springframework.validation.Errors
+
 import static org.springframework.http.HttpStatus.*
 
 class UserController {
@@ -29,41 +31,43 @@ class UserController {
             return
         }
 
-        try {
-            Long userID = session['userID'] as Long
-            User u = User.get(userID)
-            if ((user.organization==null && u.isAdmin()) ||
-                    u.isAdmin(user.organization) || u.isSysAdmin()) {
+        Long userID = session['userID'] as Long
+        User u = User.get(userID)
+        if ((user.organization==null && u.isAdmin()) ||
+                u.isAdmin(user.organization) || u.isSysAdmin()) {
+            try {
                 Map<String, Object> result = httpClientService.postParamsExpectMap('user', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, isAdmin: true])
                 String uuid = result.uuid
                 if (uuid) {
                     Date now = new Date()
                     user.uuid = uuid
-                    if (user.organization.name!="CoVeritas") {
+                    if (user.organization.name != "CoVeritas") {
                         user.organization = u.organization
                     }
                     user.created = now
                     user.lastUpdated = now
                     String password = params.password
                     //todo check password
-                    if (password != null && password.size()>0) {
-                        user.setPassword( password )
+                    if (password != null && password.size() > 0) {
+                        user.changePassword(password)
                     }
                     user.roles = [Role.findByName('User')]
                     userService.save(user)
                 } // else //todo throw Validation Exception and set error
+            } catch (ValidationException e) {
+                respond user.errors, view: 'create'
+                return
             }
-        } catch (ValidationException e) {
-            respond user.errors, view:'create'
-            return
-        }
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.name])
-                redirect user
+            request.withFormat {
+                form multipartForm {
+                    flash.message = message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.name])
+                    redirect user
+                }
+                '*' { respond user, [status: CREATED] }
             }
-            '*' { respond user, [status: CREATED] }
+        } else {
+            notAllowed('default.not.created.message')
         }
     }
 
@@ -77,28 +81,36 @@ class UserController {
             return
         }
 
-        try {
-            Long userID = session['userID'] as Long
-            User u = User.get(userID)
-            if ( u.isAdmin(user.organization)||u.isSysAdmin()||u.id==user.id) {
-                String password = params.password
+        Long userID = session['userID'] as Long
+        User u = User.get(userID)
+        if ( u.isAdmin(user.organization)||u.isSysAdmin()||u.id==user.id) {
+            try {
+                String password = params.remove('password')
                 //todo check password
                 if (password != null && password.size() > 0) {
-                    user.setPassword(password)
+                    if (u.id==user.id) {
+                        if (!u.authenticate(params.old_password)) {
+                            user.errors << "wrong password"
+                            throw new ValidationException("wrong password", user.errors)
+                        }
+                    }
+                    user.changePassword(password)
                 }
                 userService.save(user)
+            } catch (ValidationException e) {
+                respond user.errors, view:'edit'
+                return
             }
-        } catch (ValidationException e) {
-            respond user.errors, view:'edit'
-            return
-        }
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])
-                redirect user
+            request.withFormat {
+                form multipartForm {
+                    flash.message = message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.name])
+                    redirect user
+                }
+                '*'{ respond user, [status: OK] }
             }
-            '*'{ respond user, [status: OK] }
+        } else {
+            notAllowed('default.not.updated.message')
         }
     }
 
@@ -107,25 +119,41 @@ class UserController {
             notFound()
             return
         }
+        Long userID = session['userID'] as Long
+        User u = User.get(userID)
+        User user = User.get(id)
+        if ( u.isAdmin(user.organization)||u.isSysAdmin()||u.id==user.id) {
+            userService.delete(id)
 
-        userService.delete(id)
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), id])
-                redirect action:"index", method:"GET"
+            request.withFormat {
+                form multipartForm {
+                    flash.message = message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), id])
+                    redirect action: "index", method: "GET"
+                }
+                '*' { render status: NO_CONTENT }
             }
-            '*'{ render status: NO_CONTENT }
+        } else {
+            notAllowed('default.not.deleted.message')
         }
     }
 
     protected void notFound() {
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.name])
                 redirect action: "index", method: "GET"
             }
             '*'{ render status: NOT_FOUND }
+        }
+    }
+
+    protected void notAllowed(String msg) {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: msg, args: [message(code: 'user.label', default: 'User'), params.name])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: FORBIDDEN }
         }
     }
 }

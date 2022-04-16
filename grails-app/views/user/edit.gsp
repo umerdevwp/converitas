@@ -27,20 +27,52 @@
                 </g:eachError>
             </ul>
             </g:hasErrors>
-            <g:form resource="${this.user}" method="PUT">
-                <g:hiddenField name="version" value="${this.user?.version}" />
-                <fieldset class="form">
-                    <f:field bean="user" property="name"/>
-                    <f:field bean="user" property="uuid" widget-readonly="true"/>
-                    <g:if test="${User.get(session["userID"]).isSysAdmin()}">
-                        <f:field bean="user" property="organization"/>
-                    </g:if>
-                    <f:field bean="user" property="roles"/>
-                </fieldset>
-                <fieldset class="buttons">
-                    <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                </fieldset>
-            </g:form>
+            <g:set var="u" value="${User.get(session["userID"])}"/>
+            <g:if test="${u.isAdmin(this.user.organization)||u.isSysAdmin()||u.id==this.user.id}">
+                <g:form resource="${this.user}" method="PUT">
+                    <g:hiddenField name="version" value="${this.user?.version}" />
+                    <fieldset class="form">
+                        <f:field bean="user" property="name"/>
+                        <f:field bean="user" property="uuid" widget-readonly="true"/>
+                        <g:if test="${u.isSysAdmin()}">
+                            <f:field bean="user" property="organization"/>
+                        </g:if>
+                        <f:field bean="user" property="roles"/>
+                        <div class="fieldcontain required">
+                            <label for="passwordChg">Change Password </label>
+                            <input type="checkbox" name="changePwd" value="changePwd" onchange='var x=document.getElementById("passwordchg"); x.style.display=(this.checked)?"block":"none"'/>
+                        </div>
+                        <div id="passwordchg" style="display: none">
+                            <g:if test="${u.id==this.user.id}">
+                                <div class="fieldcontain required">
+                                    <label for="old_password">Old Password
+                                        <span class="required-indicator">*</span>
+                                    </label>
+                                    <g:passwordField name="old_password"/>
+                                </div>
+                            </g:if>
+                            <div class="fieldcontain required">
+                                <label for="password">New Password
+                                    <span class="required-indicator">*</span>
+                                </label>
+                                <g:passwordField name="password"/>
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="repeat">Repeat
+                                    <span class="required-indicator">*</span>
+                                </label>
+                                <g:passwordField name="repeat"/>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="buttons">
+                        <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+                    </fieldset>
+                </g:form>
+            </g:if>
+            <g:else>
+                UNAUTHORIZED ACCESS
+            </g:else>
         </div>
     </body>
 </html>

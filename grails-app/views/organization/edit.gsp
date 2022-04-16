@@ -1,3 +1,4 @@
+<%@ page import="com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -11,7 +12,10 @@
             <ul>
                 <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
                 <li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
-                <li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
+                <g:set var="u" value="${User.get(session["userID"])}"/>
+                <g:if test="${u.isSysAdmin()}">
+                    <li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
+                </g:if>
             </ul>
         </div>
         <div id="edit-organization" class="content scaffold-edit" role="main">
@@ -26,19 +30,24 @@
                 </g:eachError>
             </ul>
             </g:hasErrors>
-            <g:form resource="${this.organization}" method="PUT">
-                <g:hiddenField name="version" value="${this.organization?.version}" />
-                <fieldset class="form">
-                    <f:field bean="organization" property="name"/>
-                    <f:field bean="organization" property="users"/>
-                    <f:field bean="organization" property="country"/>
-                    <f:field bean="organization" property="uuid" widget-readonly="true"/>
-                    <f:field bean="organization" property="created"/>
-                </fieldset>
-                <fieldset class="buttons">
-                    <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                </fieldset>
-            </g:form>
+            <g:if test="${u.isAdmin(this.organization)||u.isSysAdmin()}">
+                <g:form resource="${this.organization}" method="PUT">
+                    <g:hiddenField name="version" value="${this.organization?.version}" />
+                    <fieldset class="form">
+                        <f:field bean="organization" property="name"/>
+                        <f:field bean="organization" property="users"/>
+                        <f:field bean="organization" property="country"/>
+                        <f:field bean="organization" property="uuid" widget-readonly="true"/>
+                        <f:field bean="organization" property="created"/>
+                    </fieldset>
+                    <fieldset class="buttons">
+                        <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+                    </fieldset>
+                </g:form>
+            </g:if>
+            <g:else>
+                UNAUTHORIZED ACCESS
+            </g:else>
         </div>
     </body>
 </html>

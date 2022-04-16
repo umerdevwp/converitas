@@ -54,7 +54,7 @@ class User {
         no.toByteArray()
     }
 
-    def setPassword(String password) {
+    def changePassword(String password) {
         //todo check password
         byte[] bSalt = salt()
         this.salt = bSalt

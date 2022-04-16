@@ -28,19 +28,25 @@ class RoleController {
             return
         }
 
-        try {
-            roleService.save(role)
-        } catch (ValidationException e) {
-            respond role.errors, view:'create'
-            return
-        }
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'role.label', default: 'Role'), role.id])
-                redirect role
+        Long userID = session['userID'] as Long
+        User u = User.get(userID)
+        if (u.isSysAdmin()) {
+            try {
+                roleService.save(role)
+            } catch (ValidationException e) {
+                respond role.errors, view:'create'
+                return
             }
-            '*' { respond role, [status: CREATED] }
+
+            request.withFormat {
+                form multipartForm {
+                    flash.message = message(code: 'default.created.message', args: [message(code: 'role.label', default: 'Role'), role.id])
+                    redirect role
+                }
+                '*' { respond role, [status: CREATED] }
+            }
+        } else {
+            notAllowed('default.not.created.message')
         }
     }
 
@@ -54,19 +60,25 @@ class RoleController {
             return
         }
 
-        try {
-            roleService.save(role)
-        } catch (ValidationException e) {
-            respond role.errors, view:'edit'
-            return
-        }
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'role.label', default: 'Role'), role.id])
-                redirect role
+        Long userID = session['userID'] as Long
+        User u = User.get(userID)
+        if (u.isSysAdmin()) {
+            try {
+                roleService.save(role)
+            } catch (ValidationException e) {
+                respond role.errors, view:'edit'
+                return
             }
-            '*'{ respond role, [status: OK] }
+
+            request.withFormat {
+                form multipartForm {
+                    flash.message = message(code: 'default.updated.message', args: [message(code: 'role.label', default: 'Role'), role.id])
+                    redirect role
+                }
+                '*'{ respond role, [status: OK] }
+            }
+        } else {
+            notAllowed('default.not.updated.message')
         }
     }
 
@@ -76,24 +88,40 @@ class RoleController {
             return
         }
 
-        roleService.delete(id)
+        Long userID = session['userID'] as Long
+        User u = User.get(userID)
+        if (u.isSysAdmin()) {
+            roleService.delete(id)
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'role.label', default: 'Role'), id])
-                redirect action:"index", method:"GET"
+            request.withFormat {
+                form multipartForm {
+                    flash.message = message(code: 'default.deleted.message', args: [message(code: 'role.label', default: 'Role'), id])
+                    redirect action: "index", method: "GET"
+                }
+                '*' { render status: NO_CONTENT }
             }
-            '*'{ render status: NO_CONTENT }
+        } else {
+            notAllowed('default.not.deleted.message')
         }
     }
 
     protected void notFound() {
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'role.label', default: 'Role'), params.id])
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'role.label', default: 'Role'), params.name])
                 redirect action: "index", method: "GET"
             }
             '*'{ render status: NOT_FOUND }
+        }
+    }
+
+    protected void notAllowed(String msg) {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: msg, args: [message(code: 'role.label', default: 'Role'), params.name])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: FORBIDDEN }
         }
     }
 }

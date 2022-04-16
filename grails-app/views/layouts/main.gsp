@@ -1,3 +1,4 @@
+<%@ page import="com.coveritas.heracles.ui.User" %>
 <!doctype html>
 <html lang="en" class="no-js">
 <head>
@@ -41,10 +42,17 @@
                 <a href="#" onclick="window.search()">
                     <asset:image width="28px" height="28px" src="feather_search.svg" />
                 </a>
-                &nbsp;&nbsp;&nbsp;
-            <a href="/system/index">Overview</a>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="/organization/index">Index</a>
+            &nbsp;&nbsp;&nbsp;
+        <a href="/organization/index">Organizations</a>
+        <g:set var="u" value="${User.get(session["userID"])}"/>
+        <g:if test="${u!=null}">
+            &nbsp;&nbsp;&nbsp;
+            <a href="/auth/logout">Logout ${u.name}</a>
+        </g:if>
+        <g:else>
+            &nbsp;&nbsp;&nbsp;
+            <a href="/auth/login">Login</a>
+        </g:else>
         </ul>
     </div>
 

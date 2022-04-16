@@ -1,3 +1,4 @@
+<%@ page import="com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -10,7 +11,10 @@
         <div class="nav" role="navigation">
             <ul>
                 <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-                <li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
+                <g:set var="u" value="${User.get(session["userID"])}"/>
+                <g:if test="${u.isSysAdmin()}">
+                    <li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
+                </g:if>
             </ul>
         </div>
         <div id="list-role" class="content scaffold-list" role="main">
@@ -18,8 +22,23 @@
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
-            <f:table collection="${roleList}" />
+            <table>
+                <thead>
+                <tr>
+                    <g:sortableColumn property="name" title="Name" />
+                    <g:sortableColumn property="users" title="Users" />
+                </tr>
+                </thead>
+                <tbody>
 
+                <g:each in="${roleList}" var="bean" status="i">
+                    <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                        <td><g:link method="GET" resource="${bean}"><f:display bean="${bean}" property="name" displayStyle="table"/></g:link></td>
+                        <td><f:display bean="${bean}" property="users"  displayStyle="${'table'}" /></td>
+                    </tr>
+                </g:each>
+                </tbody>
+            </table>
             <div class="pagination">
                 <g:paginate total="${roleCount ?: 0}" />
             </div>
