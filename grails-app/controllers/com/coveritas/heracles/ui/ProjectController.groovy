@@ -42,7 +42,7 @@ class ProjectController {
             try {
 //                Date now = new Date()
                 project.uuid = uuid
-                project.organization = organization
+                project.organization = Organization.get(organization.id)
                 projectService.save(project)
             } catch (ValidationException e) {
                 respond project.errors, view:'create'
