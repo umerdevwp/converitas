@@ -18,7 +18,7 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark navbar-static-top" role="navigation" >
-    <a class="navbar-brand" href="/organization/index"><asset:image width="48px" height="48px" src="coveritas.svg"
+    <a class="navbar-brand" href="/project/index"><asset:image width="48px" height="48px" src="coveritas.svg"
                                                                     alt="Coveritas Logo"/></a>
 
     <div class="navbar-collapse">
@@ -42,15 +42,22 @@
                 <a href="#" onclick="window.search()">
                     <asset:image width="28px" height="28px" src="feather_search.svg" />
                 </a>
-            &nbsp;&nbsp;&nbsp;
-        <a href="/organization/index">Organizations</a>
-        <g:set var="u" value="${User.get(session["userID"])}"/>
-        <g:if test="${u!=null}">
-            &nbsp;&nbsp;&nbsp;
+         &nbsp;&nbsp;&nbsp;
+         <g:set var="u" value="${User.get(session["userID"])}"/>
+         <g:if test="${u!=null}">
+             <a href="/project/index">Projects</a>
+             &nbsp;&nbsp;&nbsp;
+             <g:if test="${u.isAdmin()}">
+                <a href="/user/index">Users</a>
+                &nbsp;&nbsp;&nbsp;
+                <g:if test="${u.isAdmin()}">
+                  <a href="/organization/index">Organizations</a>
+                  &nbsp;&nbsp;&nbsp;
+                </g:if>
+            </g:if>
             <a href="/auth/logout">Logout ${u.name}</a>
         </g:if>
         <g:else>
-            &nbsp;&nbsp;&nbsp;
             <a href="/auth/login">Login</a>
         </g:else>
         </ul>

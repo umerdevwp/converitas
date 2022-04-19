@@ -85,7 +85,7 @@ class UserController {
         User u = User.get(userID)
         if ( u.isAdmin(user.organization)||u.isSysAdmin()||u.id==user.id) {
             try {
-                String password = params.remove('password')
+                String password = params.password
                 //todo check password
                 if (password != null && password.size() > 0) {
                     if (u.id==user.id) {
@@ -93,6 +93,11 @@ class UserController {
                             user.errors << "wrong password"
                             throw new ValidationException("wrong password", user.errors)
                         }
+                    }
+                    String repeat   = params.repeat
+                    if (password!=repeat) {
+                        user.errors << "passwords dont match"
+                        throw new ValidationException("passwords dont match", user.errors)
                     }
                     user.changePassword(password)
                 }
