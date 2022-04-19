@@ -15,7 +15,8 @@ class ViewController {
 
         Long userID = session['userID'] as Long
         User u = User.get(userID)
-        List<View> views = u.isSysAdmin()?viewService.list(params):View.findAllByOrganization(u.organization, params)
+        List<Project> prjLst = Project.findAllByOrganization(u.organization)
+        List<View> views = u.isSysAdmin()?viewService.list(params):View.findAllByProjectInList(prjLst, params)
         long total = u.isSysAdmin()?viewService.count():Project.countByOrganization(u.organization)
         respond views, model:[projectCount: total]
     }

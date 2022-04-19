@@ -40,6 +40,7 @@ class OrganizationController {
                     if (orgUUID) {
                         Date now = new Date()
                         organization.uuid = orgUUID
+                        organization.created=now
                         organizationService.save(organization)
                         User.create(adminUUID, "admin", organization, "@dm1n!", [Role.findByName(Role.ADMIN)] as Set<Role>)
                     }
@@ -96,9 +97,10 @@ class OrganizationController {
             notFound()
             return
         }
+        Organization o = Organization.get(id)
         Long userID = session['userID'] as Long
         User u = User.get(userID)
-        if ( u.isAdmin(organization)||u.isSysAdmin()) {
+        if ( u.isAdmin(o)||u.isSysAdmin()) {
             organizationService.delete(id)
 
             request.withFormat {

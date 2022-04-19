@@ -33,15 +33,15 @@ class UserController {
 
         Long userID = session['userID'] as Long
         User u = User.get(userID)
-        if ((user.organization==null && u.isAdmin()) ||
-                u.isAdmin(user.organization) || u.isSysAdmin()) {
+        if ((user.organization==null && u.isAdmin()) || u.isAdmin(user.organization) || u.isSysAdmin()) {
             try {
                 Map<String, Object> result = httpClientService.postParamsExpectMap('user', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, isAdmin: true])
                 String uuid = result.uuid
                 if (uuid) {
                     Date now = new Date()
                     user.uuid = uuid
-                    if (user.organization.name != "CoVeritas") {
+                    if (!u.isSysAdmin()) {
+                        //user does not get to chose the organization in which to create new user (except sysadmin)
                         user.organization = u.organization
                     }
                     user.created = now
