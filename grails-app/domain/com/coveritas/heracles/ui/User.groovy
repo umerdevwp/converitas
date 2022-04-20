@@ -46,8 +46,8 @@ class User {
 
     private static byte[] passwordHash(String password, byte[] salt) {
         MessageDigest md = MessageDigest.getInstance("SHA-512")
-        byte[] messageDigest = md.digest(password.getBytes())
         md.update(salt)
+        byte[] messageDigest = md.digest(password.getBytes())
         BigInteger no = new BigInteger(1, messageDigest)
 
         // Convert message digest into hex value
