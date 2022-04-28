@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.*
 class ViewController {
     HttpClientService httpClientService
     ViewService viewService
+    CompanyViewObjectService companyViewObjectService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -15,10 +16,12 @@ class ViewController {
 
         Long userID = session['userID'] as Long
         User u = User.get(userID)
-        List<Project> prjLst = Project.findAllByOrganization(u.organization)
-        List<View> views = u.isSysAdmin()?viewService.list(params):View.findAllByProjectInList(prjLst, params)
-        long total = u.isSysAdmin()?viewService.count():Project.countByOrganization(u.organization)
-        respond views, model:[projectCount: total]
+        if (u) {
+            List<Project> prjLst = Project.findAllByOrganization(u.organization)
+            List<View> views = u.isSysAdmin() ? viewService.list(params) : View.findAllByProjectInList(prjLst, params)
+            long total = u.isSysAdmin() ? viewService.count() : Project.countByOrganization(u.organization)
+            respond views, model: [projectCount: total]
+        }
     }
 
     def show(Long id) {
@@ -40,7 +43,7 @@ class ViewController {
         Organization organization = u.organization
         Project project = view.project
         if (project.organization==u.organization|| u.isSysAdmin()) {
-            Map<String, Object> result = httpClientService.postParamsExpectMap('view', [userUUID: u.uuid, userOrgUUID: organization.uuid, projectUUID:project.uuid])
+            Map<String, Object> result = httpClientService.postParamsExpectMap('view', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid])
             String uuid = result.uuid
             if (uuid) {
                 try {
@@ -68,6 +71,45 @@ class ViewController {
 
     def edit(Long id) {
         respond viewService.get(id)
+    }
+
+    def addCompany(long  viewId, long companyId, String level) {
+        View view = View.get(viewId)
+        Company company = Company.get(companyId)
+        if (view == null || company == null || !CompanyViewObject.LEVELS.contains(level)) {
+            notFound()
+            return
+        }
+
+        Long userID = session['userID'] as Long
+        User u = User.get(userID)
+        Organization organization = u.organization
+        Project project = view.project
+        if (project.organization==u.organization|| u.isSysAdmin()) {
+            Map<String, Object> result = httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, viewUUID: view.uuid, companyUUID: company.uuid, level: level])
+            String uuid = result.uuid
+            if (uuid) {
+                try {
+                    CompanyViewObject companyViewObject = new CompanyViewObject(uuid: uuid, projectUUID: project.uuid, view: view, viewUUID: view.uuid, company: company, organizationUUID: project.organization.uuid, level: level)
+                    companyViewObjectService.save(companyViewObject)
+                } catch (ValidationException e) {
+                    respond companyViewObject.errors, view:'create'
+                    return
+                }
+
+                request.withFormat {
+                    form multipartForm {
+                        flash.message = message(code: 'default.created.message', args: [message(code: 'companyViewObject.label', default: 'CompanyViewObject'), companyViewObject])
+                        redirect companyViewObject.view
+                    }
+                    '*' { respond companyViewObject.view, [status: CREATED] }
+                }
+            } else {
+                notAllowed('default.not.created.message')
+            }
+        } else {
+            notAllowed('default.not.created.message')
+        }
     }
 
     def update(View view) {

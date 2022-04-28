@@ -5,12 +5,11 @@ import java.security.SecureRandom
 
 class User {
     public static final String SYS_ADMIN_UUID = "asdjA12364SDUHADIh"
-
-    static belongsTo = [organization:Organization]
     static hasMany = [roles:Role]
     Long id
     String uuid
     String name
+    Organization organization
     byte[] passwordHash
     byte[] salt
 //    Organization organization
@@ -37,9 +36,10 @@ class User {
     }
 
     static constraints = {
+        id generator : 'increment'
+        uuid nullable: false, blank: false, unique: true
         roles lazy: false
         name blank: false, minSize: 3, unique: ['organization']
-        id generator : 'increment'
     }
 
     private static final Random RANDOM = new SecureRandom()
@@ -84,8 +84,8 @@ class User {
     }
 
     @Override
-    public String toString() {
-        return "User{name='" + name + "', organization='" + organization + "'}";
+    String toString() {
+        return "$name ($organization)"
     }
 
     boolean isSysAdmin() {

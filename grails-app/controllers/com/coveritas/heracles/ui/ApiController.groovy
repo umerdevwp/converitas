@@ -4,11 +4,9 @@ import com.coveritas.heracles.HttpClientService
 import grails.converters.JSON
 import groovy.transform.CompileStatic
 
-import javax.annotation.Nullable
-
 @CompileStatic
 class ApiController {
-    OrganizationService organizationService
+    CompanyService companyService
     HttpClientService httpClientService
 
     /**
@@ -27,15 +25,15 @@ class ApiController {
         }
     }
 
-/*
-
     def suggestions() {
         call {
-            List<Map> addCompanies = organizationService.matchingCompanies((String) params.input, "USA")
-            addCompanies.removeAll(organizationService.tracked())
+            List<Map> addCompanies = companyService.matchingCompanies((String) params.input, "USA")
+//            addCompanies.removeAll(companyService.tracked())
             addCompanies
         }
     }
+
+/*
 
     def companytimeline(String uuid, @Nullable Long from, @Nullable Long to) {
         call {

@@ -99,7 +99,7 @@ heracles:
         server: "http://localhost:8081"
 #        server: "https://sharp-skunk-65.loca.lt"
         credential: "http://localhost:8081"
-        isDebug: false
+        isDebug: true
         verifySsl: false
 ---
 hibernate:

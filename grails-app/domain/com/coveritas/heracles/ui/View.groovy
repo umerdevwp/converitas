@@ -5,12 +5,13 @@ class View {
 
     String name
     String description
-    static belongsTo = [project:Project]
-    static hasMany = [companies:Company]
+    Project project
+    Set<Company> companies
+    static hasMany = [companyViewObjects:CompanyViewObject, viewObjects:ViewObject]
 
-
-    @Override
-    String toString() { name }
+    def onLoad(){
+        companyViewObjects.each { CompanyViewObject cvo -> companies << cvo.company}
+    }
 
     static mapping = {
         table name: 'ma_view'
@@ -18,7 +19,12 @@ class View {
 
     static constraints = {
         id generator : 'increment'
-        uuid nullable: false, unique: true
+        uuid nullable: false, blank: false, unique: true
         name nullable: false, unique: ['project']
     }
+
+    static transients = ['companies']
+
+    @Override
+    String toString() { name }
 }

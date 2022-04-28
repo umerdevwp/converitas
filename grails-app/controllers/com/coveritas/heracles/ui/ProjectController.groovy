@@ -14,9 +14,11 @@ class ProjectController {
         params.max = Math.min(max ?: 10, 100)
         Long userID = session['userID'] as Long
         User u = User.get(userID)
-        List<Project> projects = u.isSysAdmin()?projectService.list(params):Project.findAllByOrganization(u.organization, params)
-        long total = u.isSysAdmin()?projectService.count():Project.countByOrganization(u.organization)
-        respond projects, model:[projectCount: total]
+        if (u) {
+            List<Project> projects = u.isSysAdmin() ? projectService.list(params) : Project.findAllByOrganization(u.organization, params)
+            long total = u.isSysAdmin() ? projectService.count() : Project.countByOrganization(u.organization)
+            respond projects, model: [projectCount: total]
+        }
     }
 
     def show(Long id) {

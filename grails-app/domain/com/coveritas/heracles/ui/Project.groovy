@@ -5,7 +5,8 @@ class Project {
 
     String name
     String description
-    static belongsTo = [organization:Organization]
+    Organization organization
+//    static belongsTo = [organization:Organization]
     static hasMany = [views:View]
 
     @Override
@@ -17,7 +18,7 @@ class Project {
 
     static constraints = {
         id generator : 'increment'
-        uuid nullable: false, unique: true
+        uuid nullable: false, blank: false, unique: true
         name nullable: false, unique: ['organization']
     }
 }

@@ -36,12 +36,12 @@ class Organization {
         name unique: true
         users lazy: false
         country nullable: true
-        uuid unique: true
+        uuid nullable: false, blank: false, unique: true
     }
 
 
     @Override
     public String toString() {
-        return "Organization{name='" + name + ((country==null)?"":("', country='" + country)) + "'}";
+        return "$name" + ((country == null) ? "" : " ($country)");
     }
 }

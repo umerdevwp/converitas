@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import grails.config.Config
 import grails.converters.JSON
 import grails.core.support.GrailsConfigurationAware
+import grails.util.Holders
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -14,6 +15,7 @@ import kong.unirest.HeaderNames
 import kong.unirest.HttpResponse
 import kong.unirest.Unirest
 import org.apache.commons.codec.Charsets
+import org.springframework.context.ApplicationContext
 
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
@@ -34,6 +36,8 @@ class HttpClientService implements GrailsConfigurationAware {
 
 
     HttpClientService() {
+        config = Holders.getConfig()
+        setConfiguration(config)
     }
 
     @Override
@@ -72,7 +76,7 @@ class HttpClientService implements GrailsConfigurationAware {
 
     @SuppressWarnings('GrMethodMayBeStatic')
     private void logRequestAsCurl(String method, Map<String, String> headers, String url, String body) {
-//        if (isDebug) {
+        if (isDebug) {
             StringJoiner hdrJoiner = new StringJoiner(" -H ")
             for (Map.Entry<String, String> e : headers.entrySet()) {
                 hdrJoiner.add("'${e.getKey()}: ${e.getValue()}'")
@@ -86,7 +90,7 @@ class HttpClientService implements GrailsConfigurationAware {
             }
             curlJoiner.add(url)
             log.info(curlJoiner.toString())
-//        }
+        }
     }
 
     /**
@@ -136,7 +140,7 @@ class HttpClientService implements GrailsConfigurationAware {
         String url = getUrl(task) + paramsFromMap(params)
         String sResponse = httpGetRequest(url)
         if (isDebug) {
-            log.debug("Response for get request to \"${url}\" is:\n ${sResponse}")
+            log.info("Response for get request to \"${url}\" is:\n ${sResponse}")
         }
         sResponse
     }
