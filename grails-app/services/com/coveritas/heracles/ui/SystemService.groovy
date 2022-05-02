@@ -17,7 +17,7 @@ class SystemService {
 
     SystemState getState(Long ts = null) {
         httpClientService.getParamsExpectObject("system/state", (ts ? [ts: ts] : null) as Map<String, Object>,
-            SystemState.class) as SystemState
+            SystemState.class, false) as SystemState
     }
 
 }

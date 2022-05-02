@@ -20,16 +20,16 @@ class CompanyController {
     }
 
     def info(String uuid) {
-        Company company = httpClientService.getParamsExpectObject("company/byuuid", [uuid:uuid], Company.class)
+        Company company = httpClientService.getParamsExpectObject("company/byuuid", [uuid:uuid], Company.class, true)
         company.id=null
-//        company.save(failOnError:true)
         companyService.save(company)
 
-        redirect  action:"index", method:"GET" //, params = company
+        redirect  action:"show", method:"GET", params:[id: company.id]
     }
 
     def create() {
-        respond new Company(params)
+        Company company = new Company(params)
+        respond company
     }
 
     def save(Company company) {
@@ -39,6 +39,21 @@ class CompanyController {
         }
 
         try {
+            Map<String, Object> result = httpClientService.getParamsExpectMap('company/resolve', [name:company.canonicalName, iso:company.countryIso], false)
+            Map<String, Object> c = result.company as Map<String, Object>
+            company.uuid = c.uuid
+            if (!company.overrideBackend) {
+                company.canonicalName  = c.canonicalName
+                company.normalizedName = c.normalizedName
+                company.deleted        = c.deleted?:false
+                company.ticker         = c.ticker
+                company.exchange       = c.exchange
+                company.countryIso     = c.countryIso
+                company.source         = c.source
+                company.sourceId       = c.sourceId
+                company.category       = c.category
+                company.preferred      = c.preferred
+            }
             companyService.save(company)
         } catch (ValidationException e) {
             respond company.errors, view:'create'
@@ -55,7 +70,11 @@ class CompanyController {
     }
 
     def edit(Long id) {
-        respond companyService.get(id)
+        Company company = companyService.get(id)
+//        if (!company.overrideBackend) {
+//            c = httpClientService.getParamsExpectObject("company/byuuid", [uuid:uuid], Company.class, true)
+//        }
+        respond company
     }
 
     def update(Company company) {
@@ -86,7 +105,9 @@ class CompanyController {
             return
         }
 
-        companyService.delete(id)
+        Company company = Company.get(id)
+        company.deleted = true
+        companyService.save(company)
 
         request.withFormat {
             form multipartForm {

@@ -2,12 +2,12 @@ package com.coveritas.heracles.ui
 
 class Organization {
     public static final String COVERITAS_UUID = "ADSJDHAO123987asdkj"
-    def httpClientService
 
     static hasMany = [users:User]
     Long   id
     String uuid
     String name
+    String description
     String country
     Date   created
     Date   lastUpdated
@@ -36,6 +36,7 @@ class Organization {
         name unique: true
         users lazy: false
         country nullable: true
+        description nullable: true
         uuid nullable: false, blank: false, unique: true
     }
 

@@ -27,9 +27,9 @@ class SystemController {
 
     def query(String query, @Nullable Long from, @Nullable Long to) {
         List<Map> articles = httpClientService.getParamsExpectResult(
-            'articles/search', [q:query, from: from, to: to]) as List<Map> ?: []
+            'articles/search', [q:query, from: from, to: to], false) as List<Map> ?: []
         List<List> companyarticles = httpClientService.postParamsExpectResult(
-            'organization/byarticles', [uuids: articles.collect { ((Map)it).uuid }]) as List<List>
+            'organization/byarticles', [uuids: articles.collect { ((Map)it).uuid }], false) as List<List>
 
         articles.each() { Map article ->
             article.companies = companyarticles.findAll {

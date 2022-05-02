@@ -10,14 +10,10 @@ import grails.util.Holders
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import kong.unirest.ContentType
 import kong.unirest.HeaderNames
 import kong.unirest.HttpResponse
 import kong.unirest.Unirest
-import org.apache.commons.codec.Charsets
-import org.springframework.context.ApplicationContext
 
-import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
 @CompileStatic
@@ -156,34 +152,31 @@ class HttpClientService implements GrailsConfigurationAware {
      * @param params
      * @return  value of result:
      */
-    Object getParamsExpectResult(String task, Map params) throws IOException, APIException {
-        Map<String, Object> temp = new Gson().fromJson(getParamsGeneric(task, params), Map)
+    Object getParamsExpectResult(String task, Map params, boolean noException) throws IOException, APIException {
+        String content = getParamsGeneric(task, params)
+        extractResult(content, task, noException)
+    }
+
+    private static Object extractResult(String content, String task, boolean noException) {
+        Map<String, Object> temp = new Gson().fromJson(content, Map)
         if (temp.error) {
             throw new APIException((String)temp.error)
-        }
-        else {
-            if (! temp.keySet().contains('result')) {
-                throw new APIException("Call to ${task} gave no result")
-            }
-            else {
+        } else {
+            if (!temp.keySet().contains('result')) {
+                if (noException) {
+                    [:]
+                } else {
+                    throw new APIException("Call to ${task} gave no map with a result: '$content'")
+                }
+            } else {
                 temp.result
             }
         }
     }
 
-    Object postParamsExpectResult(String task, Map params) throws IOException, APIException {
-        Map<String, Object> temp = new Gson().fromJson(postParamsGeneric(task, params), LinkedHashMap.class)
-        if (temp.error) {
-            throw new APIException((String)temp.error)
-        }
-        else {
-            if (! temp.keySet().contains('result')) {
-                throw new APIException("Call to ${task} gave no result")
-            }
-            else {
-                temp.result
-            }
-        }
+    Object postParamsExpectResult(String task, Map params, boolean noException) throws IOException, APIException {
+        String content = postParamsGeneric(task, params)
+        extractResult(content, task, noException)
     }
 
     /**
@@ -195,8 +188,8 @@ class HttpClientService implements GrailsConfigurationAware {
      * @throws IOException
      * @throws APIException
      */
-    Object getParamsExpectObject(String task, Map params, Class clazz) throws IOException, APIException {
-        Meta.fromMap(clazz, getParamsExpectResult(task, params) as Map<String, Object>)
+    Object getParamsExpectObject(String task, Map params, Class clazz, boolean noException) throws IOException, APIException {
+        Meta.fromMap(clazz, getParamsExpectResult(task, params, noException) as Map<String, Object>)
     }
 
     /**
@@ -207,8 +200,8 @@ class HttpClientService implements GrailsConfigurationAware {
      * @throws IOException
      * @throws APIException
      */
-    Map getParamsExpectMap(String task, Map params) throws IOException, APIException {
-        getParamsExpectResult(task, params) as Map<String, Object>
+    Map getParamsExpectMap(String task, Map params, boolean noException) throws IOException, APIException {
+        getParamsExpectResult(task, params, noException) as Map<String, Object>
     }
 
 
@@ -223,8 +216,8 @@ class HttpClientService implements GrailsConfigurationAware {
      * @throws IOException - mostly for low level errors (hopefully temporary)
      * @throws APIException - mostly for API level errors (hopefully never)
      */
-    List getParamsExpectList(String task, Map params, Class clazz) throws IOException, APIException {
-        typedListFromJson(getParamsExpectResult(task, params) as List<Map>, clazz)
+    List getParamsExpectList(String task, Map params, Class clazz, boolean noException) throws IOException, APIException {
+        typedListFromJson(getParamsExpectResult(task, params, noException) as List<Map>, clazz)
     }
 
     private static String urlEncode(String s) { URLEncoder.encode(s, StandardCharsets.UTF_8) }
@@ -265,8 +258,8 @@ class HttpClientService implements GrailsConfigurationAware {
      * @throws IOException - mostly for low level errors (hopefully temporary)
      * @throws APIException - mostly for API level errors (hopefully never)
      */
-    Map postParamsExpectMap(String task, Map params) throws IOException, APIException {
-        postParamsExpectResult(task, params) as Map
+    Map postParamsExpectMap(String task, Map params, boolean noException) throws IOException, APIException {
+        postParamsExpectResult(task, params, noException) as Map
     }
 
     private String postParamsGeneric(String task, Map params) throws IOException, APIException {
@@ -278,7 +271,7 @@ class HttpClientService implements GrailsConfigurationAware {
         String url = getUrl(task)
         String sResponse = httpPostRequest(url, json)
         if (isDebug) {
-            log.debug("Response for request to \"${url}\" with JSON \"${json}\" is:\n${sResponse}")
+            log.info("Response for request to \"${url}\" with JSON \"${json}\" is:\n${sResponse}")
             //System.out.println("Response for request to \""+url+"\" with JSON \""+json+"\" is:\n"+ sResponse)
         }
         sResponse

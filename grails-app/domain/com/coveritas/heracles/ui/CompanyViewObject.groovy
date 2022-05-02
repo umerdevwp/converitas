@@ -23,7 +23,7 @@ class CompanyViewObject extends ViewObject {
     }
 
     @Override
-    public String toString() {
+    String toString() {
         return "$company"+(view == null) ? "" : "@$view'";
     }
 }

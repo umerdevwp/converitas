@@ -1,3 +1,4 @@
+<%@ page import="com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -52,7 +53,10 @@
                         <div style="display:inline-block;width:150px;background-color: transparent">
                             <g:form method="post" action="startTacking">
                                 <input type="hidden" id="uuid" name="uuid"/>
-                                <button type="submit" id="addButton">Add Company</button>
+                                <g:set var="u" value="${User.get(session["userID"])}"/>
+                                <g:if test="${u.isSysAdmin()}">
+                                  <button type="submit" id="addButton">Add Company</button>
+                                </g:if>
                             </g:form>
                         </div>
                         <div style="width:400px;height:30px;background-color: transparent">

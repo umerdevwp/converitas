@@ -1,13 +1,11 @@
 package com.coveritas.heracles.ui
 
-import com.coveritas.heracles.HttpClientService
 import grails.converters.JSON
 import groovy.transform.CompileStatic
 
 @CompileStatic
 class ApiController {
-    CompanyService companyService
-    HttpClientService httpClientService
+    ApiService apiService
 
     /**
      * Invoke the closure and render its returned value as JSON. Catch any exceptions and render a 500 response
@@ -27,8 +25,8 @@ class ApiController {
 
     def suggestions() {
         call {
-            List<Map> addCompanies = companyService.matchingCompanies((String) params.input, "USA")
-//            addCompanies.removeAll(companyService.tracked())
+            List<Map> addCompanies = apiService.matchingCompanies((String) params.input, "US")
+//            addCompanies.removeAll(apiService.tracked())
             addCompanies
         }
     }

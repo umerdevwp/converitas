@@ -38,25 +38,32 @@ class ProjectController {
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         Organization organization = u.organization
-        Map<String, Object> result = httpClientService.postParamsExpectMap('project', [userUUID: u.uuid, userOrgUUID: organization.uuid])
-        String uuid = result.uuid
-        if (uuid) {
-            try {
-//                Date now = new Date()
-                project.uuid = uuid
-                project.organization = Organization.get(organization.id)
-                projectService.save(project)
-            } catch (ValidationException e) {
-                respond project.errors, view:'create'
-                return
-            }
-
-            request.withFormat {
-                form multipartForm {
-                    flash.message = message(code: 'default.created.message', args: [message(code: 'project.label', default: 'Project'), project.id])
-                    redirect project
+        if (u.isAdmin(organization) || u.isSysAdmin()) {
+            Map<String, Object> result = httpClientService.postParamsExpectMap('project', [userUUID: u.uuid,
+                                                                                           userOrgUUID: organization.uuid,
+                                                                                           description:project.description,
+                                                                                           name:project.name], true)
+            String uuid = result.uuid
+            if (uuid) {
+                try {
+//                    Date now = new Date()
+                    project.uuid = uuid
+                    project.organization = Organization.get(organization.id)
+                    projectService.save(project)
+                } catch (ValidationException e) {
+                    respond project.errors, view:'create'
+                    return
                 }
-                '*' { respond project, [status: CREATED] }
+
+                request.withFormat {
+                    form multipartForm {
+                        flash.message = message(code: 'default.created.message', args: [message(code: 'project.label', default: 'Project'), project.id])
+                        redirect project
+                    }
+                    '*' { respond project, [status: CREATED] }
+                }
+            } else {
+                notAllowed('default.not.created.message')
             }
         } else {
             notAllowed('default.not.created.message')

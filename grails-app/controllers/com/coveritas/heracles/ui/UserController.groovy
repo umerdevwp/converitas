@@ -35,7 +35,7 @@ class UserController {
         User u = User.get(userID)
         if ((user.organization==null && u.isAdmin()) || u.isAdmin(user.organization) || u.isSysAdmin()) {
             try {
-                Map<String, Object> result = httpClientService.postParamsExpectMap('user', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, isAdmin: true])
+                Map<String, Object> result = httpClientService.postParamsExpectMap('user', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, isAdmin: true], true)
                 String uuid = result.uuid
                 if (uuid) {
                     Date now = new Date()

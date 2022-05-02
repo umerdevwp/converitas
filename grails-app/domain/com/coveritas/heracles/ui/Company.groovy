@@ -24,11 +24,15 @@ class Company {
     // The 'cold' sourceId (which is a permalink) to search for wam information.
     String category // Broad category the company is in e.g. 'Software'
     Boolean preferred = false  // If multiple matches (e.g. name) see if one is preferred
+    Boolean overrideBackend = false // ... or try to get more detailed base info
+    Boolean deleted = false
 
     static hasMany = [attributes:CompanyAttribute,
                       companyViewObjects:CompanyViewObject]
+    static fetchMode = [attributes: 'eager',
+                        companyViewObjects : 'eager']
 
-    Set<View> views = []
+    Map<View,String> views = [:]
 
     Set<Annotation> annotations = []
 
@@ -36,16 +40,20 @@ class Company {
 
     final static Integer TEMP_COLD = 0 // If used in a lookup request only check to see if we know it
     final static Integer TEMP_WARM = 1 // ... or try Wikidata or Crunchbase (or ...) to get base info
-    final static Integer TEMP_HOT = 2  // ... or try to get more detailed base info
+    final static Integer TEMP_HOT = 2
 
     def onLoad() {
         log.debug "Loading ${id}"
-        //todo annotations
-        //todo views
+        // views
+        companyViewObjects.each { CompanyViewObject cvo ->
+            views[cvo.view] = cvo.level
+            // annotations
+            annotations.addAll( cvo.annotations )
+        }
     }
 
     @Override
-    String toString() { uuid?:canonicalName }
+    String toString() { "$canonicalName ($uuid)" }
 
     static mapping = {
         table name: 'ma_company'
@@ -66,4 +74,19 @@ class Company {
     }
 
     static transients = ['annotations', 'views']
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        Company company = (Company) o
+
+        if (uuid != company.uuid) return false
+
+        return true
+    }
+
+    int hashCode() {
+        return (uuid != null ? uuid.hashCode() : 0)
+    }
 }

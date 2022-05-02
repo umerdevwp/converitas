@@ -37,6 +37,7 @@
                         <f:field bean="view" property="project"/>  %{--todo project is read only--}%
                         <f:field bean="view" property="description"/>
                         <f:field bean="view" property="companies"/>
+                        <f:field bean="view" property="companyViewObjects"/>
                     </fieldset>
                     <fieldset class="buttons">
                         <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />

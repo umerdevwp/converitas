@@ -1,10 +1,11 @@
 package com.coveritas.heracles.ui
 
+import com.coveritas.heracles.HttpClientService
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
 class CompanyViewObjectController {
-
+    HttpClientService httpClientService
     CompanyViewObjectService companyViewObjectService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
@@ -19,7 +20,50 @@ class CompanyViewObjectController {
     }
 
     def create() {
-        respond new CompanyViewObject(params)
+        CompanyViewObject cvo = new CompanyViewObject(params)
+        if (!cvo.uuid) {
+            cvo.uuid = UUID.randomUUID()
+            View view = cvo.view
+            if (view!=null) {
+                cvo.viewUUID = view.uuid
+                Project project = view.project
+                cvo.projectUUID = project.uuid
+                cvo.organizationUUID = project.organization.uuid
+            }
+        }
+        respond cvo
+    }
+
+    def save(CompanyViewObject cvo) {
+        if (cvo == null) {
+            notFound()
+            return
+        }
+
+        Long userID = session['userID'] as Long
+        User u = User.get(userID)
+        View view = cvo.view
+        Project project = view.project
+        if (project.organization==u.organization|| u.isSysAdmin()) {
+            Map<String, Object> result = httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid, level: cvo.level], false)
+            try {
+                cvo.uuid = result.uuid
+                companyViewObjectService.save(cvo)
+            } catch (ValidationException e) {
+                respond cvo.errors, cvo: 'create'
+                return
+            }
+
+            request.withFormat {
+                form multipartForm {
+                    flash.message = message(code: 'default.created.message', args: [message(code: 'companyViewMessage.label', default: 'CompanyViewMessage'), cvo.id])
+                    redirect cvo
+                }
+                '*' { respond cvo, [status: CREATED] }
+            }
+        } else {
+            notAllowed('default.not.created.message')
+        }
     }
 
     def edit(Long id) {
@@ -72,6 +116,16 @@ class CompanyViewObjectController {
                 redirect action: "index", method: "GET"
             }
             '*'{ render status: NOT_FOUND }
+        }
+    }
+
+    protected void notAllowed(String msg) {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: msg, args: [message(code: 'companyViewObject.label', default: 'CompanyViewObject'), params.name])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: FORBIDDEN }
         }
     }
 }
