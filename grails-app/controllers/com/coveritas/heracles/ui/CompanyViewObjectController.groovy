@@ -47,7 +47,9 @@ class CompanyViewObjectController {
         if (project.organization==u.organization|| u.isSysAdmin()) {
             Map<String, Object> result = httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid, level: cvo.level], false)
             try {
-                cvo.uuid = result.uuid
+                cvo.organizationUUID    = project.organization.uuid
+                cvo.projectUUID         = project.uuid
+                cvo.viewUUID            = view.uuid
                 companyViewObjectService.save(cvo)
             } catch (ValidationException e) {
                 respond cvo.errors, cvo: 'create'

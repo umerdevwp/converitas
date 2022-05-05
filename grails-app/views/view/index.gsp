@@ -38,7 +38,7 @@
                         <td><f:display bean="${bean}" property="uuid"  displayStyle="${'table'}" /></td>
                         <td><f:display bean="${bean}" property="description" displayStyle="${'table'}" />
                         <td><f:display bean="${bean}" property="companies"  displayStyle="${'table'}" /></td>
-                        <td><a href="/company/create?view.id=${bean.id}">Add Company</a></td>
+                        <td><a href="/companyViewObject/create?view.id=${bean.id}">Add Company</a></td>
                     </tr>
                 </g:each>
                 </tbody>

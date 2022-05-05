@@ -37,7 +37,18 @@
                         <f:field bean="view" property="project"/>  %{--todo project is read only--}%
                         <f:field bean="view" property="description"/>
                         <f:field bean="view" property="companies"/>
-                        <f:field bean="view" property="companyViewObjects"/>
+                        <div class="fieldcontain">
+                            <label for="views">Company View Object</label>
+                            <ul>
+                                <g:each in="${view.companyViewObjects}" var="cvo">
+                                    <li><a href="/companyViewObject/show/${cvo.id}">${cvo}</a></li>
+                                </g:each>
+                            </ul>
+                            <a href="/companyViewObject/create?view.id=${view.id}">
+                                Add Company View Object
+                            </a>
+                        </div>
+
                     </fieldset>
                     <fieldset class="buttons">
                         <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />

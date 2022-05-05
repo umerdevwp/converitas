@@ -2,6 +2,7 @@ package com.coveritas.heracles.ui
 
 import grails.converters.JSON
 import groovy.transform.CompileStatic
+import org.springframework.lang.Nullable
 
 @CompileStatic
 class ApiController {
@@ -18,6 +19,7 @@ class ApiController {
             render cl() as JSON
         }
         catch (Exception e) {
+            log.warn("Exception while executing request", e)
             response.sendError(501, e.message)
             response
         }
@@ -28,6 +30,28 @@ class ApiController {
             List<Map> addCompanies = apiService.matchingCompanies((String) params.input, "US")
 //            addCompanies.removeAll(apiService.tracked())
             addCompanies
+        }
+    }
+
+    def addEvent() {
+        call {
+            EntityViewEvent.withNewTransaction {
+                EntityViewEvent eve = new EntityViewEvent(params)
+                eve.uuid = UUID.randomUUID()
+                View v = View.get(params.viewId as long)
+                eve.viewUUID = v.uuid
+                Company c = Company.get(params.companyId as long)
+                eve.entityUUID = c.uuid
+                eve.ts = System.currentTimeMillis()
+                eve.save(update:false, flush:true, failOnError:true)
+                [EntityViewEvent:eve]
+            }
+        }
+    }
+
+    def viewtimeline(long id, @Nullable Long from, @Nullable Long to) {
+        call {
+            apiService.itemsForTimeline(View.get(id).uuid, from, to)
         }
     }
 

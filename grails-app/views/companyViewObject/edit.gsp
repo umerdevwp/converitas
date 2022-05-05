@@ -29,7 +29,14 @@
             <g:form resource="${this.companyViewObject}" method="PUT">
                 <g:hiddenField name="version" value="${this.companyViewObject?.version}" />
                 <fieldset class="form">
-                    <f:all bean="companyViewObject"/>
+%{--                    <f:all bean="companyViewObject"/>--}%
+                    <f:field bean="companyViewObject" property="uuid"/>
+                    <f:field bean="companyViewObject" property="organizationUUID"/>
+                    <f:field bean="companyViewObject" property="projectUUID"/>
+                    <f:field bean="companyViewObject" property="viewUUID"/>
+                    <f:field bean="companyViewObject" property="view"/>
+                    <f:field bean="companyViewObject" property="company"/>
+                    <f:field bean="companyViewObject" property="level"/>
                 </fieldset>
                 <fieldset class="buttons">
                     <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />

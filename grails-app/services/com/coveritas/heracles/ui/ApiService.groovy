@@ -4,6 +4,9 @@ import com.coveritas.heracles.HttpClientService
 import com.coveritas.heracles.utils.Meta
 import grails.gorm.transactions.Transactional
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.transaction.TransactionStatus
+
+import java.time.Duration
 
 @Transactional
 class ApiService {
@@ -35,18 +38,19 @@ class ApiService {
      * @return a list of project objects that contains all dependencies of each project except annotations.
      */
     Set<Project> remoteProjects(User user) {
-        Set<Project> localProjects =[]
+        Set<Project> allLocalProjects =[]
 
         List<Organization> orgs = user.isSysAdmin()?Organization.list():[user.organization]
         for (Organization organization in orgs) {
-            Map remotePrjMap = httpClientService.getParamsExpectObject("project/${organization.uuid}/${user.uuid}", null, LinkedHashMap.class, true) as Map
+            def orgUuid = organization.uuid
+            Map remotePrjMap = httpClientService.getParamsExpectObject("project/${orgUuid}/${user.uuid}", null, LinkedHashMap.class, true) as Map
             if (remotePrjMap.isEmpty()) {
-                return localProjects
+                continue
             }
             Set<Map> remoteProjects = new LinkedHashSet(remotePrjMap.get("projects") as Collection)
 
             Project.withTransaction { status ->
-                localProjects = Project.findAllByOrganization(organization)
+                Set<Project> localProjects = Project.findAllByOrganization(organization)
                 for (Map rp:remoteProjects) {
                     String rpUuid = rp.uuid
                     Project lp = localProjects.find({it.uuid==rpUuid})
@@ -54,7 +58,7 @@ class ApiService {
                     if (lpIsDirty) {
                         lp = new Project(uuid:rpUuid, name:rpUuid)
                     }
-                    Map remoteVwMap = httpClientService.getParamsExpectObject("view/${organization.uuid}/${user.uuid}/${rpUuid}",null, LinkedHashMap.class, true)
+                    Map remoteVwMap = httpClientService.getParamsExpectObject("view/${orgUuid}/${user.uuid}/${rpUuid}",null, LinkedHashMap.class, true)
                     def views = remoteVwMap.get("views")
                     if (views!=null) {
                         Map<String, Object> remoteViews = Meta.fromMap(LinkedHashMap, views) as Map<String, Object>
@@ -64,7 +68,11 @@ class ApiService {
                             View lv = localViews.find { it.uuid == rvUuid }
                             boolean lvIsDirty = lv == null
                             if (lvIsDirty) {
-                                lv = new View(uuid: rvUuid, name: rvUuid)
+                                lv = createOrUpdateViewFromApi(rvUuid, rpUuid, orgUuid, user.uuid)
+                                if (lv==null)
+                                    continue
+                                //todo correct name!
+                                lv = new View(uuid: rvUuid, name: rvUuid).save(update:false, flush:true, failOnError:true)
                                 lpIsDirty = true
                             }
                             Boolean[] isDirtyRef = {lpIsDirty}
@@ -77,13 +85,14 @@ class ApiService {
                         }
                     }
                 }
+                allLocalProjects.addAll(localProjects)
             }
         }
-        localProjects
+        allLocalProjects
     }
 
     Set<CompanyViewObject> remoteViewCompanies(View lv, User user, Boolean[] isDirtyRef) {
-        View.withNewTransaction {
+        View.withTransaction { TransactionStatus status ->
             lv = View.get(lv.id)
             List<CompanyViewObject> localCompanies = CompanyViewObject.findAllByView(lv)
             String vUuid = lv.uuid
@@ -97,59 +106,156 @@ class ApiService {
                 Set<String> remoteCompanyUUIDs = remoteCompanies.keySet()
                 // localCompanies = localCompanies.findAll({ !(it.company.overrideBackend && it.company.deleted)})
                 for (String rcUuid in remoteCompanyUUIDs) {
-                    String level = remoteCompanies.get(rcUuid).get("state").get("currentLevel") //todo get level right
+                    def cStateObj = remoteCompanies.get(rcUuid)
+                    String level = cStateObj.get("state")?.get("currentLevel")?:CompanyViewObject.UNKNOWN //todo get level right
                     CompanyViewObject lcvo = localCompanies.find { it.company.uuid = rcUuid }
+                    Company lc
                     if (lcvo==null) {
-                        Company lc = Company.findByUuid(rcUuid)
+                        lc = Company.findByUuid(rcUuid)
                         if (!lc) {
-                            // get company data from API
-                            lc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: rcUuid], Company.class, true) as Company
-                            // create company locally and add to view with view level
-                            lc.id = null
-                            lc.overrideBackend = false
-                            lc = companyService.save(lc)
+                            lc = createCompanyFromApi(rcUuid)
                         }
                         //create company locally and add to view with view level
-                        CompanyViewObject companyViewObject = new CompanyViewObject(uuid: UUID.randomUUID(), projectUUID: lp.uuid, view: lv, viewUUID: lv.uuid, company: lc, organizationUUID: lp.organization.uuid, level: level)
-                        lcvo = companyViewObject.save(update:false, flush:true)
+                        CompanyViewObject companyViewObject = CompanyViewObject.createDontSave(lc, lv, level)
+                        lcvo = companyViewObject.save(update:false, flush:true, failOnError:true)
                         lnrCompanies.add(companyViewObject)
-                        lv.viewObjects.add(lcvo)
-                        lv.companyViewObjects.add(lcvo)
-                        lv.companies.add(lcvo.company)
-                        isDirtyRef[0]=true
+//                        isDirtyRef[0]=true
                     } else {
+                        lc = lcvo.company
                         localCompanies.remove(lcvo)
                         if (lcvo.level!=level) {
                             isDirtyRef[0] = true
                             lcvo.level = level
                         }
-                        if (lcvo.company.overrideBackend) {
+                        if (lc.overrideBackend) {
                             lnrCompanies << lcvo
                             //todo get and merge rc.attributes = ???
                         } else {
-                            Company rc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: rcUuid], Company.class, true) as Company
-                            rc.id = null
-                            //todo get and merge rc.attributes = ???
-                            lcvo.company = rc.save(update:true)
+                            lcvo.company = createOrUpdateCompanyFromApi(rcUuid, lc)
                         }
                     }
                     lnrCompanies << lcvo
                 }
             }
             for (CompanyViewObject lcvo:localCompanies) {
-                lv.viewObjects.remove(lcvo)
-                lv.companyViewObjects.remove(lcvo)
-                lv.companies.remove(lcvo.company)
                 lcvo.delete()
-                isDirtyRef[0] = true
+//                isDirtyRef[0] = true
             }
             if (isDirtyRef[0]) {
-//                lv.companyViewObjects = lnrCompanies
-//                lv.companies = lnrCompanies*.company
                 lv.save(update:true)
             }
             lnrCompanies
         }
+    }
+
+    Company createCompanyFromApi(String uuid) {
+        return createOrUpdateCompanyFromApi(uuid)
+    }
+
+    Company createOrUpdateCompanyFromApi(String uuid, Company lc=null) {
+        if (lc==null) {
+            lc = Company.findByUuid(uuid)
+        }
+        Company rc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: uuid], Company.class, true) as Company
+        if (lc==null) {
+            rc.id = null
+            //todo get and merge rc.attributes = ???
+            lc = companyService.save(rc)
+        } else {
+            lc = Company.get(lc.id)
+            if (!lc.overrideBackend) {
+                lc.canonicalName = rc.canonicalName
+                lc.normalizedName = rc.normalizedName
+                lc.ticker = rc.ticker
+                lc.exchange = rc.exchange
+                lc.countryIso = rc.countryIso
+                lc.source = rc.source
+                lc.sourceId = rc.sourceId
+                lc.category = rc.category
+                lc.preferred = rc.preferred
+                lc.overrideBackend = rc.overrideBackend
+                lc.deleted = rc.deleted
+                //todo get and merge rc.attributes = ???
+            }
+            lc.save(update: true)
+            if (lc.id==null) {
+                lc = Company.findByUuid(uuid)
+            }
+        }
+        return lc
+    }
+
+    View createOrUpdateViewFromApi(String vUuid, String pUuid, String userOrgUUID, String userUuid, View lv=null) {
+        if (lv==null) {
+            lv = View.findByUuid(vUuid)
+        }
+        //todo find out how to get the right data for the View from API
+        Map rvMap = httpClientService.getParamsExpectResult("view/${userOrgUUID}/${userUuid}/${pUuid}/${vUuid}", null, true) as Map
+        View rv = Meta.fromMap(View.class, rvMap.get("view")) as View
+        if (lv==null) {
+            if (!rv) {
+                return null
+            }
+            lv = View.findByUuid(vUuid)
+            if (lv==null) {
+                rv.project = Project.findByUuid(pUuid)
+                rv.id = null
+                lv = rv.save(update: false, flush: true, failOnError: true)
+            } else {
+                lv.project = Project.findByUuid(rv.projUUID)
+                lv.name = rv.name
+                lv.description = rv.description
+                lv.save(update: true, flush: true, failOnError: true)
+            }
+        } else {
+            lv = View.get(lv.id)
+            if (rv.name!=null) {
+                lv.name = rv.name
+                lv.description = rv.description
+            } else {
+                //create view in backend DB (view exists without data)
+                httpClientService.postParamsExpectMap('view', [userUUID: userUuid, userOrgUUID: userOrgUUID, projectUUID:pUuid, name: lv.name, description:lv.description], true)
+            }
+            lv.save(update: true)
+            if (lv.id==null) {
+                lv = View.findByUuid(vUuid)
+            }
+        }
+        return lv
+    }
+
+    Map itemsForTimeline(String uuid, Long from = null, Long to = null) {
+        to = to ?: System.currentTimeMillis()
+        from = from ?: to - Duration.ofHours(24).toMillis()
+
+//        httpClientService.getParamsExpectMap("view/tldata/${uuid}", [from: from, to: to], true)
+        List<EntityViewEvent> events = EntityViewEvent.findAllByViewUUIDAndTsBetween(uuid, from, to, [sort:'ts', order:'desc'])
+        List tldata = []
+        events.eachWithIndex {EntityViewEvent e, int i -> tldata.add([id:i, content:e.title, start:e.ts])}
+
+        [tldata:tldata]
+
+//        "    \"tldata\" : [ {\n" +
+//                "      \"id\" : 1,\n" +
+//                "      \"content\" : \"<span style='color: red'>2 Daily Articles</span>\",\n" +
+//                "      \"start\" : 1651708800000\n" +
+//                "    }, {\n" +
+//                "      \"id\" : 3,\n" +
+//                "      \"content\" : \"<a href='https://www.forbes.com/sites/geekgirlrising/2022/05/04/former-princeton-lacrosse-star-discusses-suicide-survival-and-how-schools-can-help/' target='_blank' rel='noopener noreferrer'>Princeton Lacrosse Legend  Discusses Suicide Survival  </a>\",\n" +
+//                "      \"start\" : 1651686873000\n" +
+//                "    }, {\n" +
+//                "      \"id\" : 4,\n" +
+//                "      \"start\" : 1651642200000,\n" +
+//                "      \"content\" : \"\$28.75\"\n" +
+//                "    }, {\n" +
+//                "      \"id\" : 5,\n" +
+//                "      \"start\" : 1651720389000,\n" +
+//                "      \"content\" : \"\$29.70\"\n" +
+//                "    }, {\n" +
+//                "      \"id\" : 6,\n" +
+//                "      \"start\" : 1651721870000,\n" +
+//                "      \"content\" : \"\$29.75\"\n" +
+//                "    } ]\n"
     }
 
 }

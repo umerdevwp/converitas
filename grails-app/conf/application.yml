@@ -9,7 +9,7 @@ grails:
             # Disabled by default for performance reasons
             events: false
 server:
-    port: 9080
+    port: 9081
 info:
     app:
         name: '@info.app.name@'
@@ -115,6 +115,7 @@ dataSource:
     driverClassName: org.postgresql.Driver
     username: postgres
     password: postgres
+    dialect: POSTGRES
 
 environments:
     development:
@@ -122,33 +123,45 @@ environments:
 #            dbCreate: create-drop
             dbCreate: update
             url: "jdbc:postgresql://localhost:5432/man-ui?reWriteBatchedInserts=true&ssl=false"
-            user: "postgres"
-            password: "postgres"
-            driver: "org.postgresql.Driver"
             numThreads: 5
             maxConnections: 5
             minConnections: 1
+#        dataSources:
+#            mad:
+#                dbCreate: validate
+#                url: "jdbc:postgresql://localhost:5432/mad?reWriteBatchedInserts=true&ssl=false"
+#                numThreads: 5
+#                maxConnections: 5
+#                minConnections: 1
     test:
         dataSource:
             dbCreate: update
             url: "jdbc:postgresql://localhost:5432/man-ui?reWriteBatchedInserts=true&ssl=false"
-            user: "postgres"
-            password: "postgres"
-            driver: "org.postgresql.Driver"
             numThreads: 5
             maxConnections: 5
             minConnections: 1
+#        dataSources:
+#            mad:
+#                dbCreate: validate
+#                url: "jdbc:postgresql://localhost:5432/mad?reWriteBatchedInserts=true&ssl=false"
+#                numThreads: 5
+#                maxConnections: 5
+#                minConnections: 1
     production:
         dataSource:
             dbCreate: update
             url: "jdbc:postgresql://localhost:5432/man-ui?reWriteBatchedInserts=true&ssl=false"
-            user: "postgres"
-            password: "postgres"
-            driver: "org.postgresql.Driver"
             numThreads: 5
             maxConnections: 5
             minConnections: 1
-            
+#        dataSources:
+#            mad:
+#                dbCreate: validate
+#                url: "jdbc:postgresql://localhost:5432/mad?reWriteBatchedInserts=true&ssl=false"
+#                numThreads: 5
+#                maxConnections: 5
+#                minConnections: 1
+
 logger:
     levels:
         com:

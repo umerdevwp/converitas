@@ -66,7 +66,7 @@ class HttpClientService implements GrailsConfigurationAware {
      * @returns the URL of the eventing support service based on the required task.
      */
     private String getUrl(String task) {
-        server + "/" + task/*+"?credential="+credential*/
+        server + (task.startsWith("/")?"":"/") + task/*+"?credential="+credential*/
     }
 
 

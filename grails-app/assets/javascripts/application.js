@@ -84,3 +84,14 @@ window.onmousemove = function (e) {
     }
 };
 
+function requestUrl (url) {
+    $.ajax({
+        url: url,
+        success: function(data) {
+            console.log('call '+url+' succeeded');
+        },
+        error: function(err, status) {
+            alert(err.responseJSON.message);
+        }
+    })
+}

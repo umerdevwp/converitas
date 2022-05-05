@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.*
 class CompanyController {
     HttpClientService httpClientService
     CompanyService companyService
+    ApiService apiService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -20,11 +21,9 @@ class CompanyController {
     }
 
     def info(String uuid) {
-        Company company = httpClientService.getParamsExpectObject("company/byuuid", [uuid:uuid], Company.class, true)
-        company.id=null
-        companyService.save(company)
+        Company company = apiService.createOrUpdateCompanyFromApi(uuid)
 
-        redirect  action:"show", method:"GET", params:[id: company.id]
+        redirect  url:"/company/show/${company.id}"
     }
 
     def create() {
@@ -41,20 +40,7 @@ class CompanyController {
         try {
             Map<String, Object> result = httpClientService.getParamsExpectMap('company/resolve', [name:company.canonicalName, iso:company.countryIso], false)
             Map<String, Object> c = result.company as Map<String, Object>
-            company.uuid = c.uuid
-            if (!company.overrideBackend) {
-                company.canonicalName  = c.canonicalName
-                company.normalizedName = c.normalizedName
-                company.deleted        = c.deleted?:false
-                company.ticker         = c.ticker
-                company.exchange       = c.exchange
-                company.countryIso     = c.countryIso
-                company.source         = c.source
-                company.sourceId       = c.sourceId
-                company.category       = c.category
-                company.preferred      = c.preferred
-            }
-            companyService.save(company)
+            apiService.createCompanyFromApi(c.uuid as String)
         } catch (ValidationException e) {
             respond company.errors, view:'create'
             return
@@ -71,9 +57,9 @@ class CompanyController {
 
     def edit(Long id) {
         Company company = companyService.get(id)
-//        if (!company.overrideBackend) {
-//            c = httpClientService.getParamsExpectObject("company/byuuid", [uuid:uuid], Company.class, true)
-//        }
+        if (!company.overrideBackend) {
+            company = apiService.createOrUpdateCompanyFromApi(company.uuid)
+        }
         respond company
     }
 

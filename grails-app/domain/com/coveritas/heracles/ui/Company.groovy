@@ -1,9 +1,5 @@
 package com.coveritas.heracles.ui
 
-import groovyjarjarpicocli.CommandLine
-
-import javax.persistence.Transient
-
 class Company {
     String uuid                 // Company ID in backend
 
@@ -26,15 +22,11 @@ class Company {
     Boolean preferred = false  // If multiple matches (e.g. name) see if one is preferred
     Boolean overrideBackend = false // ... or try to get more detailed base info
     Boolean deleted = false
+    static hasMany = [attributes:CompanyAttribute]
+    static fetchMode = [attributes: 'eager']
 
-    static hasMany = [attributes:CompanyAttribute,
-                      companyViewObjects:CompanyViewObject]
-    static fetchMode = [attributes: 'eager',
-                        companyViewObjects : 'eager']
-
+    Set<CompanyViewObject> companyViewObjects = []
     Map<View,String> views = [:]
-
-    Set<Annotation> annotations = []
 
     Integer warmth = TEMP_COLD // How deep have we delved to discover base info ??
 
@@ -42,18 +34,78 @@ class Company {
     final static Integer TEMP_WARM = 1 // ... or try Wikidata or Crunchbase (or ...) to get base info
     final static Integer TEMP_HOT = 2
 
+    def afterInsert() {
+        log.debug "${id} inserted"
+        updateCompanyViewObjects()
+    }
+
+    def beforeUpdate() {
+        log.debug "Updating ${id}"
+        updateCompanyViewObjects()
+        return true
+    }
+
+    def beforeDelete() {
+        log.debug "Updating ${id}"
+        List<CompanyViewObject> currentCvos = CompanyViewObject.findAllByCompany(this)
+        currentCvos.each {
+            it.company.removeViewObject()
+            it.delete(flush: true)
+        }
+    }
+
+    def updateCompanyViewObjects() {
+        List<CompanyViewObject> currentCvos = CompanyViewObject.findAllByCompany(this)
+        for (View view in views.keySet()) {
+            String level = views[view]
+            CompanyViewObject wanted = currentCvos.find { it.view == view }
+            Boolean update = null
+            if (wanted == null) {
+                wanted = CompanyViewObject.createDontSave(this, View.get(view.id), level)
+                update = false
+            } else {
+                currentCvos.remove(wanted)
+                if (wanted.level != level) {
+                    wanted.level = level
+                    update = true
+                }
+            }
+            if (update != null) {
+                wanted.save(update: update, flush: true)
+                view.addViewObject(wanted)
+            }
+        }
+        for (CompanyViewObject unwanted in currentCvos) {
+            unwanted.delete()
+        }
+    }
+
+    void removeViewObject(CompanyViewObject cvo) {
+        companyViewObjects.remove(cvo)
+        views.remove(cvo.view)
+    }
+
+    void addViewObject(CompanyViewObject cvo) {
+        if (companyViewObjects==null) {
+            companyViewObjects = []
+        }
+        companyViewObjects.add(cvo)
+        views[cvo.view] = cvo.level
+    }
+
     def onLoad() {
         log.debug "Loading ${id}"
         // views
-        companyViewObjects.each { CompanyViewObject cvo ->
-            views[cvo.view] = cvo.level
-            // annotations
-            annotations.addAll( cvo.annotations )
+        List<CompanyViewObject> cvos = CompanyViewObject.findAllByCompany(this)
+        cvos.each { CompanyViewObject cvo ->
+            addViewObject(cvo)
         }
     }
 
     @Override
-    String toString() { "$canonicalName ($uuid)" }
+    String toString() {
+        canonicalName+" ("+uuid+")"
+    }
 
     static mapping = {
         table name: 'ma_company'
@@ -73,7 +125,7 @@ class Company {
         preferred nullable:false
     }
 
-    static transients = ['annotations', 'views']
+    static transients = ['companyViewObjects', 'views']
 
     boolean equals(o) {
         if (this.is(o)) return true
@@ -81,9 +133,7 @@ class Company {
 
         Company company = (Company) o
 
-        if (uuid != company.uuid) return false
-
-        return true
+        return (uuid == company.uuid)
     }
 
     int hashCode() {

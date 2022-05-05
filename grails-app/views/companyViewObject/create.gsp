@@ -26,8 +26,12 @@
             </ul>
             </g:hasErrors>
             <g:form resource="${this.companyViewObject}" method="POST">
+                <g:hiddenField name="uuid" value="${this.companyViewObject.uuid}"/>
                 <fieldset class="form">
-                    <f:all bean="companyViewObject"/>
+%{--                    <f:all bean="companyViewObject"/>--}%
+                    <f:field bean="companyViewObject" property="view"/>
+                    <f:field bean="companyViewObject" property="company"/>
+                    <f:field bean="companyViewObject" property="level"/>
                 </fieldset>
                 <fieldset class="buttons">
                     <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
