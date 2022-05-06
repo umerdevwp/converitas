@@ -55,6 +55,12 @@ class ApiController {
         }
     }
 
+    def viewcompanystate(long id) {
+        call {
+            apiService.companyStateForView(View.get(id).uuid)
+        }
+    }
+
 /*
 
     def companytimeline(String uuid, @Nullable Long from, @Nullable Long to) {

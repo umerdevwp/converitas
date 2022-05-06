@@ -42,6 +42,9 @@
         <div id="timeLine" role="navigation">
             <div id="time_line"></div>
         </div>
+    <div id="companies">
+
+    </div>
         <div id="show-view" class="content scaffold-show" role="main">
             <h1><g:message code="default.show.label" args="[entityName]" /></h1>
             <g:if test="${flash.message}">
@@ -156,6 +159,36 @@
             })
         }
 
+        function loadCompanyStatus () {
+            $.ajax({
+                url: '/api/viewcompanystate/${view.id}',
+                success: function(data) {
+                    let html = ''
+                    Object.keys(data.companies).map(function(head) {
+                        const companies = data.companies[head];
+                        let len = companies.length;
+                        console.log(head, len);
+                        let companyList = '<ul>'
+                        // for (const company of companies) {
+                        for (let i=0; i<len; i++) {
+                            const company  = companies[i];
+                            if (i>=10) {
+                                companyList   += '<a>(+)</a>';
+                                break;
+                            }
+                            companyList   += '<li>'+company+'</li>';
+                        }
+                        companyList    += '</ul>'
+                        html += ' <h3>'+head+' ('+len+')</h3>'+companyList;
+                    });
+                    $('#companies').html(html);
+                },
+                error: function(err, status) {
+                    console.log(err);
+                    alert(err.responseJSON.message);
+                }
+            })
+        }
 
         window.search = function() {
             const range = timeline.getWindow();
@@ -164,6 +197,7 @@
         }
 
         loadTimelineData();
+        loadCompanyStatus();
 
     </script>
     </body>

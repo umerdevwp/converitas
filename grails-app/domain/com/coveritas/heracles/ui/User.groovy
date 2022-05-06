@@ -59,6 +59,7 @@ class User {
         byte[] bSalt = salt()
         this.salt = bSalt
         passwordHash = passwordHash(password, bSalt)
+        new UserEvent(user:this, event: UserEvent.E_PASSWORDCHANGE, ts: System.currentTimeMillis()).save(update:false, flush:true)
     }
 
     static User create(String uuid, String name, Organization org, String password, Set<Role> roles) {
