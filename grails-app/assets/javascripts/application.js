@@ -14,7 +14,7 @@
 
 $(
     function() {
-        let $company = $("#company");
+        let $company = $("#companyInput");
         let $companyOptions = $("#companyOptions");
 
         $company.on('input', function() {
@@ -43,15 +43,16 @@ $(
                 let text = $selectedCompany.text();
                 if (text!=='') {
                     $company.val(text);
-                    var uuid = $('#uuid').val($selectedCompany.val());
-
+                    var uuid = $('#companyUUID').val($selectedCompany.val());
                     var uuid = $("#companyOptions").find(":selected").attr('value');
                     console.log('seelected uuid', uuid);
                     $('#addButton').show();
+/*
                     $('#addButton').on('click', function(event) {
                         event.preventDefault();
-                        location.replace("/company/info?uuid="+uuid);
+                        location.replace("/view/addCompanyToView?uuid="+uuid+"&viewId="+viewId);
                     });
+*/
                 } else {
                     $('#addButton').hide()
                     $companyOptions.hide()

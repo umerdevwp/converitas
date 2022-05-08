@@ -43,6 +43,7 @@ class ApiService {
         List<Organization> orgs = user.isSysAdmin()?Organization.list():[user.organization]
         for (Organization organization in orgs) {
             def orgUuid = organization.uuid
+            // get all projects in org
             Map remotePrjMap = httpClientService.getParamsExpectObject("project/${orgUuid}/${user.uuid}", null, LinkedHashMap.class, true) as Map
             if (remotePrjMap.isEmpty()) {
                 continue
@@ -56,25 +57,17 @@ class ApiService {
                     Project lp = localProjects.find({it.uuid==rpUuid})
                     boolean lpIsDirty = lp==null  // this should never happen because all views are created in UI (>=admin level)
                     if (lpIsDirty) {
-                        lp = new Project(uuid:rpUuid, name:rpUuid)
+                        lp = new Project(uuid:rpUuid, name:rp.name, description: rp.description, organization: organization)
+                        lp.save(update:false, flush:true, failOnError:true)
                     }
+                    // get all views for project (only uuid and status)
                     Map remoteVwMap = httpClientService.getParamsExpectObject("view/${orgUuid}/${user.uuid}/${rpUuid}",null, LinkedHashMap.class, true)
                     def views = remoteVwMap.get("views")
                     if (views!=null) {
                         Map<String, Object> remoteViews = Meta.fromMap(LinkedHashMap, views) as Map<String, Object>
                         Set<String> remoteViewUUIDs = remoteViews.keySet()
-                        Set<View> localViews = View.findAllByProject(lp)
                         for (String rvUuid : remoteViewUUIDs) {
-                            View lv = localViews.find { it.uuid == rvUuid }
-                            boolean lvIsDirty = lv == null
-                            if (lvIsDirty) {
-                                lv = createOrUpdateViewFromApi(rvUuid, rpUuid, orgUuid, user.uuid)
-                                if (lv==null)
-                                    continue
-                                //todo correct name!
-                                lv = new View(uuid: rvUuid, name: rvUuid).save(update:false, flush:true, failOnError:true)
-                                lpIsDirty = true
-                            }
+                            View lv = createOrUpdateViewFromApi(rvUuid, rpUuid, orgUuid, user.uuid)
                             Boolean[] isDirtyRef = {lpIsDirty}
                             remoteViewCompanies(lv, user, isDirtyRef)
                         }
@@ -153,33 +146,35 @@ class ApiService {
     }
 
     Company createOrUpdateCompanyFromApi(String uuid, Company lc=null) {
-        if (lc==null) {
-            lc = Company.findByUuid(uuid)
-        }
-        Company rc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: uuid], Company.class, true) as Company
-        if (lc==null) {
-            rc.id = null
-            //todo get and merge rc.attributes = ???
-            lc = companyService.save(rc)
-        } else {
-            lc = Company.get(lc.id)
-            if (!lc.overrideBackend) {
-                lc.canonicalName = rc.canonicalName
-                lc.normalizedName = rc.normalizedName
-                lc.ticker = rc.ticker
-                lc.exchange = rc.exchange
-                lc.countryIso = rc.countryIso
-                lc.source = rc.source
-                lc.sourceId = rc.sourceId
-                lc.category = rc.category
-                lc.preferred = rc.preferred
-                lc.overrideBackend = rc.overrideBackend
-                lc.deleted = rc.deleted
-                //todo get and merge rc.attributes = ???
-            }
-            lc.save(update: true)
-            if (lc.id==null) {
+        Company.withTransaction { status ->
+            if (lc == null) {
                 lc = Company.findByUuid(uuid)
+            }
+            Company rc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: uuid], Company.class, true) as Company
+            if (lc == null) {
+                rc.id = null
+                //todo get and merge rc.attributes = ???
+                lc = companyService.save(rc)
+            } else {
+                lc = Company.get(lc.id)
+                if (!lc.overrideBackend) {
+                    lc.canonicalName = rc.canonicalName
+                    lc.normalizedName = rc.normalizedName
+                    lc.ticker = rc.ticker
+                    lc.exchange = rc.exchange
+                    lc.countryIso = rc.countryIso
+                    lc.source = rc.source
+                    lc.sourceId = rc.sourceId
+                    lc.category = rc.category
+                    lc.preferred = rc.preferred
+                    lc.overrideBackend = rc.overrideBackend
+                    lc.deleted = rc.deleted
+                    //todo get and merge rc.attributes = ???
+                }
+                lc.save(update: true)
+                if (lc.id == null) {
+                    lc = Company.findByUuid(uuid)
+                }
             }
         }
         return lc
@@ -190,8 +185,8 @@ class ApiService {
             lv = View.findByUuid(vUuid)
         }
         //todo find out how to get the right data for the View from API
-        Map rvMap = httpClientService.getParamsExpectResult("view/${userOrgUUID}/${userUuid}/${pUuid}/${vUuid}", null, true) as Map
-        View rv = Meta.fromMap(View.class, rvMap.get("view")) as View
+        Map rvMap = httpClientService.getParamsExpectResult("view/byuuid", [viewUUID:"${vUuid}"], true) as Map
+        View rv = (rvMap.size()==0)?null:Meta.fromMap(View.class, rvMap.get("view")) as View
         if (lv==null) {
             if (!rv) {
                 return null
@@ -209,14 +204,17 @@ class ApiService {
             }
         } else {
             lv = View.get(lv.id)
-            if (rv.name!=null) {
-                lv.name = rv.name
-                lv.description = rv.description
+            if (rv!=null) {
+                if ((lv.name!=rv.name)||(lv.description!=rv.description)) {
+                    lv.name = rv.name
+                    lv.description = rv.description
+                    lv.save(update: true, failOnError: true)
+                }
             } else {
                 //create view in backend DB (view exists without data)
-                httpClientService.postParamsExpectMap('view', [userUUID: userUuid, userOrgUUID: userOrgUUID, projectUUID:pUuid, name: lv.name, description:lv.description], true)
+//                httpClientService.postParamsExpectMap('view', [userUUID: userUuid, userOrgUUID: userOrgUUID, projectUUID:pUuid, name: lv.name, description:lv.description, viewUUID: vUuid], true)
+                lv.delete(flush:true, failOnError: true)
             }
-            lv.save(update: true)
             if (lv.id==null) {
                 lv = View.findByUuid(vUuid)
             }
@@ -296,5 +294,24 @@ class ApiService {
                       "Company 95","Company 96","Company 97","Company 98","Company 99"]
             ]
         ]
+    }
+
+    boolean addCompanyToVew(User user, String companyUUID, long viewId) {
+        Company.withTransaction { status ->
+            View view = View.get(viewId)
+            Project project = view.project
+            if (project.organization==user.organization|| user.isSysAdmin()) {
+                CompanyViewObject cvo = new CompanyViewObject()
+                Company company = createOrUpdateCompanyFromApi(companyUUID)
+                cvo.company = company
+                cvo.view = view
+                httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid, level: cvo.level], false)
+                cvo.organizationUUID = project.organization.uuid
+                cvo.projectUUID = project.uuid
+                cvo.viewUUID = view.uuid
+                cvo.save(update:false, flush:true, failOnError:true)
+            }
+        }
+        true
     }
 }

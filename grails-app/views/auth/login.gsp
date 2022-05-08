@@ -11,6 +11,14 @@
 <head>
     <meta name="layout" content="main" />
     <title><g:message code="default.login.label"/></title>
+    <script type="module">
+        $( document ).ready(function() {
+            let pageURL = window.location.href;
+            if (pageURL.indexOf('/auth/login') < 0 ) {
+                $('#url').val(pageURL);
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -20,7 +28,7 @@
         <div class="message" role="status">${flash.message}</div>
     </g:if>
     <g:form controller="auth" action="authentication" method="POST">
-        <g:hiddenField name="url" value="${url}"></g:hiddenField>
+        <g:hiddenField name="url" id="url" value="${url}"></g:hiddenField>
         <div class="form-group">
             <label for="name">Username</label>
             <g:field type="text" name="name"/>

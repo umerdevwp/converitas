@@ -6,13 +6,11 @@
         <g:set var="entityName" value="${message(code: 'company.label', default: 'Company')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
         <style>
-
         .form-control:focus + .list-group {
             display: block;
         }
         </style>
         <script type="module">
-
             $( document ).ready(function() {
                 let pageURL = window.location.href;
                 if (pageURL.indexOf('/company/index') > -1 ) {
@@ -49,9 +47,9 @@
                 <content class="trackCompanySection">
                     <h2>Add a Company:</h2>
                     <div style="display: block">
-                        <input id="company" placeholder="Add a Company" size="40">
+                        <input id="companyInput" placeholder="Add a Company" size="40">
                         <div style="display:inline-block;width:150px;background-color: transparent">
-                            <g:form method="post" action="startTacking">
+                            <g:form method="get" url="/company/info">
                                 <input type="hidden" id="uuid" name="uuid"/>
                                 <g:set var="u" value="${User.get(session["userID"])}"/>
                                 <g:if test="${u.isSysAdmin()}">

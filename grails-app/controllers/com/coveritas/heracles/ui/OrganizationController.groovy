@@ -34,7 +34,7 @@ class OrganizationController {
             try {
                 Organization.withTransaction { status ->
                     // create org with mad and get UUID
-                    Map<String, Object> result = httpClientService.postParamsExpectMap('organization', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, name:organization.name, description:organization.description], true).organization
+                    Map<String, Object> result = httpClientService.postParamsExpectMap('organization', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, name:organization.name, description:organization.description?:organization.name], true).organization
                     String orgUUID = result.uuid
                     String adminUUID = result.adminUUID
                     if (orgUUID) {

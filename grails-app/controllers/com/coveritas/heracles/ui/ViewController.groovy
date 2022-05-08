@@ -11,7 +11,7 @@ class ViewController {
     ViewService viewService
     CompanyViewObjectService companyViewObjectService
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", addCompany: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
         max = Math.min(max ?: 10, 100)
@@ -96,25 +96,25 @@ class ViewController {
         respond view, model:[companies: companies, levels:CompanyViewObject.LEVELS]
     }
 
-    def addCompany(long  viewId, long companyId, String level) {
-        View view = View.get(viewId)
-        Company company = Company.get(companyId)
-        if (view == null || company == null || !CompanyViewObject.LEVELS.contains(level)) {
-            notFound()
-            return
-        }
-
+    def addCompany() {
+        CompanyViewObject cvo = new CompanyViewObject(params)
+        View view = View.get(params.get("view").id as long)
+        cvo.view = view
+        Company company = apiService.createOrUpdateCompanyFromApi(params.companyUUID as String)
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         Project project = view.project
         if (project.organization==u.organization|| u.isSysAdmin()) {
-            Map<String, Object> result = httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, viewUUID: view.uuid, companyUUID: company.uuid, level: level], false)
+            Map<String, Object> result = httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, viewUUID: view.uuid, companyUUID: company.uuid, level: cvo.level], false)
 //            String uuid = result.uuid
             if (result) {
                 try {
                     String uuid = UUID.randomUUID()
-                    CompanyViewObject companyViewObject = new CompanyViewObject(uuid: uuid, projectUUID: project.uuid, view: view, viewUUID: view.uuid, company: company, organizationUUID: project.organization.uuid, level: level)
-                    companyViewObjectService.save(companyViewObject)
+                    cvo.projectUUID = project.uuid
+                    cvo.viewUUID = view.uuid
+                    cvo.company = company
+                    cvo.organizationUUID = project.organization.uuid
+                    companyViewObjectService.save(cvo)
                 } catch (ValidationException e) {
                     respond view.errors, view:'create'
                     return
@@ -123,7 +123,7 @@ class ViewController {
                 request.withFormat {
                     form multipartForm {
                         flash.message = message(code: 'default.created.message', args: [message(code: 'companyViewObject.label', default: 'CompanyViewObject'), companyViewObject])
-                        redirect companyViewObject.view
+                        redirect view
                     }
                     flash.message = message(code: 'default.updated.message', args: [message(code: 'view.label', default: 'View'), view.id])
                     redirect view
