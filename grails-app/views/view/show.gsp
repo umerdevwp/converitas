@@ -1,4 +1,4 @@
-<%@ page import="com.coveritas.heracles.ui.EntityViewEvent; com.coveritas.heracles.ui.User" %>
+<%@ page import="com.coveritas.heracles.json.EntityViewEvent; com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -77,10 +77,10 @@
                                     <li>
                                         <a href="/companyViewObject/show/${cvo.id}">${cvo.toString()}</a>
                                         <ol>
-                                            <g:each in="${EntityViewEvent.findAllByEntityUUIDAndViewUUID(cvo.company.uuid,cvo.view.uuid)}" var="eve">
+                                            <g:each in="${com.coveritas.heracles.json.EntityViewEvent.findAllByEntityUUIDAndViewUUID(cvo.company.uuid,cvo.view.uuid)}" var="eve">
                                                 <li><a href="/entityViewEvent/edit?id=${eve.id}">${eve}</a></li>
                                             </g:each>
-                                            <button onclick="requestUrl('/api/addEvent?companyId=${cvo.companyId}&viewId=${cvo.viewId}&type=${EntityViewEvent.T_ARTICLE}&title=${UUID.randomUUID()}')">add Event</button>
+                                            <button onclick="requestUrl('/api/addEvent?companyId=${cvo.companyId}&viewId=${cvo.viewId}&type=${com.coveritas.heracles.json.EntityViewEvent.T_ARTICLE}&title=${UUID.randomUUID()}')">add Event</button>
                                         </ol>
                                     </li>
                                 </g:each>

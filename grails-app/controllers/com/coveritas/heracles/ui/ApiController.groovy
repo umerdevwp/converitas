@@ -35,17 +35,22 @@ class ApiController {
 
     def addEvent() {
         call {
-            EntityViewEvent.withNewTransaction {
-                EntityViewEvent eve = new EntityViewEvent(params)
-                eve.uuid = UUID.randomUUID()
-                View v = View.get(params.viewId as long)
-                eve.viewUUID = v.uuid
-                Company c = Company.get(params.companyId as long)
-                eve.entityUUID = c.uuid
-                eve.ts = System.currentTimeMillis()
-                eve.save(update:false, flush:true, failOnError:true)
-                [EntityViewEvent:eve]
-            }
+            String eventUUID = UUID.randomUUID()
+            View v = View.get(params.viewId as long)
+            String viewUUID = v.uuid
+            Company c = Company.get(params.companyId as long)
+            String entityUUID = c.uuid
+            long ts = System.currentTimeMillis()
+            User u = User.get(session['userID'] as long)
+            Map eve = apiService.addEntityViewEvent(
+                    u.uuid,
+                    u.organization.uuid,
+                    eventUUID, viewUUID,entityUUID,
+                    params.type as String,
+                    params.title as String,
+                    params.state as String, ts)
+
+            [entityViewEvent:eve]
         }
     }
 
@@ -57,9 +62,12 @@ class ApiController {
 
     def viewcompanystate(long id) {
         call {
-            apiService.companyStateForView(View.get(id).uuid)
+            User u = User.get(session['userID'] as long)
+            apiService.companyStateForView(u, View.get(id).uuid)
         }
     }
+
+
 
 /*
 

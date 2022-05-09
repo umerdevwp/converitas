@@ -1,6 +1,7 @@
 package com.coveritas.heracles.ui
 
 import com.coveritas.heracles.HttpClientService
+import com.coveritas.heracles.json.EntityViewEvent
 import com.coveritas.heracles.utils.Meta
 import grails.gorm.transactions.Transactional
 import org.springframework.beans.factory.annotation.Autowired
@@ -222,16 +223,25 @@ class ApiService {
         return lv
     }
 
-    Map itemsForTimeline(String uuid, Long from = null, Long to = null) {
+    Map itemsForTimeline(String vUuid, Long from = null, Long to = null) {
         to = to ?: System.currentTimeMillis()
         from = from ?: to - Duration.ofHours(24).toMillis()
 
-//        httpClientService.getParamsExpectMap("view/tldata/${uuid}", [from: from, to: to], true)
-        List<EntityViewEvent> events = EntityViewEvent.findAllByViewUUIDAndTsBetween(uuid, from, to, [sort:'ts', order:'desc'])
         List tldata = []
-        events.eachWithIndex {EntityViewEvent e, int i ->
+        Map events = httpClientService.getParamsExpectMap("eve/view/${vUuid}/${from}/${to}", null, true)
+        List<Map<String, Object>> remoteViews = events.entityViewEvents
+        remoteViews.eachWithIndex {Map e, int i ->
             // todo change the content based on event type and state
-            tldata.add([id:i, content:e.title, start:e.ts])
+            tldata.add([
+                    id:i,
+                    content:e.title,
+                    start:e.ts,
+                    type:e.type,
+                    title:e.title,
+                    state:e.state,
+                    entityUUID:e.entityUUID,
+                    viewUUID:e.viewUUID,
+                    ts:e.ts])
         }
 
         [tldata:tldata]
@@ -259,7 +269,29 @@ class ApiService {
 //                "    } ]\n"
     }
 
-    Map companyStateForView(String s) {
+    List<EntityViewEvent> eventsForCompanyAndView(String vUuid, String cUuid, Long from = null, Long to = null) {
+        to = to ?: System.currentTimeMillis()
+        from = from ?: to - Duration.ofHours(24).toMillis()
+
+        List<EntityViewEvent>  entityViewEvents = []
+        Map events = httpClientService.getParamsExpectMap("eve/view/entity/${vUuid}/${cUuid}/${from}/${to}", null as Map, true)
+        List<Map<String, Object>> remoteViews = events.entityViewEvents
+        remoteViews.eachWithIndex {Map e, int i ->
+            // todo change the content based on event type and state
+            EntityViewEvent event = Meta.fromMap(EntityViewEvent.class, e) as EntityViewEvent
+            event.id = i
+            entityViewEvents.add(event)
+        }
+
+        entityViewEvents
+    }
+
+    Map companyStateForView(User user, String vUuid) {
+        View lv = View.findByUuid(vUuid)
+        Boolean lpIsDirty = false
+        Boolean[] isDirtyRef = {lpIsDirty}
+        Set<CompanyViewObject> cvos = remoteViewCompanies( lv,  user, isDirtyRef)
+        // todo group by level, order by level-ordinal+ name
         ["companies" : [
               "Tracked" : [
                     "Adobe",
@@ -313,5 +345,27 @@ class ApiService {
             }
         }
         true
+    }
+
+    Map addEntityViewEvent(String userUuid,
+                           String userOrgUUID,
+                           String eventUUID,
+                           String viewUUID,
+                           String entityUUID,
+                           String type,
+                           String title,
+                           String state,
+                           long ts) {
+        httpClientService.postParamsExpectMap('eve', [
+                userUUID:       userUuid,
+                userOrgUUID:    userOrgUUID,
+                eventUUID:      eventUUID,
+                viewUUID:       viewUUID,
+                entityUUID:     entityUUID,
+                type:           type,
+                title:          title,
+                state:          state,
+                ts:             ts
+        ], true).entityViewEvent as Map
     }
 }

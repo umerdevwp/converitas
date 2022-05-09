@@ -1,7 +1,7 @@
 package com.coveritas.heracles.ui
 
 import com.coveritas.heracles.HttpClientService
-import com.coveritas.heracles.json.Article
+import com.coveritas.heracles.json.EntityViewEvent
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
@@ -39,7 +39,11 @@ class ViewController {
         Long ts = params.ts ?  Long.parseLong(params.ts as String) : System.currentTimeMillis()
         Long from = ts-12*3600*1000, to = ts+12*3600*1000
         View view = viewService.get(id)
-        List<EntityViewEvent> events = EntityViewEvent.findAllByViewUUIDAndTsBetween(view.uuid, from, to, [sort:'ts', order:'desc'])
+        List<Map> eves = apiService.itemsForTimeline(view.uuid, from, to).tldata
+        List<EntityViewEvent> events = []
+        eves.each { Map eve ->
+            EntityViewEvent event = new EntityViewEvent()
+        }
 
 //        respond viewService.get(id)
         respond view, model:[ts: ts, events: events, eventCount: events.size()]
