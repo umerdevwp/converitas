@@ -29,6 +29,12 @@
             color: black;
         }
         </style>
+        <script type="module">
+            $( document ).ready(function() {
+                let pageURL = window.location.href;
+                $('#url').val(pageURL);
+            });
+        </script>
     </head>
     <body>
         <a href="#show-view" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
@@ -95,9 +101,46 @@
                 <g:form resource="${this.view}" method="DELETE">
                     <fieldset class="buttons">
                         <g:link class="edit" action="edit" resource="${this.view}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
+                        <input class="edit" id="addCompany" type="button" value="Add Company"/>
                         <input class="delete" type="submit" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
                     </fieldset>
                 </g:form>
+                <div id="addCompanyToView" style="display: none">
+                    <g:form method="POST" url="/view/addCompany">
+                        <fieldset class="form">
+                            %{--                    <f:all bean="companyViewObject"/>--}%
+                            <g:hiddenField name="view.id" value="${this.view.id}"/>
+                            %{--                    <f:field bean="companyViewObject" property="company"/>--}%
+%{--                            <div style="display: block">--}%
+                                <div class="fieldcontain required">
+                                    <label for="companyUUID">Company<span class="required-indicator">*</span></label>
+                                    <input id="companyInput" placeholder="Add a Company" size="40">
+                                    <div style="display:inline-block;width:150px;background-color: transparent">
+                                        <input type="hidden" id="companyUUID" name="companyUUID"/>
+                                    </div>
+                                    <div style="width:400px;height:30px;background-color: transparent">
+                                        <select class="form-control list-group" id="companyOptions" style="display:none">
+                                        </select>
+                                    </div>
+                                    <div class="messageSection hide">Start tracking the selected company</div>
+                                </div>
+
+%{--                            </div>--}%
+                            <div class="fieldcontain required">
+                                <label for="level">Level<span class="required-indicator">*</span></label>
+                                <select name="level" id="level" class="form-control list-group">
+                                    <g:each in="${com.coveritas.heracles.ui.CompanyViewObject.LEVELS}" var="l">
+                                        <option value="${l}">${l}</option>
+                                    </g:each>
+                                </select>
+                           </div>
+                        </fieldset>
+                        <fieldset class="buttons">
+                            <button style="display: none" class="save" type="submit" id="addButton">Add Company</button>
+                        </fieldset>
+                    </g:form>
+                </div>
+
             </g:if>
             <g:else>
                 UNAUTHORIZED ACCESS

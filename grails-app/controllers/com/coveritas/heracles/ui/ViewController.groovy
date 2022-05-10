@@ -113,24 +113,32 @@ class ViewController {
 //            String uuid = result.uuid
             if (result) {
                 try {
-                    String uuid = UUID.randomUUID()
+                    cvo.uuid        = cvo.uuid?:UUID.randomUUID()
                     cvo.projectUUID = project.uuid
-                    cvo.viewUUID = view.uuid
-                    cvo.company = company
+                    cvo.viewUUID    = view.uuid
+                    cvo.company     = company
                     cvo.organizationUUID = project.organization.uuid
                     companyViewObjectService.save(cvo)
                 } catch (ValidationException e) {
-                    respond view.errors, view:'create'
+                    respond view.errors, view:'show'
                     return
                 }
 
                 request.withFormat {
                     form multipartForm {
-                        flash.message = message(code: 'default.created.message', args: [message(code: 'companyViewObject.label', default: 'CompanyViewObject'), companyViewObject])
+//                        flash.message = message(code: 'default.created.message', args: [message(code: 'companyViewObject.label', default: 'CompanyViewObject'), cvo])
+                        if (params.url!=null) {
+                            redirect url:params.url
+                        } else {
+                            redirect view
+                        }
+                    }
+//                    flash.message = message(code: 'default.updated.message', args: [message(code: 'view.label', default: 'CompanyViewObject'), cvo])
+                    if (params.url!=null) {
+                        redirect url:params.url
+                    } else {
                         redirect view
                     }
-                    flash.message = message(code: 'default.updated.message', args: [message(code: 'view.label', default: 'View'), view.id])
-                    redirect view
                 }
             } else {
                 notAllowed('default.not.updated.message')

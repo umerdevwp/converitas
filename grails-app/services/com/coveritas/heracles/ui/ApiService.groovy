@@ -93,15 +93,15 @@ class ApiService {
             Project lp = lv.project
             String pUuid = lp.uuid
             Organization organization = lp.organization
-            Map remoteCoMap = httpClientService.getParamsExpectObject("view/company/${organization.uuid}/${user.uuid}/${pUuid}/${vUuid}", null, LinkedHashMap.class, true)
+            Map remoteCoMap = httpClientService.getParamsExpectObject("view/${organization.uuid}/${user.uuid}/${pUuid}/${vUuid}", null, LinkedHashMap.class, true)
             Set<CompanyViewObject> lnrCompanies = []
-            if (!remoteCoMap.isEmpty()) {
-                Map<String, Object> remoteCompanies = Meta.fromMap(LinkedHashMap, remoteCoMap.get("companies")) as Map<String, Object>
-                Set<String> remoteCompanyUUIDs = remoteCompanies.keySet()
-                // localCompanies = localCompanies.findAll({ !(it.company.overrideBackend && it.company.deleted)})
-                for (String rcUuid in remoteCompanyUUIDs) {
-                    def cStateObj = remoteCompanies.get(rcUuid)
-                    String level = cStateObj.get("state")?.get("currentLevel")?:CompanyViewObject.UNKNOWN //todo get level right
+            if (remoteCoMap.containsKey("companies")) {
+                List<Map<String, Object>> remoteCompanies = remoteCoMap.companies
+                for (Map companyStatusMap in remoteCompanies) {
+                    Map cStateObj = companyStatusMap.company
+                    String rcUuid = cStateObj.uuid
+
+                    String level = companyStatusMap.level?:CompanyViewObject.UNKNOWN
                     CompanyViewObject lcvo = localCompanies.find { it.company.uuid = rcUuid }
                     Company lc
                     if (lcvo==null) {

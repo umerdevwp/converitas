@@ -17,6 +17,13 @@ $(
         let $company = $("#companyInput");
         let $companyOptions = $("#companyOptions");
 
+        $('#addCompany').on('click', function(event) {
+            event.preventDefault();
+            $("#addCompanyToView").show()
+            // location.replace("/view/addCompanyToView?uuid="+uuid+"&viewId="+viewId);
+        });
+
+
         $company.on('input', function() {
             const input = $(this).val();
             $companyOptions.empty()
@@ -47,12 +54,6 @@ $(
                     var uuid = $("#companyOptions").find(":selected").attr('value');
                     console.log('seelected uuid', uuid);
                     $('#addButton').show();
-/*
-                    $('#addButton').on('click', function(event) {
-                        event.preventDefault();
-                        location.replace("/view/addCompanyToView?uuid="+uuid+"&viewId="+viewId);
-                    });
-*/
                 } else {
                     $('#addButton').hide()
                     $companyOptions.hide()

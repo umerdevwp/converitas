@@ -54,7 +54,7 @@
 %{--                    <f:all bean="companyViewObject"/>--}%
                     <f:field bean="companyViewObject" property="view"/>
 %{--                    <f:field bean="companyViewObject" property="company"/>--}%
-                    <div style="display: block">
+%{--                    <div style="display: block">--}%
                     <div class="fieldcontain required">
                         <label for="companyUUID">Company
                             <span class="required-indicator">*</span>
@@ -70,7 +70,7 @@
                         <div class="messageSection hide">Start tracking the selected company</div>
                     </div>
 
-                    </div>
+%{--                    </div>--}%
                     <f:field bean="companyViewObject" property="level"/>
                 </fieldset>
                 <fieldset class="buttons">
