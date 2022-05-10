@@ -2,6 +2,7 @@ package com.coveritas.heracles.ui
 
 class Role {
     public final static String ADMIN = "Admin"
+    public final static String USER = "User"
     private static Role ADMIN_ROLE = null
     static hasMany = [users: User]
     static belongsTo = User

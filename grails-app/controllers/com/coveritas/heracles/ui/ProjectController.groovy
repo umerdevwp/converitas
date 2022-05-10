@@ -5,12 +5,15 @@ import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
 class ProjectController {
-    HttpClientService httpClientService
-    ProjectService projectService
+    HttpClientService   httpClientService
+    ProjectService      projectService
+    ApiService          apiService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
+        Set<Project> projects = apiService.remoteProjects(u)
+
         params.max = Math.min(max ?: 10, 100)
         Long userID = session['userID'] as Long
         User u = User.get(userID)

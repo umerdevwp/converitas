@@ -74,7 +74,7 @@ class User {
         user.lastUpdated = now
         user.organization = org
         user.roles = roles
-        user.save(failOnError: true)
+        user.save(update:false, flush:true, failOnError: true)
         user
     }
 

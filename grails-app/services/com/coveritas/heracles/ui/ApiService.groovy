@@ -40,7 +40,7 @@ class ApiService {
      */
     Set<Project> remoteProjects(User user) {
         Set<Project> allLocalProjects =[]
-
+        createUsersAndOrgsFromApi()
         List<Organization> orgs = user.isSysAdmin()?Organization.list():[user.organization]
         for (Organization organization in orgs) {
             def orgUuid = organization.uuid
@@ -63,17 +63,19 @@ class ApiService {
                     }
                     // get all views for project (only uuid and status)
                     Map remoteVwMap = httpClientService.getParamsExpectObject("view/${orgUuid}/${user.uuid}/${rpUuid}",null, LinkedHashMap.class, true)
-                    def views = remoteVwMap.get("views")
+                    def views = remoteVwMap.views
                     if (views!=null) {
                         Map<String, Object> remoteViews = Meta.fromMap(LinkedHashMap, views) as Map<String, Object>
                         Set<String> remoteViewUUIDs = remoteViews.keySet()
+                        Set<View> localViews = []
                         for (String rvUuid : remoteViewUUIDs) {
                             View lv = createOrUpdateViewFromApi(rvUuid, rpUuid, orgUuid, user.uuid)
+                            localViews.add(lv)
                             Boolean[] isDirtyRef = {lpIsDirty}
                             remoteViewCompanies(lv, user, isDirtyRef)
                         }
                         if (lpIsDirty) {
-                            lp.views = new LinkedHashSet(remoteViews)
+                            lp.views = localViews
                             lp.save()
                             localProjects << lp
                         }
@@ -290,42 +292,49 @@ class ApiService {
         View lv = View.findByUuid(vUuid)
         Boolean lpIsDirty = false
         Boolean[] isDirtyRef = {lpIsDirty}
-        Set<CompanyViewObject> cvos = remoteViewCompanies( lv,  user, isDirtyRef)
-        // todo group by level, order by level-ordinal+ name
-        ["companies" : [
-              "Tracked" : [
-                    "Adobe",
-                    "Microsoft",
-                    "Salesforce",
-                    "Plutomen",
-                    "Magic Leap"],
-              "Surfaced" : [
-                    "Mesh",
-                    "Activision Blizzard",
-                    "Vsight"],
-              "Watched" : [
-                      "Company 0", "Company 1", "Company 2", "Company 3", "Company 4",
-                      "Company 5", "Company 6", "Company 7", "Company 8", "Company 9",
-                      "Company 10","Company 11","Company 12","Company 13","Company 14",
-                      "Company 15","Company 16","Company 17","Company 18","Company 19",
-                      "Company 20","Company 21","Company 22","Company 23","Company 24",
-                      "Company 25","Company 26","Company 27","Company 28","Company 29",
-                      "Company 30","Company 31","Company 32","Company 33","Company 34",
-                      "Company 35","Company 36","Company 37","Company 38","Company 39",
-                      "Company 40","Company 41","Company 42","Company 43","Company 44",
-                      "Company 45","Company 46","Company 47","Company 48","Company 49",
-                      "Company 50","Company 51","Company 52","Company 53","Company 54",
-                      "Company 55","Company 56","Company 57","Company 58","Company 59",
-                      "Company 60","Company 61","Company 62","Company 63","Company 64",
-                      "Company 65","Company 66","Company 67","Company 68","Company 69",
-                      "Company 70","Company 71","Company 72","Company 73","Company 74",
-                      "Company 75","Company 76","Company 77","Company 78","Company 79",
-                      "Company 80","Company 81","Company 82","Company 83","Company 84",
-                      "Company 85","Company 86","Company 87","Company 88","Company 89",
-                      "Company 90","Company 91","Company 92","Company 93","Company 94",
-                      "Company 95","Company 96","Company 97","Company 98","Company 99"]
-            ]
-        ]
+        Set<CompanyViewObject> cvos = remoteViewCompanies(lv,  user, isDirtyRef)
+        ["companies":["Tracked" :[SortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING)],
+                      "Surfaced":[SortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING)],
+                      "Watched" :[SortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.WATCHING)]]]
+//        // todo group by level, order by level-ordinal+ name
+//        ["companies" : [
+//              "Tracked" : [
+//                    "Adobe",
+//                    "Microsoft",
+//                    "Salesforce",
+//                    "Plutomen",
+//                    "Magic Leap"],
+//              "Surfaced" : [
+//                    "Mesh",
+//                    "Activision Blizzard",
+//                    "Vsight"],
+//              "Watched" : [
+//                      "Company 0", "Company 1", "Company 2", "Company 3", "Company 4",
+//                      "Company 5", "Company 6", "Company 7", "Company 8", "Company 9",
+//                      "Company 10","Company 11","Company 12","Company 13","Company 14",
+//                      "Company 15","Company 16","Company 17","Company 18","Company 19",
+//                      "Company 20","Company 21","Company 22","Company 23","Company 24",
+//                      "Company 25","Company 26","Company 27","Company 28","Company 29",
+//                      "Company 30","Company 31","Company 32","Company 33","Company 34",
+//                      "Company 35","Company 36","Company 37","Company 38","Company 39",
+//                      "Company 40","Company 41","Company 42","Company 43","Company 44",
+//                      "Company 45","Company 46","Company 47","Company 48","Company 49",
+//                      "Company 50","Company 51","Company 52","Company 53","Company 54",
+//                      "Company 55","Company 56","Company 57","Company 58","Company 59",
+//                      "Company 60","Company 61","Company 62","Company 63","Company 64",
+//                      "Company 65","Company 66","Company 67","Company 68","Company 69",
+//                      "Company 70","Company 71","Company 72","Company 73","Company 74",
+//                      "Company 75","Company 76","Company 77","Company 78","Company 79",
+//                      "Company 80","Company 81","Company 82","Company 83","Company 84",
+//                      "Company 85","Company 86","Company 87","Company 88","Company 89",
+//                      "Company 90","Company 91","Company 92","Company 93","Company 94",
+//                      "Company 95","Company 96","Company 97","Company 98","Company 99"]
+//            ]
+//        ]
+    }
+
+    public List<String> SortedCannonicalNamesFilteredByLevel(Set<CompanyViewObject> cvos, String level) {
+        (cvos.findAll({ it.level = level })*.company.canonicalName).sort()
     }
 
     boolean addCompanyToVew(User user, String companyUUID, long viewId) {
@@ -367,5 +376,31 @@ class ApiService {
                 state:          state,
                 ts:             ts
         ], true).entityViewEvent as Map
+    }
+
+    List<Organization> createUsersAndOrgsFromApi() {
+        Organization.withTransaction { status ->
+            Map result = httpClientService.getParamsExpectMap("organization/${Organization.COVERITAS_UUID}/${User.SYS_ADMIN_UUID}", null, true)
+            List<Organization> lOrgs = Organization.findAll()
+            result.organizations.each{ Map ro ->
+                System.out.println(ro)
+                String roUuid = ro.uuid
+                Organization lo = lOrgs.find {it.uuid==roUuid}
+                if (lo==null){
+                    Date now = new Date()
+                    lo = new Organization(uuid:roUuid, name: ro.name, country: "US", description: ro.description, created:now).save(update:false, flush:true,failOnError:true)
+                    User.create(ro.adminUUID as String, "admin", lo, "@dm1n!", [Role.findByName(Role.ADMIN)] as Set<Role>)
+                }
+                Map resultU = httpClientService.getParamsExpectMap("user/${roUuid}/${User.SYS_ADMIN_UUID}", null, true)
+                resultU.users.keySet.each { String ruUuid ->
+                    User lu = lo.users.find { it.uuid == ruUuid }
+                    if (lu==null){
+                        User.create(ru.uuid as String, ruUuid as String, lo, "test", [Role.findByName(Role.USER)] as Set<Role>)
+                    }
+                }
+
+            }
+            Organization.findAll()
+        }
     }
 }
