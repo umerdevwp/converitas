@@ -12,12 +12,11 @@ class ProjectController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
-        Set<Project> projects = apiService.remoteProjects(u)
-
         params.max = Math.min(max ?: 10, 100)
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         if (u) {
+            apiService.remoteProjects(u)
             List<Project> projects = u.isSysAdmin() ? projectService.list(params) : Project.findAllByOrganization(u.organization, params)
             long total = u.isSysAdmin() ? projectService.count() : Project.countByOrganization(u.organization)
             respond projects, model: [projectCount: total]

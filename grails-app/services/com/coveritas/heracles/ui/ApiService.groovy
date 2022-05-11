@@ -277,8 +277,8 @@ class ApiService {
 
         List<EntityViewEvent>  entityViewEvents = []
         Map events = httpClientService.getParamsExpectMap("eve/view/entity/${vUuid}/${cUuid}/${from}/${to}", null as Map, true)
-        List<Map<String, Object>> remoteViews = events.entityViewEvents
-        remoteViews.eachWithIndex {Map e, int i ->
+        List<Map<String, Object>> eves = events.entityViewEvents
+        eves.eachWithIndex {Map e, int i ->
             // todo change the content based on event type and state
             EntityViewEvent event = Meta.fromMap(EntityViewEvent.class, e) as EntityViewEvent
             event.id = i
@@ -402,5 +402,68 @@ class ApiService {
             }
             Organization.findAll()
         }
+    }
+
+    Map contentForProject(User user, String projectUUID) {
+        Project project = remoteProjects(user).find({ Project p -> p.uuid == projectUUID })
+
+        def eves = allEventsForProject(user, project.uuid)
+        long now = System.currentTimeMillis()
+        [
+         Description:[project.name,project.description],
+         Insights:[eves],
+         Comments:[millis:"This is a comment",
+                   "${now-100}":"This is another comment",
+                   "${now-66}":"This is now the third comment",
+                   "${now-33}":"This is the least important comment",
+                   "${now}":"This is now the last comment"         ],
+         Constraints:[employees:"10-200000",
+                   "marketCap":"0-10B",
+                   "revenue":"undefined",
+                   "categories":"AR"]
+        ]
+    }
+
+    Map contentForCompanyInProject(User user, String projectUUID, String companyUUID) {
+        Project project = remoteProjects(user).find({ Project p -> p.uuid == projectUUID })
+
+        def eves = allEventsForCompanyAndProject(user, project.uuid)
+        long now = System.currentTimeMillis()
+        [
+         Description:[project.name,project.description],
+         Insights:[eves],
+         Comments:[millis:"This is a comment",
+                   "${now-100}":"This is another comment",
+                   "${now-66}":"This is now the third comment",
+                   "${now-33}":"This is the least important comment",
+                   "${now}":"This is now the last comment"         ],
+         Constraints:[employees:"10-200000",
+                   "marketCap":"0-10B",
+                   "revenue":"undefined",
+                   "categories":"AR"]
+        ]
+    }
+
+    List<EntityViewEvent> allEventsForProject(User user, String pUUID) {
+        Map events = httpClientService.getParamsExpectMap("eve/projects/${pUUID}", null, true)
+        eveIt(events)
+    }
+
+    List<EntityViewEvent> allEventsForCompanyInProject(User user, String pUUID, String cUUID) {
+        Map events = httpClientService.getParamsExpectMap("eve/projects/entity/${pUUID}/${cUUID}", null, true)
+        eveIt(events)
+    }
+
+    List<EntityViewEvent> eveIt(Map<String, Object> events) {
+        List<EntityViewEvent> entityViewEvents = []
+        List<Map<String, Object>> eves = events.entityViewEvents
+        eves.eachWithIndex { Map e, int i ->
+            // todo change the content based on event type and state
+            EntityViewEvent event = Meta.fromMap(EntityViewEvent.class, e) as EntityViewEvent
+            event.id = i
+            entityViewEvents.add(event)
+        }
+
+        entityViewEvents
     }
 }
