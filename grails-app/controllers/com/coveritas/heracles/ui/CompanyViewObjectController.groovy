@@ -80,6 +80,9 @@ class CompanyViewObjectController {
         }
 
         try {
+            Long userID = session['userID'] as Long
+            User u = User.get(userID)
+            httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, projectUUID:companyViewObject.projectUUID, viewUUID: companyViewObject.viewUUID, companyUUID: companyViewObject.company.uuid, level: companyViewObject.level], false)
             companyViewObjectService.save(companyViewObject)
         } catch (ValidationException e) {
             respond companyViewObject.errors, view:'edit'

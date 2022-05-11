@@ -407,7 +407,8 @@ class ApiService {
     }
 
     Map contentForProject(User user, String projectUUID) {
-        Project project = remoteProjects(user).find({ Project p -> p.uuid == projectUUID })
+//        Project project = remoteProjects(user).find({ Project p -> p.uuid == projectUUID })
+        Project project = Project.findByUuid( projectUUID )
 
         def eves = allEventsForProject(user, project.uuid)
         long now = System.currentTimeMillis()
@@ -447,12 +448,12 @@ class ApiService {
     }
 
     List<EntityViewEvent> allEventsForProject(User user, String pUUID) {
-        Map events = httpClientService.getParamsExpectMap("eve/projects/${pUUID}", null, true)
+        Map events = httpClientService.getParamsExpectMap("eve/project/${pUUID}", null, true)
         eveIt(events)
     }
 
     List<EntityViewEvent> allEventsForCompanyInProject(User user, String pUUID, String cUUID) {
-        Map events = httpClientService.getParamsExpectMap("eve/projects/entity/${pUUID}/${cUUID}", null, true)
+        Map events = httpClientService.getParamsExpectMap("eve/project/entity/${pUUID}/${cUUID}", null, true)
         eveIt(events)
     }
 

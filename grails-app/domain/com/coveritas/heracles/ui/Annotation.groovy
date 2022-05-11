@@ -4,6 +4,9 @@ class Annotation extends ViewObject {
     String annotationType  // could be description, note, constraint?
     String title
     String textContent
+    byte[] binContent
+    long ts
+    User user
     static hasOne = [annotatedVO:ViewObject]
 
     static mapping = {
@@ -11,6 +14,11 @@ class Annotation extends ViewObject {
     }
 
     static constraints = {
+        id              generator:'increment'
+        textContent     nullable:true
+        annotationType  nullable:true
+        binContent      nullable:true
+        ts              nullable:true
     }
 
     @Override

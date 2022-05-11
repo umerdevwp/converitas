@@ -55,7 +55,7 @@
                   &nbsp;&nbsp;&nbsp;
                 </g:if>
             </g:if>
-            <a href="/auth/logout">Logout ${u.name}</a>
+            <a href="/auth/logout">Logout ${u}</a>
         </g:if>
         <g:else>
             <a href="/auth/login">Login</a>
