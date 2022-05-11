@@ -123,6 +123,7 @@ environments:
 #            dbCreate: create-drop
             dbCreate: update
             url: "jdbc:postgresql://localhost:5432/man-ui?reWriteBatchedInserts=true&ssl=false"
+#            url: "jdbc:postgresql://localhost:5432/man-ui1?reWriteBatchedInserts=true&ssl=false"
             numThreads: 5
             maxConnections: 5
             minConnections: 1
@@ -137,6 +138,7 @@ environments:
         dataSource:
             dbCreate: update
             url: "jdbc:postgresql://localhost:5432/man-ui?reWriteBatchedInserts=true&ssl=false"
+#            url: "jdbc:postgresql://localhost:5432/man-ui1?reWriteBatchedInserts=true&ssl=false"
             numThreads: 5
             maxConnections: 5
             minConnections: 1
@@ -151,6 +153,7 @@ environments:
         dataSource:
             dbCreate: update
             url: "jdbc:postgresql://localhost:5432/man-ui?reWriteBatchedInserts=true&ssl=false"
+#            url: "jdbc:postgresql://localhost:5432/man-ui1?reWriteBatchedInserts=true&ssl=false"
             numThreads: 5
             maxConnections: 5
             minConnections: 1

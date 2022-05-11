@@ -294,45 +294,40 @@ class ApiService {
         Boolean lpIsDirty = false
         Boolean[] isDirtyRef = {lpIsDirty}
         Set<CompanyViewObject> cvos = remoteViewCompanies(lv,  user, isDirtyRef)
-        ["companies":["Tracked" :sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
-                      "Surfaced":sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING),
-                      "Watched" :sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.WATCHING)]]
+//        ["companies":["Tracked" :sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
+//                      "Surfaced":sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING),
+//                      "Watched" :sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.WATCHING)]]
 
-//        // todo group by level, order by level-ordinal+ name
-//        ["companies" : [
-//              "Tracked" : [
-//                    "Adobe",
-//                    "Microsoft",
-//                    "Salesforce",
-//                    "Plutomen",
-//                    "Magic Leap"],
-//              "Surfaced" : [
-//                    "Mesh",
-//                    "Activision Blizzard",
-//                    "Vsight"],
-//              "Watched" : [
-//                      "Company 0", "Company 1", "Company 2", "Company 3", "Company 4",
-//                      "Company 5", "Company 6", "Company 7", "Company 8", "Company 9",
-//                      "Company 10","Company 11","Company 12","Company 13","Company 14",
-//                      "Company 15","Company 16","Company 17","Company 18","Company 19",
-//                      "Company 20","Company 21","Company 22","Company 23","Company 24",
-//                      "Company 25","Company 26","Company 27","Company 28","Company 29",
-//                      "Company 30","Company 31","Company 32","Company 33","Company 34",
-//                      "Company 35","Company 36","Company 37","Company 38","Company 39",
-//                      "Company 40","Company 41","Company 42","Company 43","Company 44",
-//                      "Company 45","Company 46","Company 47","Company 48","Company 49",
-//                      "Company 50","Company 51","Company 52","Company 53","Company 54",
-//                      "Company 55","Company 56","Company 57","Company 58","Company 59",
-//                      "Company 60","Company 61","Company 62","Company 63","Company 64",
-//                      "Company 65","Company 66","Company 67","Company 68","Company 69",
-//                      "Company 70","Company 71","Company 72","Company 73","Company 74",
-//                      "Company 75","Company 76","Company 77","Company 78","Company 79",
-//                      "Company 80","Company 81","Company 82","Company 83","Company 84",
-//                      "Company 85","Company 86","Company 87","Company 88","Company 89",
-//                      "Company 90","Company 91","Company 92","Company 93","Company 94",
-//                      "Company 95","Company 96","Company 97","Company 98","Company 99"]
-//            ]
-//        ]
+        // todo group by level, order by level-ordinal+ name
+        ["companies" : [
+              "Tracked" : sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
+              "Surfaced" : [
+                    "Mesh",
+                    "Activision Blizzard",
+                    "Vsight"],
+              "Watched" : [
+                      "Company 0", "Company 1", "Company 2", "Company 3", "Company 4",
+                      "Company 5", "Company 6", "Company 7", "Company 8", "Company 9",
+                      "Company 10","Company 11","Company 12","Company 13","Company 14",
+                      "Company 15","Company 16","Company 17","Company 18","Company 19",
+                      "Company 20","Company 21","Company 22","Company 23","Company 24",
+                      "Company 25","Company 26","Company 27","Company 28","Company 29",
+                      "Company 30","Company 31","Company 32","Company 33","Company 34",
+                      "Company 35","Company 36","Company 37","Company 38","Company 39",
+                      "Company 40","Company 41","Company 42","Company 43","Company 44",
+                      "Company 45","Company 46","Company 47","Company 48","Company 49",
+                      "Company 50","Company 51","Company 52","Company 53","Company 54",
+                      "Company 55","Company 56","Company 57","Company 58","Company 59",
+                      "Company 60","Company 61","Company 62","Company 63","Company 64",
+                      "Company 65","Company 66","Company 67","Company 68","Company 69",
+                      "Company 70","Company 71","Company 72","Company 73","Company 74",
+                      "Company 75","Company 76","Company 77","Company 78","Company 79",
+                      "Company 80","Company 81","Company 82","Company 83","Company 84",
+                      "Company 85","Company 86","Company 87","Company 88","Company 89",
+                      "Company 90","Company 91","Company 92","Company 93","Company 94",
+                      "Company 95","Company 96","Company 97","Company 98","Company 99"]
+            ]
+        ]
     }
 
     List<String> sortedCannonicalNamesFilteredByLevel(Set<CompanyViewObject> cvos, String level) {
