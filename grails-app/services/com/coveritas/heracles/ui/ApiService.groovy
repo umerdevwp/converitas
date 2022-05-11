@@ -90,6 +90,9 @@ class ApiService {
         View.withTransaction { TransactionStatus status ->
             lv = View.get(lv.id)
             List<CompanyViewObject> localCompanies = CompanyViewObject.findAllByView(lv)
+            if (true) {
+                return localCompanies
+            }
             String vUuid = lv.uuid
             Project lp = lv.project
             String pUuid = lp.uuid
@@ -405,45 +408,71 @@ class ApiService {
 //        Project project = remoteProjects(user).find({ Project p -> p.uuid == projectUUID })
         Project project = Project.findByUuid( projectUUID )
 
-        def eves = allEventsForProject(user, project.uuid)
+        List<EntityViewEvent> eves = allEventsForProject(user, projectUUID)
         long now = System.currentTimeMillis()
         [
          Description:[project.name,project.description],
          Insights:[eves],
-         Comments:[millis:"This is a comment",
-                   "${now-100}":"This is another comment",
-                   "${now-66}":"This is now the third comment",
-                   "${now-33}":"This is the least important comment",
-                   "${now}":"This is now the last comment"         ],
+         Comments:["${now-50*60000}":"This is a comment",
+                   "${now-40*60000}":"This is another comment",
+                   "${now-30*60000}":"This is now the third comment",
+                   "${now-20*60000}":"This is the least important comment",
+                   "${now-10*60000}":"This is now the last comment"         ],
          Constraints:[employees:"10-200000",
-                   "marketCap":"0-10B",
-                   "revenue":"undefined",
-                   "categories":"AR"]
+                      "Market Cap":"0-10B",
+                      "revenue":"undefined",
+                      "categories":"AR"]
+        ]
+    }
+
+    Map contentForView(User user, String viewUUID) {
+//        Project project = remoteProjects(user).find({ Project p -> p.uuid == viewUUID })
+        View project = View.findByUuid( viewUUID )
+
+        List<EntityViewEvent> eves = allEventsForView(user, viewUUID)
+        long now = System.currentTimeMillis()
+        [
+         Description:[project.name,project.description],
+         Insights:[eves],
+         Comments:["${now-50*60000}":"This is a comment",
+                   "${now-40*60000}":"This is another comment",
+                   "${now-30*60000}":"This is now the third comment",
+                   "${now-20*60000}":"This is the least important comment",
+                   "${now-10*60000}":"This is now the last comment"         ],
+         Constraints:[employees:"10-200000",
+                      "Market Cap":"0-10B",
+                      "revenue":"undefined",
+                      "categories":"AR"]
         ]
     }
 
     Map contentForCompanyInProject(User user, String projectUUID, String companyUUID) {
         Project project = remoteProjects(user).find({ Project p -> p.uuid == projectUUID })
 
-        def eves = allEventsForCompanyAndProject(user, project.uuid)
+        def eves = allEventsForCompanyInProject(user, project.uuid)
         long now = System.currentTimeMillis()
         [
-         Description:[project.name,project.description],
+         Profile:[project.name,project.description],
          Insights:[eves],
-         Comments:[millis:"This is a comment",
-                   "${now-100}":"This is another comment",
-                   "${now-66}":"This is now the third comment",
-                   "${now-33}":"This is the least important comment",
-                   "${now}":"This is now the last comment"         ],
-         Constraints:[employees:"10-200000",
-                   "marketCap":"0-10B",
-                   "revenue":"undefined",
-                   "categories":"AR"]
+         Comments:["${now-50*60000}":"This is a comment",
+                   "${now-40*60000}":"This is another comment",
+                   "${now-30*60000}":"This is now the third comment",
+                   "${now-20*60000}":"This is the least important comment",
+                   "${now-10*60000}":"This is now the last comment"         ],
+         "Similar Companies":["",
+                   "marketCap",
+                   "revenue",
+                   "categories"]
         ]
     }
 
     List<EntityViewEvent> allEventsForProject(User user, String pUUID) {
         Map events = httpClientService.getParamsExpectMap("eve/project/${pUUID}", null, true)
+        eveIt(events)
+    }
+
+    List<EntityViewEvent> allEventsForView(User user, String vUUID) {
+        Map events = httpClientService.getParamsExpectMap("eve/view/${vUUID}", null, true)
         eveIt(events)
     }
 

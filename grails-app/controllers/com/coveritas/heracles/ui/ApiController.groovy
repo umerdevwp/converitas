@@ -74,7 +74,18 @@ class ApiController {
         }
     }
 
+    def contentForView(long id) {
+        call {
+            User u = User.get(session['userID'] as long)
+            apiService.contentForView(u, View.get(id).uuid)
+        }
+    }
 
+    def contentForCompanyInProject(String companyUUID, long viewId) {
+        User u = User.get(session['userID'] as long)
+        String projectUUID = View.get(viewId).project.uuid
+        apiService.contentForCompanyInProject(u, projectUUID, companyUUID)
+    }
 
 /*
 
