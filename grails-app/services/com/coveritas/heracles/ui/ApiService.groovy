@@ -468,4 +468,19 @@ class ApiService {
 
         entityViewEvents
     }
+
+    void activateAllViews() {
+        for (View v in View.all) {
+            Organization org = v.project.organization
+            User u = User.findByOrganizationAndName(org, "admin")
+            if (u) {
+                httpClientService.postParamsExpectResult("view/set",
+                        [userUUID   : u.uuid,
+                         userOrgUUID: org.uuid,
+                         projectUUID: v.project.uuid,
+                         viewUUID   : v.uuid,
+                         level      : 'start'], true)
+            }
+        }
+    }
 }
