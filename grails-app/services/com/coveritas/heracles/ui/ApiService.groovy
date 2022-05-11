@@ -69,10 +69,9 @@ class ApiService {
                         Set<String> remoteViewUUIDs = remoteViews.keySet()
                         Set<View> localViews = []
                         for (String rvUuid : remoteViewUUIDs) {
-                            View lv = createOrUpdateViewFromApi(rvUuid, rpUuid, orgUuid, user.uuid)
-                            localViews.add(lv)
                             Boolean[] isDirtyRef = {lpIsDirty}
-                            remoteViewCompanies(lv, user, isDirtyRef)
+                            View lv = createOrUpdateViewFromApi(rvUuid, rpUuid, orgUuid, user, isDirtyRef)
+                            localViews.add(lv)
                         }
                         if (lpIsDirty) {
                             lp.views = localViews
@@ -183,7 +182,7 @@ class ApiService {
         return lc
     }
 
-    View createOrUpdateViewFromApi(String vUuid, String pUuid, String userOrgUUID, String userUuid, View lv=null) {
+    View createOrUpdateViewFromApi(String vUuid, String pUuid, String userOrgUUID, User user, Boolean[] isDirtyRef, View lv=null) {
         if (lv==null) {
             lv = View.findByUuid(vUuid)
         }
@@ -222,6 +221,8 @@ class ApiService {
                 lv = View.findByUuid(vUuid)
             }
         }
+        remoteViewCompanies(lv, user, isDirtyRef)
+
         return lv
     }
 
@@ -293,9 +294,10 @@ class ApiService {
         Boolean lpIsDirty = false
         Boolean[] isDirtyRef = {lpIsDirty}
         Set<CompanyViewObject> cvos = remoteViewCompanies(lv,  user, isDirtyRef)
-        ["companies":["Tracked" :[SortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING)],
-                      "Surfaced":[SortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING)],
-                      "Watched" :[SortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.WATCHING)]]]
+        ["companies":["Tracked" :sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
+                      "Surfaced":sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING),
+                      "Watched" :sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.WATCHING)]]
+
 //        // todo group by level, order by level-ordinal+ name
 //        ["companies" : [
 //              "Tracked" : [
@@ -333,8 +335,8 @@ class ApiService {
 //        ]
     }
 
-    public List<String> SortedCannonicalNamesFilteredByLevel(Set<CompanyViewObject> cvos, String level) {
-        (cvos.findAll({ it.level = level })*.company.canonicalName).sort()
+    List<String> sortedCannonicalNamesFilteredByLevel(Set<CompanyViewObject> cvos, String level) {
+        (cvos.findAll({ it.level == level })*.company.canonicalName).sort()
     }
 
     boolean addCompanyToVew(User user, String companyUUID, long viewId) {

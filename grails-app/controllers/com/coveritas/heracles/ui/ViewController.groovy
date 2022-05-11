@@ -102,6 +102,7 @@ class ViewController {
 
     def addCompany() {
         CompanyViewObject cvo = new CompanyViewObject(params)
+        String url = params.url
         View view = View.get(params.get("view").id as long)
         cvo.view = view
         Company company = apiService.createOrUpdateCompanyFromApi(params.companyUUID as String)
@@ -127,15 +128,15 @@ class ViewController {
                 request.withFormat {
                     form multipartForm {
 //                        flash.message = message(code: 'default.created.message', args: [message(code: 'companyViewObject.label', default: 'CompanyViewObject'), cvo])
-                        if (params.url!=null) {
-                            redirect url:params.url
+                        if (url!=null) {
+                            redirect url:url
                         } else {
                             redirect view
                         }
                     }
 //                    flash.message = message(code: 'default.updated.message', args: [message(code: 'view.label', default: 'CompanyViewObject'), cvo])
-                    if (params.url!=null) {
-                        redirect url:params.url
+                    if (url!=null) {
+                        redirect url:url
                     } else {
                         redirect view
                     }

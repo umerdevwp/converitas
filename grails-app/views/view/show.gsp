@@ -1,4 +1,4 @@
-<%@ page import="com.coveritas.heracles.json.EntityViewEvent; com.coveritas.heracles.ui.User" %>
+<%@ page import="com.coveritas.heracles.ui.CompanyViewObject; com.coveritas.heracles.json.EntityViewEvent; com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -90,6 +90,46 @@
                                         </ol>
                                     </li>
                                 </g:each>
+
+                                <div id="addCompanyToView" style="display: none">
+                                    <g:form method="POST" url="/view/addCompany">
+                                        <fieldset class="form">
+                                            %{--                    <f:all bean="companyViewObject"/>--}%
+                                            <g:hiddenField name="view.id" value="${this.view.id}"/>
+                                            <g:hiddenField name="level" value="${CompanyViewObject.TRACKING}"/>
+                                            %{--                    <f:field bean="companyViewObject" property="company"/>--}%
+                                            %{--                            <div style="display: block">--}%
+                                            <div class="fieldcontain required">
+                                                <label for="companyUUID">Company<span class="required-indicator">*</span></label>
+                                                <input id="companyInput" placeholder="Add a Company" size="40">
+                                                <div style="display:inline-block;width:150px;background-color: transparent">
+                                                    <input type="hidden" id="companyUUID" name="companyUUID"/>
+                                                </div>
+                                                <div style="width:400px;height:30px;background-color: transparent">
+                                                    <select class="form-control list-group" id="companyOptions" style="display:none">
+                                                    </select>
+                                                </div>
+                                                <div class="messageSection hide">Start tracking the selected company</div>
+                                            </div>
+
+                                            %{--                            </div>--}%
+                                            %{--
+                                                                        <div class="fieldcontain required">
+                                                                            <label for="level">Level<span class="required-indicator">*</span></label>
+                                                                            <select name="level" id="level" class="form-control list-group">
+                                                                                <g:each in="${com.coveritas.heracles.ui.CompanyViewObject.LEVELS}" var="l">
+                                                                                    <option value="${l}">${l}</option>
+                                                                                </g:each>
+                                                                            </select>
+                                                                       </div>
+                                            --}%
+                                        </fieldset>
+                                        <fieldset class="buttons">
+                                            <button style="display: none" class="save" type="submit" id="addButton">Add Company</button>
+                                        </fieldset>
+                                    </g:form>
+                                </div>
+
                             </ul>
                         </div>
                     </li>
@@ -105,42 +145,6 @@
                         <input class="delete" type="submit" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
                     </fieldset>
                 </g:form>
-                <div id="addCompanyToView" style="display: none">
-                    <g:form method="POST" url="/view/addCompany">
-                        <fieldset class="form">
-                            %{--                    <f:all bean="companyViewObject"/>--}%
-                            <g:hiddenField name="view.id" value="${this.view.id}"/>
-                            %{--                    <f:field bean="companyViewObject" property="company"/>--}%
-%{--                            <div style="display: block">--}%
-                                <div class="fieldcontain required">
-                                    <label for="companyUUID">Company<span class="required-indicator">*</span></label>
-                                    <input id="companyInput" placeholder="Add a Company" size="40">
-                                    <div style="display:inline-block;width:150px;background-color: transparent">
-                                        <input type="hidden" id="companyUUID" name="companyUUID"/>
-                                    </div>
-                                    <div style="width:400px;height:30px;background-color: transparent">
-                                        <select class="form-control list-group" id="companyOptions" style="display:none">
-                                        </select>
-                                    </div>
-                                    <div class="messageSection hide">Start tracking the selected company</div>
-                                </div>
-
-%{--                            </div>--}%
-                            <div class="fieldcontain required">
-                                <label for="level">Level<span class="required-indicator">*</span></label>
-                                <select name="level" id="level" class="form-control list-group">
-                                    <g:each in="${com.coveritas.heracles.ui.CompanyViewObject.LEVELS}" var="l">
-                                        <option value="${l}">${l}</option>
-                                    </g:each>
-                                </select>
-                           </div>
-                        </fieldset>
-                        <fieldset class="buttons">
-                            <button style="display: none" class="save" type="submit" id="addButton">Add Company</button>
-                        </fieldset>
-                    </g:form>
-                </div>
-
             </g:if>
             <g:else>
                 UNAUTHORIZED ACCESS
@@ -186,7 +190,7 @@
             window.location = '/view/show/${view.id}?ts=' + props.time.getTime();
         });
 
-        function loadTimelineData () {
+        function loadTimelineData() {
             $.ajax({
                 url: '/api/viewtimeline/${view.id}?from='+ from + '&to=' + to,
                 success: function(data) {
@@ -202,7 +206,7 @@
             })
         }
 
-        function loadCompanyStatus () {
+        function loadCompanyStatus() {
             $.ajax({
                 url: '/api/viewcompanystate/${view.id}',
                 success: function(data) {
@@ -233,6 +237,38 @@
             })
         }
 
+        function loadProjectContent() {
+            $.ajax({
+                url: '/api/contentForProject/${view.project.id}',
+                success: function(data) {
+console.log(data)
+                    // let html = ''
+                    // Object.keys(data.companies).map(function(head) {
+                    //     const companies = data.companies[head];
+                    //     let len = companies.length;
+                    //     console.log(head, len);
+                    //     let companyList = '<ul>'
+                    //     // for (const company of companies) {
+                    //     for (let i=0; i<len; i++) {
+                    //         const company  = companies[i];
+                    //         if (i>=10) {
+                    //             companyList   += '<a>(+)</a>';
+                    //             break;
+                    //         }
+                    //         companyList   += '<li>'+company+'</li>';
+                    //     }
+                    //     companyList    += '</ul>'
+                    //     html += ' <h3>'+head+' ('+len+')</h3>'+companyList;
+                    // });
+                    // $('#companies').html(html);
+                },
+                error: function(err, status) {
+                    console.log(err);
+                    alert(err.responseJSON.message);
+                }
+            })
+        }
+
         window.search = function() {
             const range = timeline.getWindow();
             const from = range.start.getTime(), to = range.end.getTime();
@@ -241,6 +277,7 @@
 
         loadTimelineData();
         loadCompanyStatus();
+        loadProjectContent();
 
     </script>
     </body>
