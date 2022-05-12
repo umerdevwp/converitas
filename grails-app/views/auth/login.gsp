@@ -22,7 +22,7 @@
 </head>
 <body>
 
-<div id="show-organization" class="content scaffold-show" role="main">
+<!-- <div id="show-organization" class="content scaffold-show" role="main">
     <h1><g:message code="default.prompt.login.label" /></h1>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
@@ -48,6 +48,60 @@
             <input class="login" type="submit" value="${message(code: 'default.button.login.label', default: 'Login')}" />
         </fieldset>
     </g:form>
-</div>
+</div> -->
+
+
+ <div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+		
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- form card login -->
+                    <div class="card rounded-0" id="login-form">
+                        <div class="col-md-12 text-center mb-5">
+                            <asset:image width="100px" height="100px" src="coveritas.svg" alt="Coveritas Logo"/>
+                        </div>
+                        <div class="card-header">
+                            
+                            <h3 class="mb-0"><g:message code="default.prompt.login.label" /></h3>
+                            <g:if test="${flash.message}">
+                                <div class="message" role="status">${flash.message}</div>
+                            </g:if>
+                        </div>
+                        <div class="card-body">
+                            <g:form controller="auth" action="authentication" method="POST">
+                                <div class="form-group">
+                                    <label for="uname1">Username</label>
+                                    
+                                    <g:field type="text" class="form-control form-control-lg rounded-0" name="name"/>
+     
+                                </div>
+                                <div class="form-group">
+                                    <label>Password</label>
+                                   
+                                    <g:field type="password" class="form-control form-control-lg rounded-0" name="password"/>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="orgId">Organization</label>
+                                    <g:select name="orgId" class="form-control"
+                                        from="${Organization.list()}"
+                                        optionValue="name"
+                                        optionKey="uuid"/>
+                                </div>
+
+                                <input class="login btn btn-success btn-site-primary btn-lg float-right" type="submit" value="${message(code: 'default.button.login.label', default: 'Login')}" />
+                            </g:form>
+                        </div>
+                    </div>
+                    <!-- /form card login end-->
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
 </body>
 </html>

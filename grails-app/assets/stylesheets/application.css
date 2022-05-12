@@ -13,6 +13,226 @@
 *= require mobile
 *= require_self
 */
-/* body {
-  font-family: sans-serif;
-} */
+
+
+.background-color{
+  background: #faf9f8;
+}
+.row{
+  max-width:100%!important;
+}
+.companies-panel {
+  background: #ffffff;
+  margin-left: 0px !important;
+  padding-left: 15px;
+}
+.companies-panel h3 {
+  padding: 2rem 0 0 0;
+}
+.companies-panel ul {
+  list-style: none;
+  padding: .5rem 0 0 0;
+}
+
+nav.sidebar-menu ul{
+  margin:0;
+  padding:0;
+  height:100%;
+  width:200px;
+  position: fixed;
+  /*  position: sticky;
+    top: 4rem;
+    z-index: 1000;
+    height: calc(100vh - 4rem);*/
+  top:0;
+  left:0;
+  background-color:#ffffff;
+  border-right: 1px solid rgba(0,0,0,.1);
+}
+
+nav.sidebar-menu ul li{
+  list-style:none;
+}
+nav.sidebar-menu ul li.logo{
+  padding: 2rem;
+}
+nav.sidebar-menu ul li.logo a{
+  padding: 0;
+}
+
+nav.sidebar-menu ul li a{
+  display:block;
+  text-decoration:none;
+  text-transform:uppercase;
+  font-size:14px;
+  font-weight: 500;
+  color:#333;
+  position:relative;
+  padding:7px 0px 7px 20px;
+  transition:all 0.5s;
+}
+
+nav.sidebar-menu ul li a:before{
+  content:'';
+  position:absolute;
+  top:0;
+  right:0;
+  height:100%;
+  background:#e1e1e1;
+  border-radius:40px 0 0 40px;
+  z-index:-1;
+  transition:all 1s;
+}
+nav.sidebar-menu ul li.logo a:before{
+  background:none;
+}
+
+nav.sidebar-menu ul li a:hover{
+  color:#2b2626;
+}
+
+nav.sidebar-menu ul li a:hover:before{
+  width:95%;
+}
+
+.wrapper{
+  margin-left:200px;
+}
+
+
+div.card {
+  border: 0;
+  margin-bottom: 30px;
+  /* margin-top: 30px;
+  border-radius: 6px; */
+  color: rgba(0,0,0,.87);
+  background: #f1f6fc;
+  width: 100%;
+  /* box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12); */
+}
+
+div.card.card-plain {
+  background: transparent;
+  box-shadow: none;
+}
+div.card .card-header {
+  border-radius: 3px;
+  padding: 1rem 15px;
+  margin-left: 15px;
+  margin-right: 15px;
+  border: 0;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.card-plain .card-header:not(.card-avatar) {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.div.card .card-body{
+  padding: 15px 30px;
+}
+
+
+.card-nav-tabs .card-header {
+  
+}
+
+.card .card-header .nav-tabs {
+  padding: 0;
+}
+
+.nav-tabs {
+  border: 0;
+  border-radius: 3px;
+  padding: 0 15px;
+}
+
+.tab-pane{
+  background-color: #fff;
+  padding: 1rem;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+.nav-tabs .nav-item {
+  margin-bottom: -1px;
+  background: #fff;
+    width: 45%;
+    margin-bottom: 1rem;
+}
+
+.nav-tabs .nav-item .nav-link.active {
+  background-color: hsla(0,0%,100%,.2);
+  transition: background-color .3s .2s;
+}
+
+.nav-tabs .nav-item .nav-link{
+  border: 0!important;
+  color: #333!important;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-item .nav-link {
+  color: #333;
+  border: 0;
+  margin: 0;
+  border-radius: 3px;
+  line-height: 24px;
+ /*  text-transform: uppercase; */
+  font-size: 12px;
+  padding: 10px 15px;
+  background-color: transparent;
+  transition: background-color .3s 0s;
+}
+
+.nav-link{
+  display: block;
+}
+
+.nav-tabs .nav-item .material-icons {
+  margin: -1px 5px 0 0;
+  vertical-align: middle;
+}
+
+.nav .nav-item {
+  position: relative;
+}
+
+#login-form .card-header{
+  margin-left:0;
+  margin-right:0;
+}
+.btn-site-primary{
+  background-color: #133c7c;
+  border-color: #133c7c;
+}
+.btn-site-primary:hover{
+  background-color: #f59424;
+  border-color: #f59424;
+}
+
+table.project-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  margin: 30px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+table.project-table tbody{  overflow:auto; height: 400px; }
+table.project-table th { font-weight: 500; background-color: #f1f4f9; color: #00032a; text-align: left; }
+table.project-table td {}
+table.project-table th,
+table.project-table td { border-bottom: 1px solid rgba(48,64,80,.15); border-right: 1px solid rgba(48,64,80,.1); padding: 5px; font-size: 12px; }
+table.project-table tr:last-child td { border-bottom: 0; }
+table.project-table tr th:last-child,
+table.project-table tr td:last-child  { border-right: 0; }
+.table-scrollbar { position: relative;height: 200px;overflow: auto; }
+.table-wrapper-scroll-y { display: block; }

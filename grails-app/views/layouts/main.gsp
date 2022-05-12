@@ -9,7 +9,9 @@
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <asset:link rel="icon" href="favicon.ico" type="image/x-ico"/>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100&display=swap" rel="stylesheet">
     <asset:stylesheet src="application.css"/>
 
     <g:layoutHead/>
@@ -20,6 +22,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark navbar-static-top" role="navigation" >
     <a class="navbar-brand" href="/project/index"><asset:image width="48px" height="48px" src="coveritas.svg"
                                                                     alt="Coveritas Logo"/></a>
+                                                                
 
     <div class="navbar-collapse">
         %{--        <ul class="nav navbar-nav ml-auto">--}%
@@ -45,17 +48,17 @@
          &nbsp;&nbsp;&nbsp;
          <g:set var="u" value="${User.get(session["userID"])}"/>
          <g:if test="${u!=null}">
-             <a href="/project/index">Projects</a>
+            <!-- <a href="/project/index">Projects</a> -->
              &nbsp;&nbsp;&nbsp;
              <g:if test="${u.isAdmin()}">
-                <a href="/user/index">Users</a>
+              <!--   <a href="/user/index">Users</a> -->
                 &nbsp;&nbsp;&nbsp;
                 <g:if test="${u.isAdmin()}">
-                  <a href="/organization/index">Organizations</a>
+               <!--    <a href="/organization/index">Organizations</a> -->
                   &nbsp;&nbsp;&nbsp;
                 </g:if>
             </g:if>
-            <a href="/auth/logout">Logout ${u}</a>
+            <a href="/auth/logout">Logout ${u.name}</a>
         </g:if>
         <g:else>
             <a href="/auth/login">Login</a>
@@ -64,6 +67,38 @@
     </div>
 
 </nav>
+
+<g:set var="u" value="${User.get(session["userID"])}"/>
+            <g:if test="${u!=null}">
+
+<nav class="sidebar-menu">
+    <ul>
+        <li class="logo"><a class="navbar-brand" href="/project/index"><asset:image width="58px" height="58px" src="coveritas.svg" alt="Coveritas Logo"/></a></li>
+        <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+        <g:set var="u" value="${User.get(session["userID"])}"/>
+            <g:if test="${u!=null}">
+                <li><a href="/project/index">Projects</a></li>
+                <g:if test="${u.isAdmin()}">
+                    <li><a href="/user/index">Users</a></li>
+                    <g:if test="${u.isAdmin()}">
+                    <li><a href="/organization/index">Organizations</a></li>
+                    </g:if>
+                </g:if>
+               
+            </g:if>
+            <g:else>
+                
+            </g:else>
+    </ul>
+</nav>
+
+ </g:if>
+<g:else>
+</g:else>
+
+<div class="wrapper">
+
+
 <script>
     document.getElementById('q').addEventListener("keyup", function(event) {
         if (event.keyCode === 13) {
@@ -86,5 +121,6 @@
 
   gtag('config', 'G-V6N9TV480Q');
 </script>
+</div>
 </body>
 </html>
