@@ -186,7 +186,7 @@ class BootStrap {
                 Organization org = new Organization(uuid: Organization.COVERITAS_UUID, name: "CoVeritas", created: now, lastUpdated: now).save(failOnError: true)
                 Role adminRole = new Role(name: Role.ADMIN).save(failOnError: true)
                 new Role(name: Role.USER).save(failOnError: true)
-                User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>)
+                User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, Color.get(8))
             } else {
                 ApplicationContext ctx = Holders.grailsApplication.mainContext
                 ApiService apiService = ctx.getBean(ApiService)

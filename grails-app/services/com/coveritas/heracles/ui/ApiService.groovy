@@ -65,14 +65,14 @@ class ApiService {
                     // get all views for project (only uuid and status)
                     Map remoteVwMap = httpClientService.getParamsExpectObject("view/${orgUuid}/${user.uuid}/${rpUuid}",null, LinkedHashMap.class, true)
                     def views = remoteVwMap.views
-                    if (views!=null) {
-                        Map<String, Object> remoteViews = Meta.fromMap(LinkedHashMap, views) as Map<String, Object>
-                        Set<String> remoteViewUUIDs = remoteViews.keySet()
+                    if (views!=null && !views.isEmpty()) {
                         Set<View> localViews = []
-                        for (String rvUuid : remoteViewUUIDs) {
+                        for (Map view in views) {
                             Boolean[] isDirtyRef = {lpIsDirty}
-                            View lv = createOrUpdateViewFromApi(rvUuid, rpUuid, orgUuid, user, isDirtyRef)
-                            localViews.add(lv)
+                            for (String rvUUID in view.keySet()) {
+                                View lv = createOrUpdateViewFromApi(rvUUID, rpUuid, orgUuid, user, isDirtyRef)
+                                localViews.add(lv)
+                            }
                         }
                         if (lpIsDirty) {
                             lp.views = localViews
@@ -91,9 +91,9 @@ class ApiService {
         View.withTransaction { TransactionStatus status ->
             lv = View.get(lv.id)
             List<CompanyViewObject> localCompanies = CompanyViewObject.findAllByView(lv)
-            if (true) {
-                return localCompanies
-            }
+//            if (true) {
+//                return localCompanies
+//            }
             String vUuid = lv.uuid
             Project lp = lv.project
             String pUuid = lp.uuid

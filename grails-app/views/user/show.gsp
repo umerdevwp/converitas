@@ -39,7 +39,7 @@
                 <li class="fieldcontain">
                     <span id="color-label" class="property-label"><g:message code="user.color.label" default="Color" /></span>
                     <div class="property-value" aria-labelledby="organization-label">
-                        <span style="color: ${user.color.code}">${user.color}</span>
+                        <span style="color: ${user.color?.code}">${user.color}</span>
                     </div>
                 </li>
                 <li class="fieldcontain">

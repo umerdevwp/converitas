@@ -52,7 +52,7 @@ class ProjectController {
 //                    Date now = new Date()
                     project.uuid = uuid
                     project.organization = Organization.get(organization.id)
-                    if (project.users.isEmpty()) {
+                    if (!project.users?.size()) {
                         project.users = User.findAllByOrganization(organization)
                     }
                     projectService.save(project)

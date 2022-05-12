@@ -69,7 +69,8 @@ class User {
         }
     }
 
-    static User create(String uuid, String name, Organization org, String password, Set<Role> roles) {
+    static User create(String uuid, String name, Organization org, String password, Set<Role> roles, Color c = null) {
+        if (c==null) c = Color.get(8)
         byte[] salt = salt()
         User user = new User(uuid: uuid, name: name, salt:salt, passwordHash: passwordHash(password, salt))
         Date now = new Date()
@@ -77,6 +78,7 @@ class User {
         user.lastUpdated = now
         user.organization = org
         user.roles = roles
+        user.color = c
         user.save(update:false, flush:true, failOnError: true)
         user
     }
