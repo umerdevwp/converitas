@@ -82,9 +82,18 @@ class ApiController {
     }
 
     def contentForCompanyInProject(String companyUUID, long viewId) {
-        User u = User.get(session['userID'] as long)
-        String projectUUID = View.get(viewId).project.uuid
-        apiService.contentForCompanyInProject(u, projectUUID, companyUUID)
+        call {
+            User u = User.get(session['userID'] as long)
+            String projectUUID = View.get(viewId).project.uuid
+            apiService.contentForCompanyInProject(u, projectUUID, companyUUID)
+        }
+    }
+
+    def addComment(String projectUUID, String viewUUID, String companyUUID, String comment) {
+        call {
+            User u = User.get(session['userID'] as long)
+            apiService.addComment(u, projectUUID, viewUUID, companyUUID, comment)
+        }
     }
 
 /*

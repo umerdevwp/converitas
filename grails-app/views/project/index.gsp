@@ -31,6 +31,7 @@
                     <g:sortableColumn property="uuid" title="UUID" />
                     <g:sortableColumn property="description" title="Description" />
                     <g:sortableColumn property="views" title="Views" />
+                    <g:sortableColumn property="users" title="Users" />
                     <th>Action</th>
                 </thead>
                 <tbody>
@@ -44,7 +45,10 @@
                         <td><f:display bean="${bean}" property="uuid"  displayStyle="${'table'}" /></td>
                         <td><f:display bean="${bean}" property="description" displayStyle="${'table'}" />
                         <td><f:display bean="${bean}" property="views"  displayStyle="${'table'}" /></td>
-                        <td><a href="/view/create?project.id=${bean.id}">Add View</a></td>
+                        <td><f:display bean="${bean}" property="users"  displayStyle="${'table'}" /></td>
+                        <td>
+                            <a href="/view/create?project.id=${bean.id}">Add View</a>
+                        </td>
                     </tr>
                 </g:each>
                 </tbody>

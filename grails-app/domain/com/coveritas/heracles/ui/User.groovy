@@ -5,11 +5,13 @@ import java.security.SecureRandom
 
 class User {
     public static final String SYS_ADMIN_UUID = "asdjA12364SDUHADIh"
-    static hasMany = [roles:Role]
+    static hasMany = [roles:Role,projects:Project]
+    static belongsTo = [Project]
     Long id
     String uuid
     String name
     Organization organization
+    Color color
     byte[] passwordHash
     byte[] salt
 //    Organization organization
@@ -40,6 +42,7 @@ class User {
         uuid nullable: false, blank: false, unique: true
         roles lazy: false
         name blank: false, minSize: 3, unique: ['organization']
+        color nullable: true
     }
 
     private static final Random RANDOM = new SecureRandom()

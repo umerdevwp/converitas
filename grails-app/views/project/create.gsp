@@ -35,6 +35,7 @@
                     <g:if test="${u.isSysAdmin()}">
                         <f:field bean="project" property="organization"/>
                     </g:if>
+                    <f:field bean="project" property="users"/>
 %{--                    <f:field bean="project" property="views"/>--}%
                 </fieldset>
                 <fieldset class="buttons">

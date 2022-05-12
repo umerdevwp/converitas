@@ -39,6 +39,7 @@
                             <f:field bean="project" property="organization"/>
                         </g:if>
                         <f:field bean="project" property="views"/>
+                        <f:field bean="project" property="users"/>
                     </fieldset>
                     <fieldset class="buttons">
                         <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />

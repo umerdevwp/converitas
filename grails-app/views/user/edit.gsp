@@ -64,6 +64,21 @@
                                 <g:passwordField name="repeat"/>
                             </div>
                         </div>
+                        <div class="fieldcontain required">
+                            <label for="color.id">Color</label>
+                            <g:select name="color.id" id="color"
+                                      from="${com.coveritas.heracles.ui.Color.list()}"
+                                      optionValue="${{"<span style='color:"+it.code+"'>"+ it.name +"</span>"}}"
+                                      optionKey="id" noSelection="['':'-Choose your color-']"/>
+                            <div id="colorSample"></div>
+                            <script type="module">
+                                let $color = $("#color");
+                                let $sample = $("#colorSample");
+                                $color.on('change', function(){
+                                    $sample.html($color.find(":selected").text())
+                                })
+                            </script>
+                        </div>
                     </fieldset>
                     <fieldset class="buttons">
                         <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />

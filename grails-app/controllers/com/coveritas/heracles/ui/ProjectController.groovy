@@ -28,7 +28,8 @@ class ProjectController {
     }
 
     def create() {
-        respond new Project(params)
+        Project project = new Project(params)
+        respond project
     }
 
     def save(Project project) {
@@ -51,6 +52,9 @@ class ProjectController {
 //                    Date now = new Date()
                     project.uuid = uuid
                     project.organization = Organization.get(organization.id)
+                    if (project.users.isEmpty()) {
+                        project.users = User.findAllByOrganization(organization)
+                    }
                     projectService.save(project)
                 } catch (ValidationException e) {
                     respond project.errors, view:'create'

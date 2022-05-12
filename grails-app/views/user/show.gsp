@@ -37,6 +37,12 @@
                     <div class="property-value" aria-labelledby="organization-label"><f:display bean="user" property="organization"/></div>
                 </li>
                 <li class="fieldcontain">
+                    <span id="color-label" class="property-label"><g:message code="user.color.label" default="Color" /></span>
+                    <div class="property-value" aria-labelledby="organization-label">
+                        <span style="color: ${user.color.code}">${user.color}</span>
+                    </div>
+                </li>
+                <li class="fieldcontain">
                     <span id="roles-label" class="property-label"><g:message code="user.roles.label" default="Roles" /></span>
                     <div class="property-value" aria-labelledby="roles-label"><f:display bean="user" property="roles"/></div>
                 </li>

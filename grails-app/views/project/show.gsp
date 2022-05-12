@@ -44,6 +44,10 @@
                         <span id="views-label" class="property-label"><g:message code="project.views.label" default="Views" /></span>
                         <div class="property-value" aria-labelledby="views-label"><f:display bean="project" property="views"/></div>
                     </li>
+                    <li class="fieldcontain">
+                        <span id="users-label" class="property-label"><g:message code="project.users.label" default="Users" /></span>
+                        <div class="property-value" aria-labelledby="users-label"><f:display bean="project" property="users"/></div>
+                    </li>
                 </ol>
 
                 <g:form resource="${this.project}" method="DELETE">

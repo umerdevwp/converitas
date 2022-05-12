@@ -4,7 +4,7 @@
   Date: 11/10/21
   Time: 10:47 PM
 --%>
-<%@ page import="groovy.json.JsonOutput; com.google.gson.JsonObject; java.util.stream.Collectors" contentType="text/html;charset=UTF-8" %>
+<%@ page import="groovy.json.JsonOutput; java.util.stream.Collectors" contentType="text/html;charset=UTF-8" %>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html xmlns="http://www.w3.org/1999/html">

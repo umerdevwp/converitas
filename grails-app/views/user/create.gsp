@@ -1,4 +1,4 @@
-<%@ page import="com.coveritas.heracles.ui.User" %>
+<%@ page import="com.coveritas.heracles.ui.Color; com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -41,8 +41,23 @@
                             </label>
                             <g:passwordField name="password"/>
                         </div>
-                    </fieldset>
-                    <fieldset class="buttons">
+                        <div class="fieldcontain required">
+                            <label for="color.id">Color</label>
+                            <g:select name="color.id" id="color"
+                                      from="${com.coveritas.heracles.ui.Color.list()}"
+                                      optionValue="${{"<span style='color:"+it.code+"'>"+ it.name +"</span>"}}"
+                                      optionKey="id" noSelection="['':'-Choose your color-']"/>
+                            <div id="colorSample"></div>
+                        <script type="module">
+                            let $color = $("#color");
+                            let $sample = $("#colorSample");
+                            $color.on('change', function(){
+                                $sample.html($color.find(":selected").text())
+                            })
+                        </script>
+                    </div>
+          </fieldset>
+          <fieldset class="buttons">
                         <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
                     </fieldset>
                 </g:form>

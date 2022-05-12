@@ -2,6 +2,7 @@ package com.coveritas.heracles.ui
 
 import com.coveritas.heracles.HttpClientService
 import com.coveritas.heracles.json.EntityViewEvent
+import com.coveritas.heracles.utils.APIException
 import com.coveritas.heracles.utils.Meta
 import grails.gorm.transactions.Transactional
 import org.springframework.beans.factory.annotation.Autowired
@@ -163,17 +164,17 @@ class ApiService {
             } else {
                 lc = Company.get(lc.id)
                 if (!lc.overrideBackend) {
-                    lc.canonicalName = rc.canonicalName
-                    lc.normalizedName = rc.normalizedName
-                    lc.ticker = rc.ticker
-                    lc.exchange = rc.exchange
-                    lc.countryIso = rc.countryIso
-                    lc.source = rc.source
-                    lc.sourceId = rc.sourceId
-                    lc.category = rc.category
-                    lc.preferred = rc.preferred
-                    lc.overrideBackend = rc.overrideBackend
-                    lc.deleted = rc.deleted
+                    lc.canonicalName    = rc.canonicalName
+                    lc.normalizedName   = rc.normalizedName
+                    lc.ticker           = rc.ticker
+                    lc.exchange         = rc.exchange
+                    lc.countryIso       = rc.countryIso
+                    lc.source           = rc.source
+                    lc.sourceId         = rc.sourceId
+                    lc.category         = rc.category
+                    lc.preferred        = rc.preferred
+                    lc.overrideBackend  = rc.overrideBackend
+                    lc.deleted          = rc.deleted
                     //todo get and merge rc.attributes = ???
                 }
                 lc.save(update: true)
@@ -507,5 +508,77 @@ class ApiService {
                          level      : 'start'], true)
             }
         }
+    }
+
+    ViewObject findOrCreateViewObject(Organization org, String projectUUID, String viewUUID, String companyUUID) {
+        ViewObject.withTransaction { status ->
+            View view = View.findByUuid(viewUUID)
+            ViewObject vo
+            if (companyUUID) {
+                Company company = Company.findByUuid(companyUUID)
+                vo = CompanyViewObject.findByViewAndCompany(view, company)
+            } else {
+                if (viewUUID != null) {
+                    vo = ExtraViewObject.findByViewAndType(view, ExtraViewObject.T_VIEW)
+                    if (vo == null) {
+                        new ExtraViewObject(
+                                uuid: UUID.randomUUID(),
+                                organizationUUID: org.uuid,
+                                projectUUID: projectUUID,
+                                view:view,
+                                viewUUID: viewUUID,
+                                type: ExtraViewObject.T_VIEW).save(update: false, flush: true)
+                        vo = ExtraViewObject.findByViewAndType(view, ExtraViewObject.T_VIEW)
+                    }
+                } else {
+                    vo = ExtraViewObject.findByProjectUUIDAndType(projectUUID, ExtraViewObject.T_PROJECT)
+                    if (vo == null) {
+                        new ExtraViewObject(
+                                uuid: UUID.randomUUID(),
+                                organizationUUID: org.uuid,
+                                projectUUID: projectUUID,
+                                view:view,
+                                type: ExtraViewObject.T_PROJECT).save(update: false, flush: true)
+                        vo = ExtraViewObject.findByProjectUUIDAndType(projectUUID, ExtraViewObject.T_PROJECT)
+                    }
+                }
+            }
+            vo
+        }
+    }
+
+    Annotation addComment(User user, String projectUUID, String viewUUID, String companyUUID, String comment) {
+        ViewObject.withTransaction { status ->
+            if (projectUUID == null) {
+                if (viewUUID == null) {
+                    throw new APIException("projectUUID and viewUUID cannot be both null")
+                }
+                projectUUID = View.findByUuid(viewUUID).projUUID
+            }
+            ViewObject vo = findOrCreateViewObject(user.organization, projectUUID, viewUUID, companyUUID)
+            new Annotation(user: user, annotatedVO: vo, uuid: UUID.randomUUID(), organizationUUID: user.organization.uuid, projectUUID: projectUUID, viewUUID: viewUUID, title: comment, ts: System.currentTimeMillis(), annotationType: 'text').save(update: false, flush: true, failOnError: true)
+        }
+    }
+
+    List<Annotation> commentsForProject(String projectUUID) {
+        List<ViewObject> vos = ViewObject.findAllByProjectUUID(projectUUID)
+        extractAllAnnotations(vos)
+    }
+
+    List<Annotation> extractAllAnnotations(List<ViewObject> vos) {
+        List<Annotation> result = []
+        vos.each { result.addAll(it.annotations) }
+        result
+    }
+
+    List<Annotation> commentsForView(String viewUUID) {
+        List<ViewObject> vos = ViewObject.findAllByViewUUID(viewUUID)
+        extractAllAnnotations(vos)
+    }
+
+    List<Annotation> commentsForViewAndCompany(String viewUUID, String companyUUID) {
+        Company company = Company.findByUuid(companyUUID)
+        List<ViewObject> vos = CompanyViewObject.findAllByViewUUIDAndCompany(viewUUID, company)
+        extractAllAnnotations(vos)
     }
 }

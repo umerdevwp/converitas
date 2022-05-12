@@ -49,6 +49,20 @@ class ViewController {
         respond view, model:[ts: ts, events: events, eventCount: events.size()]
     }
 
+    def s(Long id) {
+        Long ts = params.ts ?  Long.parseLong(params.ts as String) : System.currentTimeMillis()
+        Long from = ts-12*3600*1000, to = ts+12*3600*1000
+        View view = viewService.get(id)
+        List<Map> eves = apiService.itemsForTimeline(view.uuid, from, to).tldata
+        List<EntityViewEvent> events = []
+        eves.each { Map eve ->
+            EntityViewEvent event = new EntityViewEvent()
+        }
+
+//        respond viewService.get(id)
+        respond view, model:[ts: ts, events: events, eventCount: events.size()]
+    }
+
     def create() {
         respond new View(params)
     }
@@ -135,6 +149,51 @@ class ViewController {
                         }
                     }
 //                    flash.message = message(code: 'default.updated.message', args: [message(code: 'view.label', default: 'CompanyViewObject'), cvo])
+                    if (url!=null) {
+                        redirect url:url
+                    } else {
+                        redirect view
+                    }
+                }
+            } else {
+                notAllowed('default.not.updated.message')
+            }
+        } else {
+            notAllowed('default.not.updated.message')
+        }
+    }
+
+    def addComment() {
+        String url = params.url
+        View view = View.get(params.get("view").id as long)
+        Company company = null
+        if (params.companyUUID!=null) {
+            company = apiService.createOrUpdateCompanyFromApi(params.companyUUID as String)
+        }
+        Long userID = session['userID'] as Long
+        User u = User.get(userID)
+        Project project = view.project
+        String comment = params.comment
+        Annotation annotation = new Annotation(user: u, annotationType:'text', title: comment) //, project.uuid, view.uuid, company?.uuid, comment
+        if (project.organization==u.organization|| u.isSysAdmin()) {
+            if (comment) {
+                try {
+                    annotation = apiService.addComment(u, project.uuid, view.uuid, company?.uuid, comment)
+                } catch (ValidationException e) {
+                    respond view.errors, view:'show'
+                    return
+                }
+
+                request.withFormat {
+                    form multipartForm {
+//                        flash.message = message(code: 'default.created.message', args: [message(code: 'companyViewObject.label', default: 'CompanyViewObject'), annotation])
+                        if (url!=null) {
+                            redirect url:url
+                        } else {
+                            redirect view
+                        }
+                    }
+//                    flash.message = message(code: 'default.updated.message', args: [message(code: 'view.label', default: 'CompanyViewObject'), annotation])
                     if (url!=null) {
                         redirect url:url
                     } else {

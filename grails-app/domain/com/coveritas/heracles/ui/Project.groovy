@@ -7,8 +7,8 @@ class Project {
     String description
     Organization organization
 //    static belongsTo = [organization:Organization]
-    static hasMany = [views:View]
-    static fetchMode = [views: 'eager']
+    static hasMany = [views:View, users:User]
+    static fetchMode = [views: 'eager', user: 'eager']
 
     @Override
     String toString() { name }
@@ -21,6 +21,7 @@ class Project {
         id generator : 'increment'
         uuid nullable: false, blank: false, unique: true
         name nullable: false, unique: ['organization']
+        users lazy: false
     }
 
     boolean equals(o) {

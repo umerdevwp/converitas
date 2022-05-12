@@ -30,6 +30,7 @@
                     <g:sortableColumn property="organization" title="Organization" />
                     <g:sortableColumn property="roles" title="Roles" />
                     <g:sortableColumn property="uuid" title="UUID" />
+                    <g:sortableColumn property="color" title="Color" />
                     <g:sortableColumn property="created" title="Created" />
                 </tr>
                 </thead>
@@ -41,6 +42,7 @@
                         <td><f:display bean="${bean}" property="organization"  displayStyle="${'table'}" /></td>
                         <td><f:display bean="${bean}" property="roles"  displayStyle="${'table'}" /></td>
                         <td><f:display bean="${bean}" property="uuid"  displayStyle="${'table'}" /></td>
+                        <td><span style="color: ${bean.color.code}">${bean.color}</span></td>
                         <td><f:display bean="${bean}" property="created"  displayStyle="${'table'}" /></td>
                     </tr>
                 </g:each>
