@@ -2,10 +2,10 @@ package com.coveritas.heracles.ui
 
 class Project {
     String uuid                 // View ID in backend
-
     String name
     String description
     Organization organization
+    Color color
 //    static belongsTo = [organization:Organization]
     static hasMany = [views:View, users:User]
     static fetchMode = [views: 'eager', user: 'eager']
@@ -22,6 +22,7 @@ class Project {
         uuid nullable: false, blank: false, unique: true
         name nullable: false, unique: ['organization']
         users lazy: false
+        color nullable: true
     }
 
     boolean equals(o) {

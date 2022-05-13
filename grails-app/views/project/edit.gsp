@@ -38,6 +38,21 @@
                         <g:if test="${u.isSysAdmin()}">
                             <f:field bean="project" property="organization"/>
                         </g:if>
+                        <div class="fieldcontain required">
+                            <label for="color.id">Color</label>
+                            <g:select name="color.id" id="color"
+                                      from="${com.coveritas.heracles.ui.Color.list()}"
+                                      optionValue="${{"<span style='color:"+it.code+"'>"+ it.name +"</span>"}}"
+                                      optionKey="id" noSelection="['':'-Choose your color-']" value="${project.color?.id}"/>
+                            <div id="colorSample"></div>
+                            <script type="module">
+                                let $color = $("#color");
+                                let $sample = $("#colorSample");
+                                $color.on('change', function(){
+                                    $sample.html($color.find(":selected").text())
+                                })
+                            </script>
+                        </div>
                         <f:field bean="project" property="views"/>
                         <f:field bean="project" property="users"/>
                     </fieldset>

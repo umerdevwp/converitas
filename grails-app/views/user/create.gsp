@@ -46,7 +46,7 @@
                             <g:select name="color.id" id="color"
                                       from="${com.coveritas.heracles.ui.Color.list()}"
                                       optionValue="${{"<span style='color:"+it.code+"'>"+ it.name +"</span>"}}"
-                                      optionKey="id" noSelection="['':'-Choose your color-']"/>
+                                      optionKey="id" noSelection="['':'-Choose your color-']" value="${user.color?.id}"/>
                             <div id="colorSample"></div>
                         <script type="module">
                             let $color = $("#color");

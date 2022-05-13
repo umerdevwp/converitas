@@ -41,6 +41,12 @@
                         <div class="property-value" aria-labelledby="organization-label"><f:display bean="project" property="organization"/></div>
                     </li>
                     <li class="fieldcontain">
+                        <span id="color-label" class="property-label"><g:message code="project.color.label" default="Color" /></span>
+                        <div class="property-value" aria-labelledby="color-label">
+                            <span style="background: ${project.color?.code}">${project.color}</span>
+                        </div>
+                    </li>
+                    <li class="fieldcontain">
                         <span id="views-label" class="property-label"><g:message code="project.views.label" default="Views" /></span>
                         <div class="property-value" aria-labelledby="views-label"><f:display bean="project" property="views"/></div>
                     </li>
