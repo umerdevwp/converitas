@@ -29,6 +29,19 @@
             text-decoration: none;
             color: black;
         }
+        .title { 
+            display: block;
+            font-size: 13px;
+        }
+        .length { 
+            float: right;
+            font-size: 18px;
+            font-weight: bold;    
+        } 
+        .material-icons.md-36 { font-size: 36px;}
+        .material-icons.orange600 { color: #FB8C00; }
+        .material-icons.blue600 { color: #38a9dd; }
+        .material-icons.red600 { color: #fb0000; }
         </style>
     </head>
     <body>
@@ -70,31 +83,33 @@
                                 <ul class="nav nav-tabs" data-tabs="tabs">
                                     <li class="nav-item">
                                         <a class="nav-link active" href="#profile" data-toggle="tab">
-                                            <span><i class="material-icons">build</i></span>
-                                            <span>3</span>
-                                            <span>Profile</span>
+                                            <span><i class="material-icons md-36 red600">
+                                            portrait
+                                            </i></span>
+                                            <span class="length">5</span>
+                                            <span class="title">Profile</span>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" href="#insight" data-toggle="tab">
-                                            <span><i class="material-icons">build</i></span>
-                                            <span>3</span>
-                                            <span>Insights</span>
+                                            <span><i class="material-icons md-36 blue600">insights</i></span>
+                                            <span class="length">25</span>
+                                            <span class="title">Insights</span>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" href="#comments" data-toggle="tab">
-                                            <span><i class="material-icons">build</i></span>
-                                            <span>3</span>
-                                            <span>Comments</span>
+                                            <span><i class="material-icons md-36">comment</i></span>
+                                            <span class="length">120</span>
+                                            <span class="title">Comments</span>
                                         </a>
     
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" href="#similar-company" data-toggle="tab">
-                                            <span><i class="material-icons">build</i></span>
-                                            <span>3</span>
-                                            <span>Similar Companies</span>
+                                            <span><i class="material-icons md-36 orange600">business</i></span>
+                                            <span class="length">30</span>
+                                            <span class="title">Similar Companies</span>
                                         </a>
     
                                     </li>

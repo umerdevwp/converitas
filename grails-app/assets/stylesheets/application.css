@@ -118,8 +118,8 @@ div.card.card-plain {
 div.card .card-header {
   border-radius: 3px;
   padding: 1rem 15px;
-  margin-left: 15px;
-  margin-right: 15px;
+  /* margin-left: 15px;
+  margin-right: 15px; */
   border: 0;
   background-color: rgba(0, 0, 0, 0);
 }
@@ -133,7 +133,9 @@ div.card .card-header {
   padding: 15px 30px;
 }
 
-
+.card-body {
+  padding: 0 1.25rem 1.25rem 1.25rem;
+}
 .card-nav-tabs .card-header {
   
 }
@@ -164,7 +166,7 @@ div.card .card-header {
 .nav-tabs .nav-item {
   margin-bottom: -1px;
   background: #fff;
-    width: 45%;
+    width: 48%;
     margin-bottom: 1rem;
 }
 
@@ -234,7 +236,7 @@ table.project-table td { border-bottom: 1px solid rgba(48,64,80,.15); border-rig
 table.project-table tr:last-child td { border-bottom: 0; }
 table.project-table tr th:last-child,
 table.project-table tr td:last-child  { border-right: 0; }
-.table-scrollbar { position: relative;height: 200px;overflow: auto; }
+.table-scrollbar { position: relative;height: 400px;overflow: auto; }
 .table-wrapper-scroll-y { display: block; }
 .sap-logo {
   margin-left: 20px;
