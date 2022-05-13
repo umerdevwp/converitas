@@ -91,9 +91,9 @@ class ApiService {
         View.withTransaction { TransactionStatus status ->
             lv = View.get(lv.id)
             List<CompanyViewObject> localCompanies = CompanyViewObject.findAllByView(lv)
-//            if (true) {
-//                return localCompanies
-//            }
+            if (true) {
+                return localCompanies
+            }
             String vUuid = lv.uuid
             Project lp = lv.project
             String pUuid = lp.uuid
@@ -243,7 +243,8 @@ class ApiService {
                     id:i,
                     content:e.title,
                     start:e.ts,
-                    type:e.type,
+//                    type:e.type,
+                    m_type:e.type,
                     title:e.title,
                     state:e.state,
                     entityUUID:e.entityUUID,
