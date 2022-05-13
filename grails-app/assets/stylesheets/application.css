@@ -236,3 +236,7 @@ table.project-table tr th:last-child,
 table.project-table tr td:last-child  { border-right: 0; }
 .table-scrollbar { position: relative;height: 200px;overflow: auto; }
 .table-wrapper-scroll-y { display: block; }
+.sap-logo {
+  margin-left: 20px;
+  margin-bottom: 20px;
+}

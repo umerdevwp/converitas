@@ -5,6 +5,35 @@
         <meta name="layout" content="main" />
         <g:set var="entityName" value="${message(code: 'project.label', default: 'Project')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
+
+        <style>
+        .projectTable {
+            width: 60%;
+            border: 1px solid #DFDFDF;
+            margin-left: 20px;
+        }
+        .projectTable td, th {  
+            padding: 0.5em;
+        }
+        .projectTable li {
+            list-style: none;
+            display: inline-block;
+            border-radius: 6px;
+            text-align: center;
+            padding: 4px;
+            text-transform: uppercase;            
+        }
+
+        .projectTable .project-status li {
+            width: 40px;
+        }
+        .project-status div {
+           width: 75px;
+            padding: 6px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        </style>
     </head>
     <body>
         <a href="#list-project" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
@@ -20,16 +49,16 @@
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
 %{--            <f:table collection="${projectList}" />--}%
-            <table>
+            <table class="projectTable">
                 <thead>
                 <tr>
-                    <g:sortableColumn property="name" title="Name" />
+                    <g:sortableColumn property="name" title="Project Name" />
                     <g:set var="u" value="${User.get(session["userID"])}"/>
 %{--                    <g:if test="${u.isSysAdmin()}">--}%
 %{--                        <g:sortableColumn property="organization" title="Organization" />--}%
 %{--                    </g:if>--}%
 %{--                    <g:sortableColumn property="uuid" title="UUID" />--}%
-                    <g:sortableColumn property="description" title="Description" />
+                    <g:sortableColumn property="description" title="Project Description" />
                     <g:sortableColumn property="users" title="Team" />
                     <g:sortableColumn property="views" title="Views" />
                     <g:sortableColumn property="status" title="Status" />
@@ -53,7 +82,7 @@
                             </ul>
                         </td>
                         <td><f:display bean="${bean}" property="views" displayStyle="${'table'}"/></td>
-                        <td bgcolor="${bean.color?.code?:'#00FFFF'}">Status</td>
+                        <td class="project-status"><div style="background-color: ${bean.color?.code?:'#00FFFF'}">Status</div></td>
                         <td>
                             <a href="/view/create?project.id=${bean.id}">Add View</a>
                         </td>
@@ -62,9 +91,9 @@
                 </tbody>
             </table>
 
-            <div class="pagination">
+            <%-- <div class="pagination">
                 <g:paginate total="${projectCount ?: 0}" />
-            </div>
+            </div> --%>
         </div>
     </body>
 </html>

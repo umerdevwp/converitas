@@ -74,6 +74,7 @@
 <nav class="sidebar-menu">
     <ul>
         <li class="logo"><a class="navbar-brand" href="/project/index"><asset:image width="58px" height="58px" src="coveritas.svg" alt="Coveritas Logo"/></a></li>
+        <li><asset:image class="sap-logo" width="100px" src="SAP_logo.png" alt="SAP Logo"/></li>
         <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
         <g:set var="u" value="${User.get(session["userID"])}"/>
             <g:if test="${u!=null}">
