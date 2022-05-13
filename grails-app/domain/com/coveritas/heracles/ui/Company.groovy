@@ -49,7 +49,7 @@ class Company {
         log.debug "Updating ${id}"
         List<CompanyViewObject> currentCvos = CompanyViewObject.findAllByCompany(this)
         currentCvos.each {
-            it.company.removeViewObject()
+            it.view.removeViewObject(it)
             it.delete(flush: true)
         }
     }

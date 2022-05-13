@@ -16,6 +16,7 @@ class CompanyAttribute {
     String  companyUuid         // Company
     String  type                // Attribute type
     String  source              // and source
+    String  shortDescription
     String  sValue
     Float   fValue
     Integer iValue
@@ -30,7 +31,12 @@ class CompanyAttribute {
     static constraints = {
         id generator : 'increment'
         uuid nullable: false, blank: false, unique: true
-        company nullable: false, unique: true
+        company nullable: false
         companyUuid nullable: false, unique: true
+        shortDescription nullable: true
+        sValue nullable: true
+        fValue nullable: true
+        iValue nullable: true
+
     }
 }

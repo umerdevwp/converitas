@@ -91,9 +91,9 @@ class ApiService {
         View.withTransaction { TransactionStatus status ->
             lv = View.get(lv.id)
             List<CompanyViewObject> localCompanies = CompanyViewObject.findAllByView(lv)
-            if (true) {
-                return localCompanies
-            }
+//            if (true) {
+//                return localCompanies
+//            }
             String vUuid = lv.uuid
             Project lp = lv.project
             String pUuid = lp.uuid
@@ -159,7 +159,18 @@ class ApiService {
             Company rc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: uuid], Company.class, true) as Company
             if (lc == null) {
                 rc.id = null
-                //todo get and merge rc.attributes = ???
+                Set <CompanyAttribute> cas = []
+                def attributes = rc.attributes
+                if (attributes !=null && attributes.size()!=0) {
+                    for (ca in attributes) {
+                        CompanyAttribute a = ca as CompanyAttribute
+                        a.id = null
+                        a.company = rc
+                        cas.add(a)
+
+                    }
+                    rc.attributes = cas
+                }
                 lc = companyService.save(rc)
             } else {
                 lc = Company.get(lc.id)
