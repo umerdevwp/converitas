@@ -11,7 +11,7 @@ class ViewController {
     ViewService viewService
     CompanyViewObjectService companyViewObjectService
 
-    static allowedMethods = [save: "POST", addCompany: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", addCompany: "POST", addComment: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
         max = Math.min(max ?: 10, 100)

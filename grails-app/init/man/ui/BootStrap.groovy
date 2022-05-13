@@ -174,41 +174,41 @@ class BootStrap {
                 User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, Color.get(8))
             } else {
                 ApplicationContext ctx = Holders.grailsApplication.mainContext
+//                DataSource  ds = ctx.getBean(DataSource)
+//                Connection c = null
+//                try {
+//                    c = ds.connection
+//                    if (CompanyAttribute.count()==0) {
+//                        c.createStatement().executeUpdate("drop table if exists ma_company_attribute cascade;" )
+//                        c.createStatement().executeUpdate("create table if not exists ma_company_attribute (\n" +
+//                                "    id                bigint       not null\n" +
+//                                "        primary key,\n" +
+//                                "    version           bigint       not null,\n" +
+//                                "    uuid              varchar(255) not null\n" +
+//                                "        constraint uk_hbpbruwq9my2dkfcf601y9bj8\n" +
+//                                "            unique,\n" +
+//                                "    i_value           integer,\n" +
+//                                "    source            varchar(255) not null,\n" +
+//                                "    f_value           real,\n" +
+//                                "    company_id        bigint       not null\n" +
+//                                "        constraint fk6en661kyibxym7bybobnpaklb\n" +
+//                                "            references ma_company,\n" +
+//                                "    s_value           varchar(255),\n" +
+//                                "    type              varchar(255) not null,\n" +
+//                                "    company_uuid      varchar(255) not null,\n" +
+//                                "    short_description varchar(255)\n" +
+//                                ");\n" +
+//                                "\n" +
+//                                "alter table ma_company_attribute\n" +
+//                                "    owner to postgres;\n" +
+//                                "\n;" )
+//                    }
+//                } finally {
+//                    if (c!=null) {
+//                        c.close()
+//                    }
+//                }
                 ApiService apiService = ctx.getBean(ApiService)
-                DataSource  ds = ctx.getBean(DataSource)
-                Connection c = null
-                try {
-                    c = ds.connection
-                    if (CompanyAttribute.count()==0) {
-                        c.createStatement().executeUpdate("drop table if exists ma_company_attribute cascade;" )
-                        c.createStatement().executeUpdate("create table if not exists ma_company_attribute (\n" +
-                                "    id                bigint       not null\n" +
-                                "        primary key,\n" +
-                                "    version           bigint       not null,\n" +
-                                "    uuid              varchar(255) not null\n" +
-                                "        constraint uk_hbpbruwq9my2dkfcf601y9bj8\n" +
-                                "            unique,\n" +
-                                "    i_value           integer,\n" +
-                                "    source            varchar(255) not null,\n" +
-                                "    f_value           real,\n" +
-                                "    company_id        bigint       not null\n" +
-                                "        constraint fk6en661kyibxym7bybobnpaklb\n" +
-                                "            references ma_company,\n" +
-                                "    s_value           varchar(255),\n" +
-                                "    type              varchar(255) not null,\n" +
-                                "    company_uuid      varchar(255) not null,\n" +
-                                "    short_description varchar(255)\n" +
-                                ");\n" +
-                                "\n" +
-                                "alter table ma_company_attribute\n" +
-                                "    owner to postgres;\n" +
-                                "\n;" )
-                    }
-                } finally {
-                    if (c!=null) {
-                        c.close()
-                    }
-                }
                 apiService.activateAllViews()
                 Project.all.each { Project project ->
                     if (project.users.isEmpty()) {

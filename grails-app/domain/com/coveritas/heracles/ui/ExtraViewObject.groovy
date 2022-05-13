@@ -47,7 +47,7 @@ class ExtraViewObject extends ViewObject {
 
     int hashCode() {
         int result
-        result = (company != null ? company.hashCode() : 0)
+        result = (uuid != null ? uuid.hashCode() : 0)
         return 31 * result + (view != null ? view.hashCode() : 0)
     }
 }

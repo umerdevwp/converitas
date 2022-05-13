@@ -8,6 +8,7 @@ import grails.gorm.transactions.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
 
+import java.text.SimpleDateFormat
 import java.time.Duration
 
 @Transactional
@@ -417,20 +418,21 @@ class ApiService {
         }
     }
 
+    static SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss MM/dd/YYYY")
+
     Map contentForProject(User user, String projectUUID) {
 //        Project project = remoteProjects(user).find({ Project p -> p.uuid == projectUUID })
         Project project = Project.findByUuid( projectUUID )
 
         List<EntityViewEvent> eves = allEventsForProject(user, projectUUID)
         long now = System.currentTimeMillis()
+        Set<Annotation> annotations = commentsForProject(projectUUID)
+        Set<Map> comments = []
+        annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, content:a.user.name?:""]}
         [
          Description:[project.name,project.description],
          Insights:[eves],
-         Comments:["${now-50*60000}":"This is a comment",
-                   "${now-40*60000}":"This is another comment",
-                   "${now-30*60000}":"This is now the third comment",
-                   "${now-20*60000}":"This is the least important comment",
-                   "${now-10*60000}":"This is now the last comment"         ],
+         Comments:comments,
          Constraints:[employees:"10-200000",
                       "Market Cap":"0-10B",
                       "revenue":"undefined",

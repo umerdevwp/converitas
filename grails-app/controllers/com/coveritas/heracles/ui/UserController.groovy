@@ -35,7 +35,7 @@ class UserController {
         User u = User.get(userID)
         if ((user.organization==null && u.isAdmin()) || u.isAdmin(user.organization) || u.isSysAdmin()) {
             try {
-                Map<String, Object> result = httpClientService.postParamsExpectMap('user', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, isAdmin: true], true)
+                Map<String, Object> result = httpClientService.postParamsExpectMap('user', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, isAdmin: false], true)
                 String uuid = result.uuid
                 if (uuid) {
                     Date now = new Date()
@@ -61,7 +61,7 @@ class UserController {
 
             request.withFormat {
                 form multipartForm {
-                    flash.message = message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.name])
+                    flash.message = message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])
                     redirect user
                 }
                 '*' { respond user, [status: CREATED] }

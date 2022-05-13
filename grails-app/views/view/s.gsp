@@ -29,12 +29,6 @@
             color: black;
         }
         </style>
-        <script type="module">
-            $( document ).ready(function() {
-                let pageURL = window.location.href;
-                $('#url').val(pageURL);
-            });
-        </script>
     </head>
     <body>
         <a href="#show-view" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
@@ -741,6 +735,13 @@
         import "/assets/vis-timeline-graph2d.min.js";
         import "/assets/vis-network.min.js";
 
+        let pageURL = '';
+
+        $( document ).ready(() => {
+            pageURL = window.location.href;
+            $('#url').val(pageURL);
+        });
+
         let from, to;
         let now = ${ts ?: System.currentTimeMillis()};
 
@@ -830,15 +831,25 @@
         }
         function formatCommentsContent(content)     {
             //todo iterate through map, convert timestamp to date, + tab + text
-            return '<h3>content for Comments</h3>'+
-                '<form method=\'post\' url=\'/view/addComment\'>'+
-                '<input type=\'hidden\'  name=\'view.id\' value=\'${this.view.id}\'/>'+
-                '<input id=\'comment\' name=\'comment\' placeholder=\'Enter a Comment\'>' +
-                '<input id=\'addComment\' value=\'Add Comment\' type=\'submit\'>'+
-                "</form>"
-        }
-        function formatConstraintsContent(content)  {
+            let html = '<div class="news-insight-item"><ul class="">';
+            for (let i=0; i<content.length; i++) {
+                const c = content[i];
+                html+= '  <li>\n'+
+                       '    <span>'+c['time']+'</span>\n'+
+                       '    <h3>'+c['title']+'</h3>\n'+
+                       '    <p>'+c['content']+'</p>'+
+                       '  </li>';
+            }
+            html+='<form method=\'post\' action=\'/view/addComment\'>'+
+                  '<input type=\'hidden\'  name=\'view.id\' value=\'${this.view.id}\'/>'+
+                  '<input id=\'comment\' name=\'comment\' placeholder=\'Enter a Comment\'>' +
+                  '<input id=\'addComment\' value=\'Add Comment\' type=\'submit\'>'+
+                  '</form></ul></div>';
 
+            return html
+        }
+
+        function formatConstraintsContent(content)  {
             // todo iterate through map key tab value
             return "<h3>content for constraints</h3>"
         }
