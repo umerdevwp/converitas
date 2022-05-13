@@ -428,7 +428,7 @@ class ApiService {
         long now = System.currentTimeMillis()
         Set<Annotation> annotations = commentsForProject(projectUUID)
         Set<Map> comments = []
-        annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, content:a.user.name?:""]}
+        annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
         [
          Description:[project.name,project.description],
          Insights:[eves],
