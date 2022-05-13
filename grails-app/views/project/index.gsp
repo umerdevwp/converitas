@@ -79,15 +79,39 @@
         .col-2.leftElement {
             margin-left: 75px;
         }
+        .btn-primary {
+            color: #fff;
+            background-color: #133b74;
+            border-color: #133b74;
+        }
+        .btn.btn-primary a {
+            color: #fff;
+        }
         </style>
     </head>
     <body>
         <a href="#list-project" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-        <div class="nav" role="navigation">
+        <%-- <div class="nav" role="navigation">
             <ul>
                 <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-                <li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
+                <li>
+                    <g:link class="create" action="create"><span class="material-icons">add_circle</span><g:message code="default.new.label" args="[entityName]" /></g:link>
+                </li>
+<div class="btn btn-primary">
+<g:link class="create" action="create"><span class="material-icons">add_circle</span><g:message code="default.new.label" args="[entityName]" /></g:link>
+              </div>
+
             </ul>
+        </div> --%>
+
+        <div>
+        <div class="btn btn-primary" style="margin-left: 20px;margin-top: 45px;">
+        
+                <g:link class="create" action="create">
+                    <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
+                    <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;"><g:message code="default.new.label" args="[entityName]" /></span>
+                </g:link>
+        </div>
         </div>
         <div id="list-project" class="content scaffold-list" role="main">
             <div class="col-8" style="display: block;float: left;"><h1><g:message code="default.list.label" args="[entityName]" /></h1></div>
