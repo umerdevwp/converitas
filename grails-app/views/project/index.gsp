@@ -8,12 +8,14 @@
 
         <style>
         .projectTable {
-            width: 60%;
+            /* width: 65%; */
             border: 1px solid #DFDFDF;
             margin-left: 20px;
         }
         .projectTable td, th {  
-            padding: 0.5em;
+            padding: 1em;
+            line-height: 1.6em;
+            font-size: 13px;
         }
         .projectTable li {
             list-style: none;
@@ -32,6 +34,50 @@
             padding: 6px;
             text-align: center;
             border-radius: 8px;
+            color: #FFF;
+        }
+        .project-status th a:link, .project-status th a:visited {
+            color: #FFF;
+        }
+        .news-insight-item ul li{
+            margin-bottom: 23px;
+            color: #171822;
+            font-size: 16px;
+            line-height: 1.8;
+            border-left: 4px solid #ffd46d;
+            padding-left: 1em;
+        }
+        .news-insight-item ul li span{
+            color:#133c74;
+        }
+        .news-insight-item ul li h3 {
+            font-size: 1em;
+            margin: 0.1em 0 0.5em 0;
+        }
+        .news-insight-item p{
+            color: #171822;
+            font-size: 12px;
+            line-height: 1.2;
+        }
+        .leftElement { float: left;}
+        .table-scrollbar.insight-section {
+            height: 100%;
+        }
+        .material-icons.md-48 { font-size: 48px; }
+        .section-title,
+        .icon-section {
+            float: left;
+        }
+        .section-title {
+            padding-top: 10px;
+            padding-left: 10px;
+            font-weight: bold;
+        }
+        .news-insight-item li:first-child {
+            border-left: none;
+        }
+        .col-2.leftElement {
+            margin-left: 75px;
         }
         </style>
     </head>
@@ -44,12 +90,13 @@
             </ul>
         </div>
         <div id="list-project" class="content scaffold-list" role="main">
-            <h1><g:message code="default.list.label" args="[entityName]" /></h1>
+            <div class="col-8" style="display: block;float: left;"><h1><g:message code="default.list.label" args="[entityName]" /></h1></div>
+            <div class="col-3" style="display: block;float: left;margin-left: 75px;"><h1>Insights</h1></div>
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
 %{--            <f:table collection="${projectList}" />--}%
-            <table class="projectTable">
+            <table class="projectTable col-8 leftElement">
                 <thead>
                 <tr>
                     <g:sortableColumn property="name" title="Project Name" />
@@ -59,7 +106,7 @@
 %{--                    </g:if>--}%
 %{--                    <g:sortableColumn property="uuid" title="UUID" />--}%
                     <g:sortableColumn property="description" title="Project Description" />
-                    <g:sortableColumn property="users" title="Team" />
+                    <g:sortableColumn property="users" title="Team" width="100" />
                     <g:sortableColumn property="views" title="Views" />
                     <g:sortableColumn property="status" title="Status" />
                     <th>Action</th>
@@ -90,6 +137,47 @@
                 </g:each>
                 </tbody>
             </table>
+
+
+            <div class="col-2 leftElement">
+                <div class="table-wrapper-scroll-y table-scrollbar insight-section">
+                    <div class="news-insight-item">
+                        <ul class="">
+                            <li>
+                                <span class="material-icons md-48 icon-section">
+                                    view_list
+                                </span>
+                                <span class="section-title">NEW INSIGHTS</span>
+                            </li>
+                            <li>
+                                <span>10:00</span>
+                                <h3>Heading</h3>
+                                <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
+                            </li>
+                            <li>
+                                <span>10:00</span>
+                                <h3>Heading</h3>
+                                <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
+                            </li>
+                            <li>
+                                <span>10:00</span>
+                                <h3>Heading</h3>
+                                <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
+                            </li>
+                            <li>
+                                <span>10:00</span>
+                                <h3>Heading</h3>
+                                <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
+                            </li>
+                            <li>
+                                <span>10:00</span>
+                                <h3>Heading</h3>
+                                <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
             <%-- <div class="pagination">
                 <g:paginate total="${projectCount ?: 0}" />
