@@ -1,4 +1,4 @@
-<%@ page import="com.coveritas.heracles.json.EntityViewEvent; com.coveritas.heracles.ui.User" %>
+<%@ page import="com.coveritas.heracles.ui.CompanyViewObject; com.coveritas.heracles.json.EntityViewEvent; com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
