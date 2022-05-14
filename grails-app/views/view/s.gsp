@@ -55,468 +55,210 @@
         <div id="timeLine" role="navigation">
             <div id="time_line"></div>
         </div>
+        <div class="container-fluid background-color">
+        <div class="row p-1">
+            <div class="col-sm-2  p-0">
+            <h2>Project Blackbird</h2>
+                <div id="companies" class="companies-panel"></div>
+            </div>
+            <div class="col-sm-6">
+                <h2>Company Association</h2>
+            </div>
+            <div class="col-sm-4">
+                <h2>Blackbird > HBO</h2>
+                    <!-- Tabs with icons on Card -->
+                    <div class="card card-nav-tabs">
+                        <div class="card-header card-header-primary">
+                            <!-- colors: "header-primary", "header-info", "header-success", "header-warning", "header-danger" -->
+                            <div class="nav-tabs-navigation">
+                                <div class="nav-tabs-wrapper">
+                                    <ul class="nav nav-tabs" data-tabs="tabs">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" href="#profile" data-toggle="tab">
+                                                <span><i class="material-icons md-36 red600">
+                                                portrait
+                                                </i></span>
+                                                <span class="length" id="count1">5</span>
+                                                <span class="title" id="button1">Profile</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#insight" data-toggle="tab">
+                                                <span><i class="material-icons md-36 blue600">insights</i></span>
+                                                <span class="length" id="count2">25</span>
+                                                <span class="title" id="button2">Insights</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#comments" data-toggle="tab">
+                                                <span><i class="material-icons md-36">comment</i></span>
+                                                <span class="length" id="count3">120</span>
+                                                <span class="title" id="button3">Comments</span>
+                                            </a>
 
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#similar-company" data-toggle="tab">
+                                                <span><i class="material-icons md-36 orange600">business</i></span>
+                                                <span class="length" id="count4">30</span>
+                                                <span class="title" id="button4">Similar Companies</span>
+                                            </a>
 
-
-    <div class="container-fluid background-color">
-    <div class="row p-1">
-
-        <div class="col-sm-2  p-0">
-        <h2>Project Blackbird</h2>
-            <div id="companies" class="companies-panel"></div>
-        </div>
-        <div class="col-sm-6">
-            <h2>Company Association</h2>
-        </div>
-        <div class="col-sm-4">
-            <h2>Blackbird > HBO</h2>
-
-
-                <!-- Tabs with icons on Card -->
-                <div class="card card-nav-tabs">
-                    <div class="card-header card-header-primary">
-                        <!-- colors: "header-primary", "header-info", "header-success", "header-warning", "header-danger" -->
-                        <div class="nav-tabs-navigation">
-                            <div class="nav-tabs-wrapper">
-                                <ul class="nav nav-tabs" data-tabs="tabs">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" href="#profile" data-toggle="tab">
-                                            <span><i class="material-icons md-36 red600">
-                                            portrait
-                                            </i></span>
-                                            <span class="length" id="count1">5</span>
-                                            <span class="title" id="button1">Profile</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#insight" data-toggle="tab">
-                                            <span><i class="material-icons md-36 blue600">insights</i></span>
-                                            <span class="length" id="count2">25</span>
-                                            <span class="title" id="button2">Insights</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#comments" data-toggle="tab">
-                                            <span><i class="material-icons md-36">comment</i></span>
-                                            <span class="length" id="count3">120</span>
-                                            <span class="title" id="button3">Comments</span>
-                                        </a>
-    
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#similar-company" data-toggle="tab">
-                                            <span><i class="material-icons md-36 orange600">business</i></span>
-                                            <span class="length" id="count4">30</span>
-                                            <span class="title" id="button4">Similar Companies</span>
-                                        </a>
-    
-                                    </li>
-                                </ul>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-body ">
-                            <div class="tab-content text-center">
-                                <div class="tab-pane active" id="profile">
-                                    <div class="table-wrapper-scroll-y table-scrollbar" id="content1">
-                                        <table class="project-table">
-                                            <tbody>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                            <div class="card-body ">
+                                <div class="tab-content text-center">
+                                    <div class="tab-pane active" id="profile">
+                                        <div class="table-wrapper-scroll-y table-scrollbar" id="content1">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="tab-pane" id="insight">
-                                    <div class="table-wrapper-scroll-y table-scrollbar">
-                                        <table class="project-table">
+                                    <div class="tab-pane" id="insight">
+                                        <div class="table-wrapper-scroll-y table-scrollbar" id="content2">
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="comments">
+                                        <div class="table-wrapper-scroll-y table-scrollbar" id="content3">
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="similar-company">
+                                        <div class="table-wrapper-scroll-y table-scrollbar">
+                                            <table class="project-table">
 
-                                            <tbody>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">March 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="comments">
-                                    <div class="table-wrapper-scroll-y table-scrollbar" id="content3">
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="similar-company">
-                                    <div class="table-wrapper-scroll-y table-scrollbar">
-                                        <table class="project-table">
-
-                                            <tbody>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">June 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
-                                                    <td class="link">June 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">I think that’s a responsibility</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">April 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">MusicianI think that’s</a></td>
-                                                    <td class="link">June 14, 2022</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
-                                                    <td class="link">May 10, 2022</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
+                                                        <td class="link">June 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MusicianI think that’s</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MusicianI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility that I have</a></td>
+                                                        <td class="link">June 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">I think that’s a responsibility</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MotoI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">April 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">MusicianI think that’s</a></td>
+                                                        <td class="link">June 14, 2022</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title"><a target="_blank" href="#">CodeI think that’s a responsibility that I have</a></td>
+                                                        <td class="link">May 10, 2022</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <!-- End Tabs with icons on Card -->
                 </div>
-                <!-- End Tabs with icons on Card -->
             </div>
         </div>
-    </div>
-
-
-
         <div id="show-view" class="content scaffold-show" role="main">
             <h1><g:message code="default.show.label" args="[entityName]" /></h1>
             <g:if test="${flash.message}">
@@ -607,7 +349,7 @@
 %{--                <input type="button" id="button3" value="button3">--}%
 %{--                <input type="button" id="button4" value="button4">--}%
 %{--                <div id="content1"></div>--}%
-                <div id="content2"></div>
+%{--                <div id="content2"></div>--}%
                 <div id="content4"></div>
                 <g:form resource="${this.view}" method="DELETE">
                     <fieldset class="buttons">
@@ -727,10 +469,23 @@
 
             return html;
         }
+
         function formatInsightsContent(content)     {
-            return "<h3>content for insights</h3>"
+            let html= '<table class="project-table"> <tbody style="height: auto">';
+            for (let i=0; i<content.length; i++) {
+                const c = content[i];
+                html+= '  <tr  style="height: auto">\n'+
+                    '    <td>'+c['time']+'</td>\n'+
+                    '    <td>'+c['type']+'</td>\n'+
+                    '    <td>'+c['title']+'</td>\n'+
+                    '  </tr>\n';
+            }
+            html+='</tbody></table>';
+
+            return html;
         }
-        function formatCommentsContent(content)     {
+
+        function formatCommentsContent(content)  {
             //todo iterate through map, convert timestamp to date, + tab + text
 
             let html= '<table class="project-table"> <tbody style="height: auto">';
@@ -739,7 +494,7 @@
                 html+= '  <tr>\n'+
                        '    <td>'+c['time']+'</td>\n'+
                        '    <td>'+c['title']+'</td>\n'+
-                       '    <td>'+c['name']+'</td>'+
+                       '    <td>'+c['name']+'</td>\n'+
                        '  </tr>';
             }
             html+='</tbody></table><form method=\'post\' action=\'/view/addComment\'>'+
@@ -763,8 +518,6 @@
             html+='</tbody></table>';
 
             return html;
-
-            return "<h3>content for constraints</h3>"
         }
 
         function loadProjectContent() {
@@ -779,13 +532,24 @@
                         console.log(content)
                         $('#button'+i).html(head)
                         let html = ''
+                        let count = content.length;
                         switch (head.toLowerCase().substring(0,3)) {
-                            case 'des': html = formatDescriptionContent(content); break;
-                            case 'ins': html = formatInsightsContent(content); break;
-                            case 'com': html = formatCommentsContent(content); break;
-                            case 'con': html = formatConstraintsContent(content); break;
+                            case 'des':
+                                html = formatDescriptionContent(content);
+                                count = 1
+                                break;
+                            case 'ins':
+                                html = formatInsightsContent(content);
+                                break;
+                            case 'com':
+                                html = formatCommentsContent(content);
+                                break;
+                            case 'con':
+                                html = formatConstraintsContent(content);
+                                break;
                         }
                         $('#content'+i).html(html)
+                        $('#count'+i).html(count)
                     });
                     // $('#companies').html(html);
                 },

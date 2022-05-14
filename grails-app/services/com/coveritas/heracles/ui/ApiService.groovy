@@ -425,16 +425,27 @@ class ApiService {
         Project project = Project.findByUuid( projectUUID )
 
         List<EntityViewEvent> eves = allEventsForProject(user, projectUUID)
-        long now = System.currentTimeMillis()
+        List insights = []
+        eves.each {EntityViewEvent e ->
+            // todo change the content based on event type and state
+            insights.add([
+                    title:e.title,
+                    time:format.format(new Date(e.ts as long)),
+                    type:e.type,
+                    state:e.state,
+                    entityUUID:e.entityUUID
+                    ])
+        }
         Set<Annotation> annotations = commentsForProject(projectUUID)
         Set<Map> comments = []
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
         [
          Description:[project.name,project.description],
-         Insights:[eves],
+         Insights:insights,
          Comments:comments,
-         Constraints:[employees:"10-200000",
+         Details:[employees:"10-200000",
                       "Market Cap":"0-10B",
+                      "Markets":"US",
                       "revenue":"undefined",
                       "categories":"AR"]
         ]
@@ -570,7 +581,17 @@ class ApiService {
                 projectUUID = View.findByUuid(viewUUID).projUUID
             }
             ViewObject vo = findOrCreateViewObject(user.organization, projectUUID, viewUUID, companyUUID)
-            new Annotation(user: user, annotatedVO: vo, uuid: UUID.randomUUID(), organizationUUID: user.organization.uuid, projectUUID: projectUUID, viewUUID: viewUUID, title: comment, ts: System.currentTimeMillis(), annotationType: 'text').save(update: false, flush: true, failOnError: true)
+            long ts = System.currentTimeMillis()
+            Annotation annotation = new Annotation(
+                    user: user, annotatedVO: vo, uuid: UUID.randomUUID(),
+                    organizationUUID: user.organization.uuid,
+                    projectUUID: projectUUID,
+                    viewUUID: viewUUID,
+                    title: comment, ts: ts,
+                    annotationType: 'text').save(update: false, flush: true, failOnError: true)
+            addEntityViewEvent( user.uuid, user.organization.uuid, UUID.randomUUID() as String, viewUUID, companyUUID,
+                    'comment', comment+', by: '+user.name, null, ts)
+            annotation
         }
     }
 
