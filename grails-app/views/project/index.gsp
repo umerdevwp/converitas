@@ -222,11 +222,6 @@
                                 <h3>Heading</h3>
                                 <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
                             </li>
-                            <li>
-                                <span>10:00</span>
-                                <h3>Heading</h3>
-                                <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
-                            </li>
                         </ul>
                     </div>
                 </div>
