@@ -81,12 +81,25 @@
         }
         .btn-primary {
             color: #fff;
-            background-color: #133b74;
-            border-color: #133b74;
+            background-color: #f59424;
+            border-color: #f59424;
         }
         .btn.btn-primary a {
             color: #fff;
         }
+        .team-blank { font-size: 0;}
+        .projectTable .material-icons {
+            float: left;
+            font-size: 30px;
+            color: #676763;
+        }
+        .projectTable .number {
+            float: left;
+            padding-top: 6px;
+            padding-left: 5px;
+            font-size: 13px;
+        }
+ 
         </style>
     </head>
     <body>
@@ -115,7 +128,7 @@
         </div>
         <div id="list-project" class="content scaffold-list" role="main">
             <div class="col-8" style="display: block;float: left;"><h1><g:message code="default.list.label" args="[entityName]" /></h1></div>
-            <div class="col-3" style="display: block;float: left;margin-left: 75px;"><h1>Insights</h1></div>
+            <div class="col-3" style="display: block;float: left;margin-left: 100px;"><h1>Insights</h1></div>
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
@@ -131,9 +144,12 @@
 %{--                    <g:sortableColumn property="uuid" title="UUID" />--}%
                     <g:sortableColumn property="description" title="Project Description" />
                     <g:sortableColumn property="users" title="Team" width="100" />
+                    <g:sortableColumn property="users" title="." class="team-blank"/>
                     <g:sortableColumn property="views" title="Views" />
-                    <g:sortableColumn property="status" title="Status" />
-                    <th>Action</th>
+                    <g:sortableColumn property="insights" title="Insights" />
+                    <g:sortableColumn property="comments" title="Comments" />
+                    <%-- <g:sortableColumn property="status" title="Status" /> --%>
+                    <%-- <th>Action</th> --%>
                 </thead>
                 <tbody>
 
@@ -145,18 +161,31 @@
 %{--                        </g:if>--}%
 %{--                        <td><f:display bean="${bean}" property="uuid"  displayStyle="${'table'}" /></td>--}%
                         <td><f:display bean="${bean}" property="description" displayStyle="${'table'}"/></td>
-                        <td>
+                        <td class="pr-0">
                             <ul>
                                 <g:each in="${bean.users}" var="pu">
                                     <li style="background:${pu.color?.code?:'#0815'}"><a style="color: ghostwhite" href="/user/show/${pu.id}">${(pu.name as String).substring(0,2)}</a></li>
                                 </g:each>
                             </ul>
                         </td>
+                        <td class="pl-0"><span class="material-icons">add_circle</span></td>                        
                         <td><f:display bean="${bean}" property="views" displayStyle="${'table'}"/></td>
-                        <td class="project-status"><div style="background-color: ${bean.color?.code?:'#00FFFF'}">Status</div></td>
+                         <td>
+                            <span class="material-icons">
+                                    view_list
+                            </span>
+                            <span class="number">2/3</span>
+                        </td>         
                         <td>
+                            <span class="material-icons">
+                                chat_bubble
+                            </span>
+                            <span class="number">5</span>                          
+                        </td>                  
+                        <%-- <td class="project-status"><div style="background-color: ${bean.color?.code?:'#00FFFF'}">Status</div></td> --%>
+                        <%-- <td>
                             <a href="/view/create?project.id=${bean.id}">Add View</a>
-                        </td>
+                        </td> --%>
                     </tr>
                 </g:each>
                 </tbody>

@@ -249,8 +249,7 @@ table.project-table tr td:last-child  { border-right: 0; }
 .table-scrollbar { position: relative;height: 400px;overflow: auto; }
 .table-wrapper-scroll-y { display: block; }
 .sap-logo {
-  margin-left: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 thead th {
   background-color: #6a7b97;
@@ -258,4 +257,19 @@ thead th {
 }
 .projectTable th a:link, .projectTable th a:visited {
   color: #FFF;
+}
+.navbar { padding: 0;}
+.nav a {
+  color: #133c7c !important;
+  font-size: 14px !important;
+  margin-right: 20px;
+  border: solid 1px #133c7c;
+  border-radius: 8px;            
+}
+
+.nav a:focus, .nav a:hover {
+  background-color: #133c7c;
+}
+.list-project h1 {
+  margin-left: 5px;
 }

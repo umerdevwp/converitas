@@ -92,9 +92,9 @@ img {
 
 .content h1 {
     border-bottom: 1px solid #CCCCCC;
-    margin: 0.8em 1em 0.3em;
+    margin: 0.8em 1em 0.3em 5px;
     font-size: 22px;
-    padding: 20px 0;
+    padding: 30px 0;
     /* padding: 0 0.25em; */
 }
 
@@ -454,9 +454,9 @@ th.sortable a {
     background: #ffffff;
 }
 
-th:hover, tr:hover {
+/* th:hover, tr:hover {
     background: #fff;
-}
+} */
 
 /* PAGINATION */
 

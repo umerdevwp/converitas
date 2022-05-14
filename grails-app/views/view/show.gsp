@@ -9,6 +9,12 @@
         <asset:stylesheet src="vis-timeline-graph2d.min.css"/>
 %{--        <asset:stylesheet src="vis-network.min.css"/>--}%
         <style>
+        .container-fluid.background-color {
+            padding-top: 25px;
+        }
+        
+        #companies { padding-bottom: 300px; }
+        .home-nav { display: none;}
 
         .vis-item .vis-item-content {
             line-height: 14px;
@@ -51,7 +57,7 @@
     </head>
     <body>
         <a href="#show-view" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-        <div class="nav" role="navigation">
+        <div class="nav home-nav" role="navigation">
             <ul>
                 <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
                 <li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
@@ -87,9 +93,11 @@
                                 <ul class="nav nav-tabs" data-tabs="tabs">
                                     <li class="nav-item">
                                         <a class="nav-link active" href="#profile" data-toggle="tab">
-                                            <span><i class="material-icons md-36 red600">
-                                            portrait
-                                            </i></span>
+                                            <span>
+                                                <i class="material-icons md-36 orange600">
+                                                    business
+                                                </i>
+                                            </span>
                                             <span class="length">5</span>
                                             <span class="title">Profile</span>
                                         </a>
@@ -109,14 +117,14 @@
                                         </a>
     
                                     </li>
-                                    <li class="nav-item">
+                                    <%-- <li class="nav-item">
                                         <a class="nav-link" href="#similar-company" data-toggle="tab">
                                             <span><i class="material-icons md-36 orange600">business</i></span>
                                             <span class="length">30</span>
                                             <span class="title">Similar Companies</span>
                                         </a>
     
-                                    </li>
+                                    </li> --%>
                                 </ul>
                             </div>
                         </div>
@@ -827,6 +835,7 @@
                         html += ' <h3>'+head+' ('+len+')</h3>'+companyList;
                     });
                     $('#companies').html(html);
+                    $('#companies ul:last-child').css('display', 'none');
                 },
                 error: function(err, status) {
                     console.log(err);

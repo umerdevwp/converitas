@@ -16,15 +16,26 @@
     <asset:stylesheet src="application.css"/>
 
     <g:layoutHead/>
+
+    <style>
+    .client-logo {
+        z-index: 999;
+        margin-left: 150px;
+        padding-top: 10px;
+    }
+    /* .navbar {
+        padding: 0;
+    } */
+    </style>
 </head>
 
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark navbar-static-top" role="navigation" >
-    <a class="navbar-brand" href="/project/index"><asset:image width="48px" height="48px" src="coveritas.svg"
+    <a class="navbar-brand" href="/project/index"><asset:image width="68px" src="coveritas.svg"
                                                                     alt="Coveritas Logo"/></a>
                                                                 
-
+    <span class="client-logo"><asset:image class="sap-logo" width="75px" src="SAP_logo.png" alt="SAP Logo"/></span>
     <div class="navbar-collapse">
         %{--        <ul class="nav navbar-nav ml-auto">--}%
         <div class="ml-auto">
@@ -39,13 +50,13 @@
     </button>
 
     <div class="collapse navbar-collapse" aria-expanded="false" style="height: 0.8px;" id="navbarContent">
+    
         <ul class="nav navbar-nav ml-auto" style="color: white">
-
             <g:pageProperty name="page.nav"/>
-            <input type="text"  id="q" style="font-size: 10pt; width: 24em"></ul>&nbsp;
+            <%-- <input type="text"  id="q" style="font-size: 10pt; width: 24em"></ul>&nbsp;
                 <a href="#" onclick="window.search()">
                     <asset:image width="28px" height="28px" src="feather_search.svg" />
-                </a>
+                </a> --%>
          &nbsp;&nbsp;&nbsp;
          <g:set var="u" value="${User.get(session["userID"])}"/>
          <g:if test="${u!=null}">
@@ -75,7 +86,6 @@
 <nav class="sidebar-menu">
     <ul>
         <li class="logo"><a class="navbar-brand" href="/project/index"><asset:image width="58px" height="58px" src="coveritas.svg" alt="Coveritas Logo"/></a></li>
-        <li><asset:image class="sap-logo" width="100px" src="SAP_logo.png" alt="SAP Logo"/></li>
         <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
         <g:set var="u" value="${User.get(session["userID"])}"/>
             <g:if test="${u!=null}">
@@ -93,6 +103,7 @@
             </g:else>
     </ul>
 </nav>
+
 
  </g:if>
 <g:else>
@@ -122,6 +133,9 @@
   gtag('js', new Date());
 
   gtag('config', 'G-V6N9TV480Q');
+    if ($('.login.btn').length) {
+        $('.navbar').css('display', 'none')
+    }
 </script>
 </div>
 </body>
