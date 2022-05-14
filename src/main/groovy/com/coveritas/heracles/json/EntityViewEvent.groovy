@@ -16,6 +16,7 @@ class EntityViewEvent {
     Long id
     String uuid
     String entityUUID
+    String entity2UUID
     String viewUUID
     String title
     Long ts // = System.currentTimeMillis()

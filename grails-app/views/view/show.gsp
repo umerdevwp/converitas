@@ -767,6 +767,13 @@
         import "/assets/vis-timeline-graph2d.min.js";
         import "/assets/vis-network.min.js";
 
+        let pageURL = '';
+
+        $( document ).ready(() => {
+            pageURL = window.location.href;
+            $('#url').val(pageURL);
+        });
+
         let from, to;
         let now = ${ts ?: System.currentTimeMillis()};
 
