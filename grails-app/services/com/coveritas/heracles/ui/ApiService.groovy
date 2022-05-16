@@ -5,6 +5,7 @@ import com.coveritas.heracles.json.EntityViewEvent
 import com.coveritas.heracles.utils.APIException
 import com.coveritas.heracles.utils.Meta
 import grails.gorm.transactions.Transactional
+import org.springframework.util.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
 
@@ -65,7 +66,7 @@ class ApiService {
                     }
                     // get all views for project (only uuid and status)
                     Map remoteVwMap = httpClientService.getParamsExpectObject("view/${orgUuid}/${user.uuid}/${rpUuid}",null, LinkedHashMap.class, true)
-                    def views = remoteVwMap.views
+                    List<Map> views = remoteVwMap.views
                     if (views!=null && !views.isEmpty()) {
                         Set<View> localViews = []
                         for (Map view in views) {
@@ -509,15 +510,29 @@ class ApiService {
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
         //todo 'det' in view with content formatter
         //todo conversion rc map -> list of Maps with name, value
-        Map rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: companyUUID], true)
+        Map<String,Object> rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: companyUUID], true)
+        List profile = []
+        int profileCount=0
+        for (String k in rc.keySet()) {
+            def v = rc[k]
+            k = k=="uuid"?"UUID":StringUtils.capitalize(k);
+            if (v!=null && v!="") {
+                if (v instanceof Collection) {
+                    if (!v.isEmpty()) {
+                        profileCount+= v.size()
+                        profile << [k:k,v:v]
+                    }
+                } else {
+                    profileCount++
+                    profile << [k:k,v:v]
+                }
+            }
+        }
+        profile << [count:profileCount]
         [
-         Details:rc,
+         Profile:profile,
          Insights:insights,
-         Comments:comments,
-         "Similar Companies":["",
-                   "marketCap",
-                   "revenue",
-                   "categories"]
+         Comments:comments
         ]
     }
 

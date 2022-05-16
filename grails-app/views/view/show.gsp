@@ -410,10 +410,13 @@
             return html;
         }
 
-        function formatCommentsContent(content)  {
+        function formatCommentsContent(content, companyUUID)  {
             //todo iterate through map, convert timestamp to date, + tab + text
-            let html= '<form method=\'post\' action=\'/view/addComment\'>'+
-                  '<input type=\'hidden\'  name=\'view.id\' value=\'${this.view.id}\'/>'+
+            let html= '<form method=\'post\' action=\'/view/addComment\'>';
+            if (companyUUID!==undefined) {
+                html += '<input type=\'hidden\'  name=\'companyUUID\' value=\''+companyUUID+'\'/>'
+            }
+            html+= '<input type=\'hidden\'  name=\'view.id\' value=\'${this.view.id}\'/>'+
                   '<input id=\'comment\' name=\'comment\' placeholder=\'Enter a Comment\' class=\'form-control\'>' +
                   '<input id=\'addComment\' value=\'Add Comment\' type=\'submit\' class=\'btn btn-primary\'>'+
                   '</form>';
@@ -431,7 +434,7 @@
             return html
         }
 
-        function formatConstraintsContent(content)  {
+        function formatParametersContent(content)  {
             // todo iterate through map key tab value
             let html= '<table class="project-table"> <tbody style="height: auto">';
             for (let i=0; i<content.length; i++) {
@@ -445,13 +448,28 @@
             return html;
         }
 
+        function formatProfileContent(content)  {
+            // todo iterate through map key tab value
+            let html= '<table class="project-table"> <tbody style="height: auto">';
+            for (let i=0; i<content.length; i++) {
+                const c = content[i];
+                html+= '  <tr  style="height: auto">\n'+
+                    '    <td>'+c.k+'</td>\n'+
+                    '    <td>'+c.v+'</td>\n'+
+                    '  </tr>\n';
+            }
+            html+='</tbody></table>';
+
+            return html;
+        }
+
         function loadProjectContent(companyUUID) {
             $.ajax({
                 url: companyUUID ? '/api/contentForCompanyInView?companyUUID='+companyUUID+'&viewId=${view.id}&':'/api/contentForProject/${view.project.id}',
                 success: function(data) {
                     let i=0
                     Object.keys(data).map(function(head) {
-                        i+=1;
+                        i++;
                         console.log( "buttons:"+head)
                         const content = data[head];
                         console.log(content)
@@ -463,14 +481,18 @@
                                 html = formatDescriptionContent(content);
                                 count = 1
                                 break;
+                            case 'pro':
+                                count = content.pop()["count"]
+                                html = formatProfileContent(content);
+                                break;
                             case 'ins':
                                 html = formatInsightsContent(content);
                                 break;
                             case 'com':
-                                html = formatCommentsContent(content);
+                                html = formatCommentsContent(content, companyUUID);
                                 break;
-                            case 'con':
-                                html = formatConstraintsContent(content);
+                            case 'par':
+                                html = formatParametersContent(content);
                                 break;
                         }
                         $('#content'+i).html(html)
