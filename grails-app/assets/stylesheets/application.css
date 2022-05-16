@@ -258,7 +258,7 @@ thead th {
 .projectTable th a:link, .projectTable th a:visited {
   color: #FFF;
 }
-.navbar { padding: 0;}
+.navbar { padding: 0; height: 65px;}
 .nav a {
   color: #133c7c !important;
   font-size: 14px !important;

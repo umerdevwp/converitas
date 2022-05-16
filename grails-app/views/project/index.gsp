@@ -17,6 +17,9 @@
             line-height: 1.6em;
             font-size: 13px;
         }
+        .projectTable th {  
+            line-height: 1.2em;
+        }        
         .projectTable li {
             list-style: none;
             display: inline-block;

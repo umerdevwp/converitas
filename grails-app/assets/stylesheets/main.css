@@ -841,13 +841,16 @@ Remove all dots
     /* background: #a1a1a1; */
     background-color: #6a7b97;
     color: #fff;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .ml-auto a.selectedTab {
     background: #a1a1a1;
     color: #fff !important;
     font-weight: normal;
+}
+.buttons {
+    font-size: 14px;
 }
 
 .buttons:focus {

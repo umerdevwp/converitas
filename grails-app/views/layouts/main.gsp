@@ -20,7 +20,7 @@
     <style>
     .client-logo {
         z-index: 999;
-        margin-left: 150px;
+        margin-left: 115px;
         padding-top: 10px;
     }
     /* .navbar {
@@ -32,7 +32,7 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark navbar-static-top" role="navigation" >
-    <a class="navbar-brand" href="/project/index"><asset:image width="68px" src="coveritas.svg"
+    <a class="navbar-brand" href="/project/index"><asset:image width="88px" src="coveritas.svg"
                                                                     alt="Coveritas Logo"/></a>
                                                                 
     <span class="client-logo"><asset:image class="sap-logo" width="75px" src="SAP_logo.png" alt="SAP Logo"/></span>
@@ -85,7 +85,7 @@
 
 <nav class="sidebar-menu">
     <ul>
-        <li class="logo"><a class="navbar-brand" href="/project/index"><asset:image width="68px" src="coveritas.svg" alt="Coveritas Logo"/></a></li>
+        <li class="logo"><a class="navbar-brand" href="/project/index"><asset:image width="88px" src="coveritas.svg" alt="Coveritas Logo"/></a></li>
         <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
         <g:set var="u" value="${User.get(session["userID"])}"/>
             <g:if test="${u!=null}">
