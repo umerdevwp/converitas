@@ -260,15 +260,16 @@ thead th {
 }
 .navbar { padding: 0; height: 65px;}
 .nav a {
-  color: #133c7c !important;
+  color: #FFF !important;
   font-size: 14px !important;
   margin-right: 20px;
-  border: solid 1px #133c7c;
+  border: solid 1px #FFF;
   border-radius: 8px;            
 }
 
 .nav a:focus, .nav a:hover {
-  background-color: #133c7c;
+  background-color: #FFF;
+  color: #333 !important;
 }
 .list-project h1 {
   margin-left: 5px;
