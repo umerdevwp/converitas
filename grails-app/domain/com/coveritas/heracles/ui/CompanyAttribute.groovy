@@ -32,7 +32,7 @@ class CompanyAttribute {
         id generator : 'increment'
         uuid nullable: false, blank: false, unique: true
         company nullable: false
-        companyUuid nullable: false, unique: true
+        companyUuid nullable: false
         shortDescription nullable: true
         sValue nullable: true
         fValue nullable: true

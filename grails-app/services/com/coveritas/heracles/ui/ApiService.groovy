@@ -51,7 +51,7 @@ class ApiService {
             if (remotePrjMap.isEmpty()) {
                 continue
             }
-            Set<Map> remoteProjects = new LinkedHashSet(remotePrjMap.get("projects") as Collection)
+            List<Map> remoteProjects = remotePrjMap.projects as List<Map>
 
             Project.withTransaction { status ->
                 Set<Project> localProjects = Project.findAllByOrganization(organization)
@@ -99,42 +99,49 @@ class ApiService {
             Project lp = lv.project
             String pUuid = lp.uuid
             Organization organization = lp.organization
-            Map remoteCoMap = httpClientService.getParamsExpectObject("view/${organization.uuid}/${user.uuid}/${pUuid}/${vUuid}", null, LinkedHashMap.class, true)
+//            Map remoteCoMap = httpClientService.getParamsExpectObject("view/${organization.uuid}/${user.uuid}/${pUuid}/${vUuid}", null, LinkedHashMap.class, true)
+            def graphData =httpClientService.getParamsExpectResult("/view/graph/${organization.uuid}/${user.uuid}/${pUuid}/${vUuid}", null, true)
             Set<CompanyViewObject> lnrCompanies = []
-            if (remoteCoMap.containsKey("companies")) {
-                List<Map<String, Object>> remoteCompanies = remoteCoMap.companies
-                for (Map companyStatusMap in remoteCompanies) {
-                    Map cStateObj = companyStatusMap.company
-                    String rcUuid = cStateObj.uuid
-
-                    String level = companyStatusMap.level?:CompanyViewObject.UNKNOWN
-                    CompanyViewObject lcvo = localCompanies.find { it.company.uuid = rcUuid }
-                    Company lc
-                    if (lcvo==null) {
-                        lc = Company.findByUuid(rcUuid)
-                        if (!lc) {
-                            lc = createCompanyFromApi(rcUuid)
-                        }
-                        //create company locally and add to view with view level
-                        CompanyViewObject companyViewObject = CompanyViewObject.createDontSave(lc, lv, level)
-                        lcvo = companyViewObject.save(update:false, flush:true, failOnError:true)
-                        lnrCompanies.add(companyViewObject)
-//                        isDirtyRef[0]=true
-                    } else {
-                        lc = lcvo.company
-                        localCompanies.remove(lcvo)
-                        if (lcvo.level!=level) {
-                            isDirtyRef[0] = true
-                            lcvo.level = level
-                        }
-                        if (lc.overrideBackend) {
-                            lnrCompanies << lcvo
-                            //todo get and merge rc.attributes = ???
+//            if (remoteCoMap.containsKey("companies")) {
+            if (graphData.containsKey("nodes")) {
+//                List<Map<String, Object>> remoteCompanies = remoteCoMap.companies
+                List<Map> nodes = graphData.nodes
+//                for (Map companyStatusMap in remoteCompanies) {
+                for (Map node in nodes) {
+//                    Map cStateObj = companyStatusMap.company
+//                    String rcUuid = cStateObj.uuid
+                    String rcUuid = node.id
+//                    String level = companyStatusMap.level?:CompanyViewObject.UNKNOWN
+                    String level = node.level?:CompanyViewObject.UNKNOWN
+                    if (CompanyViewObject.LEVELS.contains(level)) {
+                        CompanyViewObject lcvo = localCompanies.find { it.company.uuid = rcUuid }
+                        Company lc
+                        if (lcvo==null) {
+                            lc = Company.findByUuid(rcUuid)
+                            if (!lc) {
+                                lc = createCompanyFromApi(rcUuid)
+                            }
+                            //create company locally and add to view with view level
+                            CompanyViewObject companyViewObject = CompanyViewObject.createDontSave(lc, lv, level)
+                            lcvo = companyViewObject.save(update:false, flush:true, failOnError:true)
+                            lnrCompanies.add(companyViewObject)
+    //                        isDirtyRef[0]=true
                         } else {
-                            lcvo.company = createOrUpdateCompanyFromApi(rcUuid, lc)
+                            lc = lcvo.company
+                            localCompanies.remove(lcvo)
+                            if (lcvo.level!=level) {
+                                isDirtyRef[0] = true
+                                lcvo.level = level
+                            }
+                            if (lc.overrideBackend) {
+                                lnrCompanies << lcvo
+                                //todo get and merge rc.attributes = ???
+                            } else {
+                                lcvo.company = createOrUpdateCompanyFromApi(rcUuid, lc)
+                            }
                         }
+                        lnrCompanies << lcvo
                     }
-                    lnrCompanies << lcvo
                 }
             }
             for (CompanyViewObject lcvo:localCompanies) {
@@ -157,7 +164,7 @@ class ApiService {
             if (lc == null) {
                 lc = Company.findByUuid(uuid)
             }
-            Company rc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: uuid], Company.class, true) as Company
+            Company rc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: uuid, plain:true], Company.class, true) as Company
             if (lc == null) {
                 rc.id = null
                 Set <CompanyAttribute> cas = []
@@ -194,8 +201,8 @@ class ApiService {
                     lc = Company.findByUuid(uuid)
                 }
             }
+            return lc
         }
-        return lc
     }
 
     View createOrUpdateViewFromApi(String vUuid, String pUuid, String userOrgUUID, User user, Boolean[] isDirtyRef, View lv=null) {
@@ -366,8 +373,8 @@ class ApiService {
                 cvo.viewUUID = view.uuid
                 cvo.save(update:false, flush:true, failOnError:true)
             }
+            true
         }
-        true
     }
 
     Map addEntityViewEvent(String userUuid,
@@ -453,18 +460,27 @@ class ApiService {
 
     Map contentForView(User user, String viewUUID) {
 //        Project project = remoteProjects(user).find({ Project p -> p.uuid == viewUUID })
-        View project = View.findByUuid( viewUUID )
+        View view = View.findByUuid( viewUUID )
 
         List<EntityViewEvent> eves = allEventsForView(user, viewUUID)
-        long now = System.currentTimeMillis()
+        List insights = []
+        eves.each {EntityViewEvent e ->
+            // todo change the content based on event type and state
+            insights.add([
+                    title:e.title,
+                    time:format.format(new Date(e.ts as long)),
+                    type:e.type,
+                    state:e.state,
+                    entityUUID:e.entityUUID
+            ])
+        }
+        Set<Annotation> annotations = commentsForView(viewUUID)
+        Set<Map> comments = []
+        annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
         [
-         Description:[project.name,project.description],
-         Insights:[eves],
-         Comments:["${now-50*60000}":"This is a comment",
-                   "${now-40*60000}":"This is another comment",
-                   "${now-30*60000}":"This is now the third comment",
-                   "${now-20*60000}":"This is the least important comment",
-                   "${now-10*60000}":"This is now the last comment"         ],
+         Description:[view.name,project.description],
+         Insights:insights,
+         Comments:comments,
          Constraints:[employees:"10-200000",
                       "Market Cap":"0-10B",
                       "revenue":"undefined",
@@ -472,19 +488,63 @@ class ApiService {
         ]
     }
 
-    Map contentForCompanyInProject(User user, String projectUUID, String companyUUID) {
-        Project project = remoteProjects(user).find({ Project p -> p.uuid == projectUUID })
+    Map contentForCompanyInView(User user, String viewUUID, String companyUUID) {
+        View view = View.findByUuid( viewUUID )
 
-        def eves = allEventsForCompanyInProject(user, project.uuid)
-        long now = System.currentTimeMillis()
+        String projectUUID = view.project.uuid
+        List<EntityViewEvent> eves = allEventsForCompanyInView(user, viewUUID, companyUUID)
+        List insights = []
+        eves.each {EntityViewEvent e ->
+            // todo change the content based on event type and state
+            insights.add([
+                    title:e.title,
+                    time:format.format(new Date(e.ts as long)),
+                    type:e.type,
+                    state:e.state,
+                    entityUUID:e.entityUUID
+            ])
+        }
+        Set<Annotation> annotations = commentsForViewAndCompany(viewUUID, companyUUID)
+        Set<Map> comments = []
+        annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
+        //todo 'det' in view with content formatter
+        //todo conversion rc map -> list of Maps with name, value
+        Map rc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: companyUUID], Company.class, true)
         [
-         Profile:[project.name,project.description],
+         Details:rc,
+         Insights:insights,
+         Comments:comments,
+         "Similar Companies":["",
+                   "marketCap",
+                   "revenue",
+                   "categories"]
+        ]
+    }
+
+    Map contentForCompanyInProject(User user, String projectUUID, String companyUUID) {
+        Project project = Project.findByUuid( viewUUID )
+
+//        String projectUUID = view.project.uuid
+        List<EntityViewEvent> eves = allEventsForCompanyInProject(user, projectUUID, companyUUID)
+        List insights = []
+        eves.each {EntityViewEvent e ->
+            // todo change the content based on event type and state
+            insights.add([
+                    title:e.title,
+                    time:format.format(new Date(e.ts as long)),
+                    type:e.type,
+                    state:e.state,
+                    entityUUID:e.entityUUID
+            ])
+        }
+        Set<Annotation> annotations = commentsForProjectAndCompany(projectUUID, companyUUID)
+        Set<Map> comments = []
+        annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
+
+        [
+         Details:[project.name,project.description],
          Insights:[eves],
-         Comments:["${now-50*60000}":"This is a comment",
-                   "${now-40*60000}":"This is another comment",
-                   "${now-30*60000}":"This is now the third comment",
-                   "${now-20*60000}":"This is the least important comment",
-                   "${now-10*60000}":"This is now the last comment"         ],
+         Comments:insights,
          "Similar Companies":["",
                    "marketCap",
                    "revenue",
@@ -499,6 +559,11 @@ class ApiService {
 
     List<EntityViewEvent> allEventsForView(User user, String vUUID) {
         Map events = httpClientService.getParamsExpectMap("eve/view/${vUUID}", null, true)
+        eveIt(events)
+    }
+
+    List<EntityViewEvent> allEventsForCompanyInView(User user, String vUUID, String cUUID) {
+        Map events = httpClientService.getParamsExpectMap("eve/view/entity/${vUUID}/${cUUID}", null, true)
         eveIt(events)
     }
 
@@ -611,9 +676,182 @@ class ApiService {
         extractAllAnnotations(vos)
     }
 
+    List<Annotation> commentsForProjectAndCompany(String projectUUID, String companyUUID) {
+        Company company = Company.findByUuid(companyUUID)
+        List<ViewObject> vos = CompanyViewObject.findAllByProjectUUIDAndCompany(projectUUID, company)
+        extractAllAnnotations(vos)
+    }
+
     List<Annotation> commentsForViewAndCompany(String viewUUID, String companyUUID) {
         Company company = Company.findByUuid(companyUUID)
         List<ViewObject> vos = CompanyViewObject.findAllByViewUUIDAndCompany(viewUUID, company)
         extractAllAnnotations(vos)
+    }
+
+    static String temperatureColor(Float temp) {
+
+        if (null == temp) return ''
+
+        int t = Math.round(temp*31)
+        switch (t) {
+            case 31: return "#790402"
+            case 30: return "#940d00"
+            case 29: return "#c12201"
+            case 28: return "#d23105"
+            case 27: return "#e14008"
+            case 26: return "#eb520e"
+            case 25: return "#f56818"
+            case 24: return "#fb8021"
+            case 23: return "#fe972b"
+            case 22: return "#fcac34"
+            case 21: return "#f7c039"
+            case 20: return "#ecd03a"
+            case 19: return "#DEDF36"
+            case 17: return "#cbec33"
+            case 16: return "#b7f734"
+            case 15: return "#A2FD3C"
+            case 14: return "#8aff4b"
+            case 13: return "#6afe64"
+            case 12: return "#4CF77D"
+            case 11: return "#31f099"
+            case 10: return "#1de9af"
+            case  9: return "#18DBC3"
+            case  8: return "#1CCCD9"
+            case  7: return "#28BBEC"
+            case  6: return "#37a7f9"
+            case  5: return "#4194ff"
+            case  4: return "#437bef"
+            case  3: return "#456be3"
+            case  2: return "#4356c6"
+            case  1: return "#382a72"
+            default: return "#2b0536"
+        }
+    }
+
+    private class NodeAndEdges {
+        Map node
+        List<Map> edges
+
+        NodeAndEdges(Map node) {
+            this.node = node
+            edges = []
+        }
+    }
+
+    /**
+     * Produce [nodes: edges] data for graph widget. If uuid is null then complete graph,
+     * else if uuid and mexdepth are not null just the subgraph of all edges connected
+     * back to node uuid up to maxdepth hops away.
+     *
+     * @param uuid
+     * @param ts
+     * @param maxdepth
+     * @return
+     */
+    Map<String, List> newGraph(User user, View view, Long from, Long to, Integer maxdepth) {
+        Project project = view.project
+        Organization org = project.organization
+        def graphData =httpClientService.getParamsExpectResult("/view/graph/${org.uuid}/${user.uuid}/${project.uuid}/${view.uuid}", null, true)
+
+        graphData
+//        Map<String, Object> params = [:] as Map<String, Object>
+//        params.viewUUID = view.uuid
+//        if (from) {
+//            params.from = from
+//            params.to   = to
+//        }
+//        List<Map> edges
+//        List<NodeAndEdges> nodeToEdges= [new NodeAndEdges(null)] // index id contains all edges incident on node with id i - starting at id=1
+//        int id = 1
+//        boolean doTarget = maxdepth
+//
+//        //todo correct endpoint and results if ready
+////        exps = httpClientService.getParamsExpectList("system/activecompanystate", params, LinkedHashMap, true) as List<LinkedHashMap>?:[]
+//        Project project = view.project
+//        Map remoteCoMap = httpClientService.getParamsExpectObject("view/${project.organization.uuid}/${user.uuid}/${project.uuid}/${view.uuid}", null, LinkedHashMap.class, true) as Map
+//        List<Map<String, Object>> exps = remoteCoMap.companies
+//        Map<String, Map> nodesMap = exps
+//                .findAll { it.company } // ? null company info sometimes ??
+//                .collectEntries {
+//                    Map company = (Map)it.company
+//                    Map node = [
+//                            label: company.canonicalName,
+//                            uuid: company.uuid,
+//                            color: temperatureColor((Float)it.heat),
+//                            mode: it.mode,
+//                            assocCompanies: it.associatedCompanies as Map,
+//                            heat: (Float)it.heat ?: 0,
+//                            docsSeen: it.docsSeen,
+//                            incrDocsSeen: it.incrDocsSeen,
+//                            shape: 'dot',
+//                            id: id++
+//                    ]
+//                    nodeToEdges << new NodeAndEdges(node)
+//                    [
+//                            company.uuid,
+//                            node
+//                    ]
+//                }
+//
+//        edges = nodesMap
+//                .keySet()
+//                .sort() // Ascending uuids
+//                .collect { fromUUID ->
+//                    Map fromInfo = nodesMap[fromUUID]
+//                    ((Map<String, Object>) nodesMap[fromUUID].assocCompanies)
+//                            .collect {
+//                                String toUUID = it.key
+//                                Map toInfo = nodesMap[toUUID], link = null
+//
+//                                if (toInfo) {
+//                                    if (toUUID < fromUUID) {
+//                                        /*
+//                                         *  I will already have processed it - did I have a link?
+//                                         *  If I did then my current 'to' will contain my 'from' as an association so
+//                                         *  skip link formation. Otherwise
+//                                         */
+//                                        if ((! toInfo.assocCompanies) || (toInfo.assocCompanies && ! ((Map)toInfo.assocCompanies).get(fromUUID)))  {
+//                                            link = [from: fromInfo.id, to: toInfo.id, color: 'black']
+//                                            if (doTarget) {
+//                                                nodeToEdges[(Integer)fromInfo.id].edges << link
+//                                                nodeToEdges[(Integer)toInfo.id].edges << link
+//                                            }
+//                                            link
+//                                        }
+//                                    } else { // Build the link
+//                                        link = [from: fromInfo.id, to: toInfo.id, color: 'black']
+//                                        if (doTarget) {
+//                                            nodeToEdges[(Integer)fromInfo.id].edges << link
+//                                            nodeToEdges[(Integer)toInfo.id].edges << link
+//                                        }
+//                                        link
+//                                    }
+//                                } else
+//                                    log.warn "Association between ${fromInfo.label} and ${toUUID} is stale"
+//                                link
+//                            }
+//                } as List<Map>
+//
+//        edges = edges.findAll { it }.flatten().findAll {it } as List<Map>
+//
+//        List<Map> nodes
+//        /**
+//         * If we have a target find all the nodes connected to it and reduce our node set to this. We don't bother
+//         * culling edges - orphaned ones won't be rendered
+//         */
+//        if (doTarget) {
+//            Integer targetId = nodesMap.values().find {it.uuid == targetUuid }?.id as Integer
+//            if (targetId)
+//                nodes = subGraph(targetId, maxdepth, nodeToEdges)
+//                        .collect {nodeToEdges[it].node }
+//            else {
+//                log.error "Cannot find targetId for $targetUuid"
+//                nodes = []
+//            }
+//        } else
+//            nodes = nodesMap.values().toList()
+//
+//
+//        [nodes: nodes, edges: edges] as Map<String, List<Map>>
     }
 }

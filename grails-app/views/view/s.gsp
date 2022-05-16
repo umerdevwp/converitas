@@ -63,6 +63,20 @@
             </div>
             <div class="col-sm-6">
                 <h2>Company Association</h2>
+                <td style="width:50%; padding-left: 5px; max-height:600px; border: solid 1px #ccc">
+                    <div class="tabs">
+                        <button class="buttons selectedTab" onclick="loadGraphData(2)">Tracking</button>
+                        <button class="buttons" onclick="loadGraphData(1)">Surfaced</button>
+                        <button class="buttons" onclick="loadGraphData(0)">Watched</button>
+                        <%-- <button class="buttons">Meta</button>--%>
+                    </div>
+                    <h2 class="modeHeading"><span id="mode"></span> Companies</h2>
+                    <div class="spinnerWrapper hide">
+                        <div class="spinner">Loading...</div>
+                    </div>
+                    <div id="graph" style="width:100%; margin: 10px; height: 550px">
+                    </div>
+                </td>
             </div>
             <div class="col-sm-4">
                 <h2>Blackbird > HBO</h2>
@@ -374,6 +388,7 @@
         import "/assets/vis-timeline-graph2d.min.js";
         import "/assets/vis-network.min.js";
 
+        const refreshInterval = 60000;
         let pageURL = '';
 
         $( document ).ready(() => {
@@ -520,9 +535,9 @@
             return html;
         }
 
-        function loadProjectContent() {
+        function loadProjectContent(companyUUID) {
             $.ajax({
-                url: '/api/contentForProject/${view.project.id}',
+                url: companyUUID ? '/api/contentForCompanyInView?companyUUID='+companyUUID+'&viewId=${view.id}&':'/api/contentForProject/${view.project.id}',
                 success: function(data) {
                     let i=0
                     Object.keys(data).map(function(head) {
@@ -566,9 +581,136 @@
             window.location = encodeURI('/system/query?query=' + $('#q').val() + '&from=' + from + '&to=' + to);
         }
 
+        //###########################################   S T A R T   G R A P H   ########################################
+
+        const graphOptions = {
+            nodes: {
+                shape: 'dot',
+                mass: 1,
+                scaling: {
+                    label: {
+                        enabled: true
+                    }
+                }
+            },
+            physics: {
+                barnesHut: {
+                    gravitationalConstant: -10000
+                },
+                solver: 'repulsion',
+                repulsion: {
+                    springLength: 250,
+                    nodeDistance: 150,
+                    springConstant:0.01
+                }
+            }
+        };
+        const graphContainer = document.getElementById('graph');
+        let ts = '', qts = '';
+
+        if (null != now) {
+            ts = "&ts=" + now;
+            qts = "?ts=" + now + '&viewId=${view.id}';
+        }
+
+        window.loadGraphData = function(mode) {
+
+            function modeFilter(d) { d.mode = d.level==='watching' ? 0 : d.level === 'surfacing' ? 1 : 2; return d.mode >= mode; }
+
+            function nodeById(nodes, id) {
+                for(let i = 0; i < nodes.length; ++i) {
+                    if (nodes[i].id === id)
+                        return nodes[i];
+                }
+            }
+
+            $.ajax({
+                url: "/api/activecompanygraph" + qts,
+                beforeSend: function() {
+                    $('.spinnerWrapper').removeClass('hide');
+                    $('.modeHeading').addClass('hide');
+                    $('#graph').addClass('hide');
+                },
+                success: function (data) {
+                    console.log('data:', data);
+                    const network = new vis.Network(graphContainer, {
+                        nodes: data.nodes.filter(modeFilter),
+                        edges: data.edges
+                    }, graphOptions);
+
+                    $('#num_cos').html(data.nodes.length);
+                    $('#mode').html( mode === 0 ? 'Watching' : mode === 1 ? 'Surfacing' : 'Tracking')
+
+                    // Indexed by node mode. Note we have  modes 3,4 for children in the graph. It is ignored in counts
+                    let cos_html = [{t: '', s: 0}, {t: '', s: 0}, {t: '', s: 0}, {t: '', s: 0}, {t: '', s: 0}];
+
+                    $('#tracked_cos_size').html('')
+
+                    for (let i = 0; i < data.nodes.length; ++i) {
+                        const node = data.nodes[i];
+                        let co_html = '<a onclick="loadProjectContent(\'' + node.id + '\')" style="text-decoration: none">';
+                        co_html += '<div>' + node.label + '</div></a>';
+                        const nodeMode = node.mode;
+                        cos_html[nodeMode].t += co_html;
+                        cos_html[nodeMode].s++;
+                    }
+
+                    $('#watched_cos').html(cos_html[0].t);
+                    $('#pinned_cos').html(cos_html[1].t);
+                    $('#tracked_cos').html(cos_html[2].t);
+                    $('#num_watched').html(cos_html[0].s);
+                    $('#num_pinned').html(cos_html[1].s);
+                    $('#num_tracked').html(cos_html[2].s);
+
+                    network.on('click', function (properties) {
+                        let haveNode = false; // Manage code continuation after window_location
+
+                        if ([] !== properties.items) {
+                            let index = properties.nodes[0];
+                            for (let i = 0; i < data.nodes.length; ++i) {
+                                if (index === data.nodes[i].id) {
+                                    haveNode = true;
+                                    loadProjectContent(data.nodes[i].id)
+                                }
+                            }
+                        }
+                        if ([] !== properties.edges && !haveNode)
+                        {
+                            let index = properties.edges[0];
+                            for (let i = 0; i < data.edges.length; ++i) {
+                                if (index === data.edges[i].id) {
+                                    const fromNode = nodeById(data.nodes, data.edges[i].from).uuid;
+                                    const toNode = nodeById(data.nodes, data.edges[i].to).uuid;
+                                    window.location = '/company/shadow?uuid=' + fromNode + '&shadow=' + toNode + ts ;
+                                }
+                            }
+                        }
+                    })
+                },
+                complete: function() {
+                    $('.spinnerWrapper').addClass('hide');
+                    $('.modeHeading').removeClass('hide');
+                    $('#graph').removeClass('hide');
+                },
+                error: function(err, status, error){
+                    alert(err.responseJSON.message);
+                }
+            })
+        }
+
+        loadGraphData(2);
+
+        setInterval(
+            function() {
+                if (now === null)
+                    $('.buttons.selectedTab').click();
+            }, refreshInterval);
+
+        //#############################################   E N D   G R A P H   ##########################################
+
         loadTimelineData();
         loadCompanyStatus();
-        loadProjectContent();
+        loadProjectContent(undefined);
 
     </script>
     </body>

@@ -1,8 +1,8 @@
 package com.coveritas.heracles.ui
 
 class ExtraViewObject extends ViewObject {
-    final static String T_PROJECT   = 'project'
-    final static String T_VIEW      = 'view'
+    public final static String T_PROJECT   = 'project'
+    public final static String T_VIEW      = 'view'
     final static List<String> TYPES = [T_PROJECT,T_VIEW]
 
     String  type

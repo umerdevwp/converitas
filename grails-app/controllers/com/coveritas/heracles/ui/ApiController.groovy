@@ -81,6 +81,14 @@ class ApiController {
         }
     }
 
+    def contentForCompanyInView(String companyUUID, long viewId) {
+        call {
+            User u = User.get(session['userID'] as long)
+            View view = View.get(viewId)
+            apiService.contentForCompanyInView(u, view.uuid, companyUUID)
+        }
+    }
+
     def contentForCompanyInProject(String companyUUID, long viewId) {
         call {
             User u = User.get(session['userID'] as long)
@@ -96,6 +104,12 @@ class ApiController {
         }
     }
 
+    def activecompanygraph( long viewId, @Nullable Long ts, @Nullable Long from, @Nullable Long to) {
+        call {
+            ///view/graph/org-uuid/user-uuid/project-uuid/view-uuid
+            apiService.newGraph(User.get(session['userID'] as long), View.get(viewId), from, to, null)
+        }
+    }
 /*
 
     def companytimeline(String uuid, @Nullable Long from, @Nullable Long to) {
@@ -123,18 +137,6 @@ class ApiController {
             httpClientService.getParamsExpectList("system/activecompanystate", params, LinkedHashMap)
         }
     }
-
-    def activecompanygraph(@Nullable Long ts, @Nullable Long from, @Nullable Long to) {
-        call {
-            if (! (from && to)) {
-                ts = ts ?: System.currentTimeMillis()
-                from = ts - 6*3600*1000
-                to = ts + 6*3600*1000
-            }
-            organizationService.newGraph(null, from, to, null)
-        }
-    }
-
 
     def bindingarticles(String co1uuid, String co2uuid, @Nullable Long from, @Nullable Long to) {
         call {
