@@ -401,7 +401,7 @@
                 const c = content[i];
                 html+= '  <tr  style="height: auto">\n'+
                     '    <td>'+c['time']+'</td>\n'+
-                    '    <td>'+c['type']+'</td>\n'+
+                    // '    <td>'+c['type']+'</td>\n'+
                     '    <td>'+c['title']+'</td>\n'+
                     '  </tr>\n';
             }
@@ -476,22 +476,26 @@
                         $('#button'+i).html(head)
                         let html = ''
                         let count = content.length;
-                        switch (head.toLowerCase().substring(0,3)) {
-                            case 'des':
+                        switch (head.toLowerCase().substring(0,4)) {
+                            case 'desc':
                                 html = formatDescriptionContent(content);
                                 count = 1
                                 break;
-                            case 'pro':
+                            case 'prof':
                                 count = content.pop()["count"]
                                 html = formatProfileContent(content);
                                 break;
-                            case 'ins':
+                            case 'comp':
+                                count = content.pop()["count"]
+                                html = formatProfileContent(content);
+                                break;
+                            case 'inss':
                                 html = formatInsightsContent(content);
                                 break;
-                            case 'com':
+                            case 'comm':
                                 html = formatCommentsContent(content, companyUUID);
                                 break;
-                            case 'par':
+                            case 'para':
                                 html = formatParametersContent(content);
                                 break;
                         }

@@ -147,7 +147,7 @@ class ApiService {
             }
             for (CompanyViewObject lcvo:localCompanies) {
                 lcvo.delete()
-//                isDirtyRef[0] = true
+                isDirtyRef[0] = true
             }
             if (isDirtyRef[0]) {
                 lv.save(update:true)
@@ -530,7 +530,7 @@ class ApiService {
         }
         profile << [count:profileCount]
         [
-         Profile:profile,
+         "Company Details":profile,
          Insights:insights,
          Comments:comments
         ]

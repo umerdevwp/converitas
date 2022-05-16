@@ -23,6 +23,6 @@ class Annotation extends ViewObject {
 
     @Override
     String toString() {
-        return "$title" ((annotatedVO==null)?"":" note for '${annotatedVO}'");
+        return "$title" /*((annotatedVO==null)?"":" note for '${annotatedVO}'")*/
     }
 }
