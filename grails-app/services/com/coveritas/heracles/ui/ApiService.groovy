@@ -509,7 +509,7 @@ class ApiService {
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
         //todo 'det' in view with content formatter
         //todo conversion rc map -> list of Maps with name, value
-        Map rc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: companyUUID], Company.class, true)
+        Map rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: companyUUID], true)
         [
          Details:rc,
          Insights:insights,

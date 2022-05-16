@@ -113,12 +113,14 @@
 
 
 <script>
+/*
     document.getElementById('q').addEventListener("keyup", function(event) {
         if (event.keyCode === 13) {
             event.preventDefault();
             window.search();
         }
     });
+*/
 </script>
 <g:layoutBody/>
 <div id="spinner" class="spinner" style="display:none;">
