@@ -57,12 +57,20 @@
         .material-icons.red600 { color: #fb0000; }
         .form-control {
             width: 65%;
-            float: left;            
+            float: left;
+            font-size: 13px;         
         }
         .btn-primary {
             float: left;
             background: #133c7c;
             border-color: #133c7c;
+            font-size: 12px;
+            padding: 6.5px 10px;
+            margin-left: 10px;
+        }
+        #comments form {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
         }
         </style>
 
@@ -404,8 +412,12 @@
 
         function formatCommentsContent(content)  {
             //todo iterate through map, convert timestamp to date, + tab + text
-
-            let html= '<table class="project-table"> <tbody style="height: auto">';
+            let html= '<form method=\'post\' action=\'/view/addComment\'>'+
+                  '<input type=\'hidden\'  name=\'view.id\' value=\'${this.view.id}\'/>'+
+                  '<input id=\'comment\' name=\'comment\' placeholder=\'Enter a Comment\' class=\'form-control\'>' +
+                  '<input id=\'addComment\' value=\'Add Comment\' type=\'submit\' class=\'btn btn-primary\'>'+
+                  '</form>';
+            html+= '<table class="project-table"> <tbody style="height: auto">';
             for (let i=0; i<content.length; i++) {
                 const c = content[i];
                 html+= '  <tr>\n'+
@@ -414,11 +426,7 @@
                        '    <td>'+c['name']+'</td>\n'+
                        '  </tr>';
             }
-            html+='</tbody></table><form method=\'post\' action=\'/view/addComment\'>'+
-                  '<input type=\'hidden\'  name=\'view.id\' value=\'${this.view.id}\'/>'+
-                  '<input id=\'comment\' name=\'comment\' placeholder=\'Enter a Comment\' class=\'form-control\'>' +
-                  '<input id=\'addComment\' value=\'Add Comment\' type=\'submit\' class=\'btn btn-primary\'>'+
-                  '</form>';
+            html+='</tbody></table>';
 
             return html
         }
