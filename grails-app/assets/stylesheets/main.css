@@ -838,7 +838,8 @@ Remove all dots
 }
 
 .selectedTab {
-    background: #a1a1a1;
+    /* background: #a1a1a1; */
+    background-color: #6a7b97;
     color: #fff;
     font-size: 16px;
 }

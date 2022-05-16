@@ -43,11 +43,37 @@
             font-size: 18px;
             font-weight: bold;    
         } 
+        #graph {
+            width:100%; 
+            height: 500px;
+            background: #FFF;
+        }
+        .tabs .buttons { 
+            padding:5px 10px !important;
+        }
         .material-icons.md-36 { font-size: 36px;}
         .material-icons.orange600 { color: #FB8C00; }
         .material-icons.blue600 { color: #38a9dd; }
         .material-icons.red600 { color: #fb0000; }
+        .form-control {
+            width: 65%;
+            float: left;            
+        }
+        .btn-primary {
+            float: left;
+            background: #133c7c;
+            border-color: #133c7c;
+        }
         </style>
+
+        <script>
+        setTimeout(() => {
+            $('.tabs .buttons').on('click', function(e) {
+            $('.tabs .buttons').removeClass('selectedTab');
+            $(this).addClass('selectedTab');
+        });
+        }, "2000");
+        </script>
     </head>
     <body>
         <a href="#show-view" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
@@ -80,7 +106,7 @@
                     <div class="spinnerWrapper hide">
                         <div class="spinner">Loading...</div>
                     </div>
-                    <div id="graph" style="width:100%; margin: 10px; height: 550px">
+                    <div id="graph">
                     </div>
                 </td>
             </div>
@@ -390,8 +416,8 @@
             }
             html+='</tbody></table><form method=\'post\' action=\'/view/addComment\'>'+
                   '<input type=\'hidden\'  name=\'view.id\' value=\'${this.view.id}\'/>'+
-                  '<input id=\'comment\' name=\'comment\' placeholder=\'Enter a Comment\'>' +
-                  '<input id=\'addComment\' value=\'Add Comment\' type=\'submit\'>'+
+                  '<input id=\'comment\' name=\'comment\' placeholder=\'Enter a Comment\' class=\'form-control\'>' +
+                  '<input id=\'addComment\' value=\'Add Comment\' type=\'submit\' class=\'btn btn-primary\'>'+
                   '</form>';
 
             return html
