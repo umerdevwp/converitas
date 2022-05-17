@@ -38,9 +38,9 @@ class CompanyController {
         }
 
         try {
-            Map<String, Object> result = httpClientService.getParamsExpectMap('company/resolve', [name:company.canonicalName, iso:company.countryIso], false)
-            Map<String, Object> c = result.company as Map<String, Object>
-            apiService.getCompanyFromAPI(c.uuid as String)
+//            Map<String, Object> result = httpClientService.getParamsExpectMap('company/resolve', [name:company.canonicalName, iso:company.countryIso], false)
+//            Map<String, Object> c = result.company as Map<String, Object>
+//            apiService.getCompanyFromAPI(c.uuid as String)
         } catch (ValidationException e) {
             respond company.errors, view:'create'
             return
@@ -70,7 +70,7 @@ class CompanyController {
         }
 
         try {
-            companyService.save(company)
+//            companyService.save(company)
         } catch (ValidationException e) {
             respond company.errors, view:'edit'
             return
@@ -92,8 +92,8 @@ class CompanyController {
         }
 
         Company company = Company.get(id)
-        company.deleted = true
-        companyService.save(company)
+//        company.deleted = true
+//        companyService.save(company)
 
         request.withFormat {
             form multipartForm {

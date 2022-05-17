@@ -251,28 +251,27 @@ class ApiService {
                         a.id = null
                         a.company = rco
                         cas.add(a)
-
                     }
                     rco.attributes = cas
                 }
                 lc = rco.save(update:false, flush:true, failOnError:true)
-            } else {
-                lc = Company.get(lc.id)
-                if (!lc.overrideBackend) {
-                    lc.canonicalName    = rc.canonicalName
-                    lc.normalizedName   = rc.normalizedName
-                    lc.ticker           = rc.ticker
-                    lc.exchange         = rc.exchange
-                    lc.countryIso       = rc.countryIso
-                    lc.source           = rc.source
-                    lc.sourceId         = rc.sourceId
-                    lc.category         = rc.category
-                    lc.preferred        = rc.preferred
-                    lc.overrideBackend  = false
-                    lc.deleted          = rc.deleted
-                    //todo get and merge rc.attributes = ???
-                }
-                lc.save(update: true, flush:true, failOnError:true)
+//            } else {
+//                lc = Company.get(lc.id)
+//                if (!lc.overrideBackend) {
+//                    lc.canonicalName    = rc.canonicalName
+//                    lc.normalizedName   = rc.normalizedName
+//                    lc.ticker           = rc.ticker
+//                    lc.exchange         = rc.exchange
+//                    lc.countryIso       = rc.countryIso
+//                    lc.source           = rc.source
+//                    lc.sourceId         = rc.sourceId
+//                    lc.category         = rc.category
+//                    lc.preferred        = rc.preferred
+//                    lc.overrideBackend  = false
+//                    lc.deleted          = rc.deleted
+//                    //todo get and merge rc.attributes = ???
+//                }
+//                lc.save(update: true, flush:true, failOnError:true)
             }
             return lc
         }
