@@ -21,7 +21,7 @@ class CompanyController {
     }
 
     def info(String uuid) {
-        Company company = apiService.createOrUpdateCompanyFromApi(uuid)
+        Company company = apiService.getCompanyFromAPI(uuid)
 
         redirect  url:"/company/show/${company.id}"
     }
@@ -40,7 +40,7 @@ class CompanyController {
         try {
             Map<String, Object> result = httpClientService.getParamsExpectMap('company/resolve', [name:company.canonicalName, iso:company.countryIso], false)
             Map<String, Object> c = result.company as Map<String, Object>
-            apiService.createCompanyFromApi(c.uuid as String)
+            apiService.getCompanyFromAPI(c.uuid as String)
         } catch (ValidationException e) {
             respond company.errors, view:'create'
             return
@@ -58,7 +58,7 @@ class CompanyController {
     def edit(Long id) {
         Company company = companyService.get(id)
         if (!company.overrideBackend) {
-            company = apiService.createOrUpdateCompanyFromApi(company.uuid)
+            company = apiService.getCompanyFromAPI(company.uuid)
         }
         respond company
     }

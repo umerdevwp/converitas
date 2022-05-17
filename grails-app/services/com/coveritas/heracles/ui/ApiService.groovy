@@ -5,6 +5,8 @@ import com.coveritas.heracles.json.EntityViewEvent
 import com.coveritas.heracles.utils.APIException
 import com.coveritas.heracles.utils.Meta
 import grails.gorm.transactions.Transactional
+import io.micronaut.caffeine.cache.Caffeine
+import io.micronaut.caffeine.cache.LoadingCache
 import org.springframework.util.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
@@ -89,9 +91,57 @@ class ApiService {
         allLocalProjects
     }
 
+    class ViewReq implements Serializable {
+
+        long viewId
+        long userId
+
+        ViewReq(View lv, User user){
+            viewId = lv.id
+            userId = user.id
+        }
+
+        boolean equals(o) {
+            if (this.is(o)) return true
+            if (getClass() != o.class) return false
+
+            ViewReq viewReq = (ViewReq) o
+
+            if (userId != viewReq.userId) return false
+            if (viewId != viewReq.viewId) return false
+
+            return true
+        }
+
+        int hashCode() {
+            int result
+            result = (int) (viewId ^ (viewId >>> 32))
+            result = 31 * result + (int) (userId ^ (userId >>> 32))
+            return result
+        }
+    }
+
+    class ViewResp implements Serializable {
+        Set<CompanyViewObject> resp
+        ViewResp(Set<CompanyViewObject> r){
+            resp=r
+        }
+    }
+
     Set<CompanyViewObject> remoteViewCompanies(View lv, User user, Boolean[] isDirtyRef) {
+        ViewReq viewReq = new ViewReq(lv, user)
+        return rvcCache.get(viewReq).resp
+    }
+
+    LoadingCache<ViewReq, ViewResp> rvcCache = Caffeine.newBuilder()
+            .maximumSize(100)
+            .build({ ViewReq viewReq -> remoteViewCompanies(viewReq)})
+
+    ViewResp remoteViewCompanies(ViewReq viewReq) {
         View.withTransaction { TransactionStatus status ->
-            lv = View.get(lv.id)
+            boolean isDirty = false
+            View lv = View.get(viewReq.viewId)
+            User user = User.get(viewReq.userId)
             List<CompanyViewObject> localCompanies = CompanyViewObject.findAllByView(lv)
 //            if (true) {
 //                return localCompanies
@@ -120,25 +170,25 @@ class ApiService {
                         if (lcvo==null) {
                             lc = Company.findByUuid(rcUuid)
                             if (!lc) {
-                                lc = createCompanyFromApi(rcUuid)
+                                lc = getCompanyFromAPI(rcUuid)
                             }
                             //create company locally and add to view with view level
                             CompanyViewObject companyViewObject = CompanyViewObject.createDontSave(lc, lv, level)
                             lcvo = companyViewObject.save(update:false, flush:true, failOnError:true)
                             lnrCompanies.add(companyViewObject)
-    //                        isDirtyRef[0]=true
+    //                        isDirty=true
                         } else {
                             lc = lcvo.company
                             localCompanies.remove(lcvo)
                             if (lcvo.level!=level) {
-                                isDirtyRef[0] = true
+                                isDirty = true
                                 lcvo.level = level
                             }
                             if (lc.overrideBackend) {
                                 lnrCompanies << lcvo
                                 //todo get and merge rc.attributes = ???
                             } else {
-                                lcvo.company = createOrUpdateCompanyFromApi(rcUuid, lc)
+                                lcvo.company = getCompanyFromAPI(rcUuid)
                             }
                         }
                         lnrCompanies << lcvo
@@ -147,40 +197,46 @@ class ApiService {
             }
             for (CompanyViewObject lcvo:localCompanies) {
                 lcvo.delete()
-                isDirtyRef[0] = true
+                isDirty = true
             }
-            if (isDirtyRef[0]) {
+            if (isDirty) {
                 lv.save(update:true)
             }
-            lnrCompanies
+
+            new ViewResp(lnrCompanies)
         }
     }
 
-    Company createCompanyFromApi(String uuid) {
-        return createOrUpdateCompanyFromApi(uuid)
+    Company getCompanyFromAPI(String uuid) {
+        return companyCache.get(uuid)
     }
 
-    Company createOrUpdateCompanyFromApi(String uuid, Company lc=null) {
+    LoadingCache<String, Company> companyCache = Caffeine.newBuilder()
+            .maximumSize(2048)
+            .build({ eid -> createOrUpdateCompanyFromApi(eid as String) }) as LoadingCache<String, Company>
+
+    Company createOrUpdateCompanyFromApi(String uuid) {
         Company.withTransaction { status ->
-            if (lc == null) {
-                lc = Company.findByUuid(uuid)
-            }
-            Company rc = httpClientService.getParamsExpectObject("company/byuuid", [uuid: uuid, plain:true], Company.class, true) as Company
+            Company lc = Company.findByUuid(uuid)
+
+            Map rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: uuid, plain:true], true)
             if (lc == null) {
                 rc.id = null
+                Company rco = new Company(rc)
+                rco.overrideBackend = false
                 Set <CompanyAttribute> cas = []
-                def attributes = rc.attributes
+                def attributes = rco.attributes
                 if (attributes !=null && attributes.size()!=0) {
                     for (ca in attributes) {
                         CompanyAttribute a = ca as CompanyAttribute
                         a.id = null
-                        a.company = rc
+                        a.company = rco
                         cas.add(a)
 
                     }
-                    rc.attributes = cas
+                    rco.attributes = cas
                 }
-                lc = companyService.save(rc)
+                lc = rco.save(update:false, flush:true, failOnError:true)
             } else {
                 lc = Company.get(lc.id)
                 if (!lc.overrideBackend) {
@@ -193,16 +249,11 @@ class ApiService {
                     lc.sourceId         = rc.sourceId
                     lc.category         = rc.category
                     lc.preferred        = rc.preferred
-                    lc.overrideBackend  = rc.overrideBackend
+                    lc.overrideBackend  = false
                     lc.deleted          = rc.deleted
                     //todo get and merge rc.attributes = ???
                 }
-                try {
-                    lc.save(update: true)
-                } catch (Exception ignore) {}
-                if (lc.id == null) {
-                    lc = Company.findByUuid(uuid)
-                }
+                lc.save(update: true, flush:true, failOnError:true)
             }
             return lc
         }
@@ -344,7 +395,7 @@ class ApiService {
             Project project = view.project
             if (project.organization==user.organization|| user.isSysAdmin()) {
                 CompanyViewObject cvo = new CompanyViewObject()
-                Company company = createOrUpdateCompanyFromApi(companyUUID)
+                Company company = getCompanyFromAPI(companyUUID)
                 cvo.company = company
                 cvo.view = view
                 httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid, level: cvo.level], false)

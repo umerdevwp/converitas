@@ -120,7 +120,7 @@ class ViewController {
         String url = params.url
         View view = View.get(params.get("view").id as long)
         cvo.view = view
-        Company company = apiService.createOrUpdateCompanyFromApi(params.companyUUID as String)
+        Company company = apiService.getCompanyFromAPI(params.companyUUID as String)
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         Project project = view.project
@@ -169,7 +169,7 @@ class ViewController {
         View view = View.get(params.get("view").id as long)
         Company company = null
         if (params.companyUUID!=null) {
-            company = apiService.createOrUpdateCompanyFromApi(params.companyUUID as String)
+            company = apiService.getCompanyFromAPI(params.companyUUID as String)
         }
         Long userID = session['userID'] as Long
         User u = User.get(userID)
