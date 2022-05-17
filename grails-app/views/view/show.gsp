@@ -152,14 +152,13 @@
                                                 <span class="title" id="button3">Comments</span>
                                             </a>
                                         </li>
-                                        <%-- <li class="nav-item">
+                                        <li class="nav-item" id="btn4item">
                                             <a class="nav-link" href="#similar-company" data-toggle="tab">
                                                 <span><i class="material-icons md-36 orange600">business</i></span>
                                                 <span class="length" id="count4">30</span>
                                                 <span class="title" id="button4">Similar Companies</span>
                                             </a>
-    
-                                        </li> --%>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -179,7 +178,7 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane" id="similar-company">
-                                    <div class="table-wrapper-scroll-y table-scrollbar">
+                                    <div class="table-wrapper-scroll-y table-scrollbar" id="content4">
                                     </div>
                                 </div>
                             </div>
@@ -437,12 +436,16 @@
         function formatParametersContent(content)  {
             // todo iterate through map key tab value
             let html= '<table class="project-table"> <tbody style="height: auto">';
-            for (let i=0; i<content.length; i++) {
-                const c = content[i];
-                html+= '  <tr  style="height: auto">\n'+
-                    '    <td>'+c+'</td>\n'+
-                    '  </tr>\n';
-            }
+            Object.keys(content).map(function(head) {
+                const lst = content[head];
+                for (let i=0; i<lst.length; i++) {
+                    const c = lst[i];
+                    html+= '  <tr>\n'+
+                        '    <td>'+(i==0?head:'')+'</td>\n'+
+                        '    <td>'+c+'</td>\n'+
+                        '  </tr>\n';
+                }
+            });
             html+='</tbody></table>';
 
             return html;
@@ -479,14 +482,11 @@
                         $('#button'+i).html(head)
                         let html = ''
                         let count = content.length;
+                        $("#btn4item").hide()
                         switch (head.toLowerCase().substring(0,4)) {
                             case 'desc':
                                 html = formatDescriptionContent(content);
                                 count = 1
-                                break;
-                            case 'prof':
-                                count = content.pop()["count"]
-                                html = formatProfileContent(content);
                                 break;
                             case 'comp':
                                 count = content.pop()["count"]
@@ -500,6 +500,8 @@
                                 break;
                             case 'para':
                                 html = formatParametersContent(content);
+                                count = content.Themes.length+content.Constraints.length
+                                $("#btn4item").show();
                                 break;
                         }
                         $('#content'+i).html(html)

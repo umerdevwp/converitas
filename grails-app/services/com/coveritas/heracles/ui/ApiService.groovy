@@ -424,15 +424,46 @@ class ApiService {
         Set<Annotation> annotations = commentsForProject(projectUUID)
         Set<Map> comments = []
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
+        Map profile = [:]
+        switch (project.name) {
+            case "Asimov":
+                profile.Themes = ["Artificial Intelligence",
+                                  "Machine Learning"]
+                profile.Constraints = ["Geography: North America, Europe",
+                                       "Size:  \$10M+ Revenue",
+                                       "Category:  Business Intelligence,  Data Warehouse",
+                                       "Industry:  All"]
+                break;
+            case "Blackbird":
+                profile.Themes = ["Virtual Reality",
+                                  "Augmented Reality"]
+                profile.Constraints = ["Geography: Global",
+                                       "Size:  \$5M+ Revenue",
+                                       "Category:  Software",
+                                       "Industry:  All"]
+                break;
+            case "Nightingale":
+                profile.Themes = ["IT Call Center"]
+                profile.Constraints = ["Geography: Global",
+                                       "Size:  \$10M+ Revenue",
+                                       "Category:  All",
+                                       "Industry:  All"]
+                break;
+            case "Samba":
+                profile.Themes = ["Systems House",
+                                  "Software Consulting"]
+                profile.Constraints = ["Geography: Central America, South America",
+                                       "Size:  \$10M+ Revenue",
+                                       "Category:  Services",
+                                       "Industry:  All"]
+                break;
+
+        }
         [
          Description:[project.name,project.description],
          Insights:insights,
          Comments:comments,
-         Details:[employees:"10-200000",
-                      "Market Cap":"0-10B",
-                      "Markets":"US",
-                      "revenue":"undefined",
-                      "categories":"AR"]
+         Parameters:profile
         ]
     }
 
