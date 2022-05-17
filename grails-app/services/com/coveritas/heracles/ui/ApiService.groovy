@@ -197,7 +197,9 @@ class ApiService {
                     lc.deleted          = rc.deleted
                     //todo get and merge rc.attributes = ???
                 }
-                lc.save(update: true)
+                try {
+                    lc.save(update: true)
+                } catch (Exception ignore) {}
                 if (lc.id == null) {
                     lc = Company.findByUuid(uuid)
                 }
