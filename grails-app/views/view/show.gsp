@@ -98,7 +98,7 @@
         <div class="container-fluid background-color">
         <div class="row p-1">
             <div class="col-sm-2  p-0">
-            <h2>Project Blackbird</h2>
+            <h2>Project ${view.project.name}</h2>
                 <div id="companies" class="companies-panel"></div>
             </div>
             <div class="col-sm-6">
@@ -119,7 +119,7 @@
                 </td>
             </div>
             <div class="col-sm-4">
-                <h2>Blackbird > HBO</h2>
+                <h2>${view.project.name} > <span id="breadcrumb">${view.name}</span></h2>
                     <!-- Tabs with icons on Card -->
                     <div class="card card-nav-tabs">
                         <div class="card-header card-header-primary">
@@ -453,6 +453,9 @@
             let html= '<table class="project-table"> <tbody style="height: auto">';
             for (let i=0; i<content.length; i++) {
                 const c = content[i];
+                if (c.k==='Name') {
+                    $('#breadcrumb').html(c.v)
+                }
                 html+= '  <tr  style="height: auto">\n'+
                     '    <td>'+c.k+'</td>\n'+
                     '    <td>'+c.v+'</td>\n'+
