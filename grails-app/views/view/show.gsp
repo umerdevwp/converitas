@@ -489,7 +489,7 @@
                                 count = content.pop()["count"]
                                 html = formatProfileContent(content);
                                 break;
-                            case 'inss':
+                            case 'insi':
                                 html = formatInsightsContent(content);
                                 break;
                             case 'comm':

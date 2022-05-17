@@ -39,6 +39,7 @@ class ViewController {
         Long ts = params.ts ?  Long.parseLong(params.ts as String) : System.currentTimeMillis()
         Long from = ts-12*3600*1000, to = ts+12*3600*1000
         View view = viewService.get(id)
+        apiService.activateView(view)
         List<Map> eves = apiService.itemsForTimeline(view.uuid, from, to).tldata
         List<EntityViewEvent> events = []
         eves.each { Map eve ->
@@ -81,7 +82,7 @@ class ViewController {
             String uuid = result.uuid
             if (uuid) {
                 try {
-                    view.uuid = result.uuid
+                    view.uuid = uuid
                     viewService.save(view)
                 } catch (ValidationException e) {
                     respond view.errors, view: 'create'
