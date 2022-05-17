@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.*
 class CompanyViewObjectController {
     HttpClientService httpClientService
     CompanyViewObjectService companyViewObjectService
+    ApiService apiService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -52,6 +53,7 @@ class CompanyViewObjectController {
                 cvo.projectUUID         = project.uuid
                 cvo.viewUUID            = view.uuid
                 companyViewObjectService.save(cvo)
+                apiService.updateRvcCache(view.id)
             } catch (ValidationException e) {
                 respond cvo.errors, cvo: 'create'
                 return
@@ -84,6 +86,7 @@ class CompanyViewObjectController {
             User u = User.get(userID)
             httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, projectUUID:companyViewObject.projectUUID, viewUUID: companyViewObject.viewUUID, companyUUID: companyViewObject.company.uuid, level: companyViewObject.level], false)
             companyViewObjectService.save(companyViewObject)
+            apiService.updateRvcCache(companyViewObject.view.id)
         } catch (ValidationException e) {
             respond companyViewObject.errors, view:'edit'
             return
@@ -103,8 +106,9 @@ class CompanyViewObjectController {
             notFound()
             return
         }
-
+        View view = CompanyViewObject.get(id).view
         companyViewObjectService.delete(id)
+        apiService.updateRvcCache(view.id)
 
         request.withFormat {
             form multipartForm {

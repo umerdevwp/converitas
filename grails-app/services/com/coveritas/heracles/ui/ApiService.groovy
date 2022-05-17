@@ -13,6 +13,7 @@ import org.springframework.transaction.TransactionStatus
 
 import java.text.SimpleDateFormat
 import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 @Transactional
 class ApiService {
@@ -101,6 +102,11 @@ class ApiService {
             userId = user.id
         }
 
+        ViewReq(long lv, long user){
+            viewId = lv.id
+            userId = user.id
+        }
+
         boolean equals(o) {
             if (this.is(o)) return true
             if (getClass() != o.class) return false
@@ -133,8 +139,21 @@ class ApiService {
         return rvcCache.get(viewReq).resp
     }
 
+    Set<CompanyViewObject> remoteViewCompanies(long lvId, long userId) {
+        ViewReq viewReq = new ViewReq(lv, user)
+        return rvcCache.get(viewReq).resp
+    }
+
+    void updateRvcCache(Long viewId) {
+        for (ViewReq viewReq in rvcCache.asMap().keySet()) {
+            if (viewReq.viewId==viewId) {
+                rvcCache.invalidate(viewReq)
+            }
+        }
+    }
+
     LoadingCache<ViewReq, ViewResp> rvcCache = Caffeine.newBuilder()
-            .maximumSize(100)
+            .maximumSize(100).expireAfterWrite(2, TimeUnit.MINUTES)
             .build({ ViewReq viewReq -> remoteViewCompanies(viewReq)})
 
     ViewResp remoteViewCompanies(ViewReq viewReq) {

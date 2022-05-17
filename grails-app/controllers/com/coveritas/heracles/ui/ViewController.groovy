@@ -135,6 +135,7 @@ class ViewController {
                     cvo.company     = company
                     cvo.organizationUUID = project.organization.uuid
                     companyViewObjectService.save(cvo)
+                    apiService.updateRvcCache(view.id)
                 } catch (ValidationException e) {
                     respond view.errors, view:'show'
                     return
