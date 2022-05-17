@@ -16,7 +16,7 @@ class ProjectController {
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         if (u) {
-q            apiService.remoteProjects(u)
+            apiService.remoteProjects(u)
             List<Project> projects = u.isSysAdmin() ? projectService.list(params) : Project.findAllByOrganization(u.organization, params)
             long total = u.isSysAdmin() ? projectService.count() : Project.countByOrganization(u.organization)
             respond projects, model: [projectCount: total]
