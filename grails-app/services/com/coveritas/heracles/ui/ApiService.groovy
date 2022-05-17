@@ -238,8 +238,8 @@ class ApiService {
         Company.withTransaction { status ->
             Company lc = Company.findByUuid(uuid)
 
-            Map rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: uuid, plain:true], true)
             if (lc == null) {
+                Map rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: uuid, plain:true], true)
                 rc.id = null
                 Company rco = new Company(rc)
                 rco.overrideBackend = false
