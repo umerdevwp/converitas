@@ -407,7 +407,7 @@
                         }
                     });
                     $('#companies').html(html);
-                    // $('#companies ul:last-child').css('display', 'none'); // 4th button?
+                    $('#companies ul:last-child').css('display', 'none');
                 },
                 error: function(err, status) {
                     console.log(err);
@@ -521,7 +521,7 @@
                         switch (head.toLowerCase().substring(0,4)) {
                             case 'desc':
                                 html = formatDescriptionContent(content);
-                                count = 1
+                                count = -1
                                 break;
                             case 'comp':
                                 count = content.pop()["count"]
@@ -536,11 +536,17 @@
                             case 'para':
                                 html = formatParametersContent(content);
                                 count = content.Themes.length+content.Constraints.length
+                                count = -1
                                 $("#btn4item").show();
                                 break;
                         }
                         $('#content'+i).html(html)
-                        $('#count'+i).html(count)
+                        // $('#count'+i).html(count)
+                        const $count = $('#count'+i);
+                        if (count<0) {
+                            $count.hide()
+                        }
+                        $count.html(count)
                     });
                     // $('#companies').html(html);
                 },
