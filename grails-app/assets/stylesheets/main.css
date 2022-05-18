@@ -828,6 +828,8 @@ Remove all dots
 }
 #companies a { 
     text-decoration: none;
+    cursor: pointer;
+    color: #336699;
 }
 .activityLink {
     border-radius: 50%;

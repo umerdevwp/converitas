@@ -45,7 +45,7 @@
         } 
         #graph {
             width:100%; 
-            height: 500px;
+            height: 660px;
             background: #FFF;
             padding-top: 40px;
         }
@@ -84,7 +84,17 @@
         }
         #companies h3:nth-child(3) {
              color: #9fc2f7;
-        }          
+        }
+        .companies-wrapper {
+            background-color: #FFF;
+        }
+        .companies-wrapper a.back-link {
+            padding-left: 15px;
+            padding-top: 15px;
+            display: block;
+            font-weight: bold;
+            font-size: 13px;
+        }
         </style>
 
         <script>
@@ -112,7 +122,10 @@
         <div class="row p-1">
             <div class="col-sm-2  p-0">
             <h2>Project ${view.project.name}</h2>
+                <div class="companies-wrapper">
+                    <a href="#" class="back-link">&lt; Back to Lens</a>
                 <div id="companies" class="companies-panel"></div>
+                </div>
             </div>
             <div class="col-sm-6">
                 <h2>Company Association</h2>
@@ -312,6 +325,9 @@
         let pageURL = '';
 
         $( document ).ready(() => {
+            $('.back-link').on('click', function(){
+                location.reload();
+            });            
             pageURL = window.location.href;
             $('#url').val(pageURL);
             setTimeout(() => {    
