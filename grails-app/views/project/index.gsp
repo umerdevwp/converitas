@@ -209,24 +209,24 @@
                                 <span class="section-title">NEW INSIGHTS</span>
                             </li>
                             <li>
-                                <span>10:00</span>
-                                <h3>Heading</h3>
-                                <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
+                                <span>03:05:01 05/17/2022</span>
+                                <h3>Apple Inc. article</h3>
+                                <p>Meta halts plans to build a large data center in the Netherlands, amid rising opposition from the government over environmental concerns (April Roach/Bloomberg)</p>
                             </li>
                             <li>
-                                <span>10:00</span>
-                                <h3>Heading</h3>
-                                <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
+                                <span>03:05:01 05/17/2022</span>
+                                <h3>Nintendo Switch Looper</h3>
+                                <p></p>
                             </li>
                             <li>
-                                <span>10:00</span>
-                                <h3>Heading</h3>
-                                <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
+                                <span>03:05:01 05/17/2022</span>
+                                <h3>Apple Inc. article</h3>
+                                <p>The Zacks Analyst Blog Highlights Apple,  The Proctor & Gamble, Chevron, Novo Nordisk and Canadian Natural Resources Limited</p>
                             </li>
                             <li>
-                                <span>10:00</span>
-                                <h3>Heading</h3>
-                                <p>Nullam cursus sollicitudin lacus. Maecenas congue.</p>
+                                <span>03:05:00 05/17/2022</span>
+                                <h3>Apple Inc. article</h3>
+                                <p>Flagship Apple Store in Toronto in Jeopardy Due to Legal Battle - Mac Rumors</p>
                             </li>
                         </ul>
                     </div>
