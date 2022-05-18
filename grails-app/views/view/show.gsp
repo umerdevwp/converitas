@@ -47,6 +47,7 @@
             width:100%; 
             height: 500px;
             background: #FFF;
+            padding-top: 40px;
         }
         .tabs .buttons { 
             padding:5px 10px !important;
@@ -72,6 +73,18 @@
             margin-bottom: 30px;
             padding-bottom: 30px;
         }
+        #companies h3 {
+            cursor: pointer;
+        }
+        #companies h3:nth-child(1) {
+             color: #ea3223;
+        }
+        #companies h3:nth-child(2) {
+             color: #f2a83b;
+        }
+        #companies h3:nth-child(3) {
+             color: #9fc2f7;
+        }          
         </style>
 
         <script>
@@ -104,13 +117,12 @@
             <div class="col-sm-6">
                 <h2>Company Association</h2>
                 <td style="width:50%; padding-left: 5px; max-height:600px; border: solid 1px #ccc">
-                    <div class="tabs">
+                    <%-- <div class="tabs">
                         <button class="buttons selectedTab" onclick="loadGraphData(2)">Tracking</button>
                         <button class="buttons" onclick="loadGraphData(1)">Surfaced</button>
                         <button class="buttons" onclick="loadGraphData(0)">Watched</button>
-                        <%-- <button class="buttons">Meta</button>--%>
-                    </div>
-                    <h2 class="modeHeading"><span id="mode"></span> Companies</h2>
+                    </div> --%>
+                    <%-- <h2 class="modeHeading"><span id="mode"></span> Companies</h2> --%>
                     <div class="spinnerWrapper hide">
                         <div class="spinner">Loading...</div>
                     </div>
@@ -302,6 +314,22 @@
         $( document ).ready(() => {
             pageURL = window.location.href;
             $('#url').val(pageURL);
+            setTimeout(() => {    
+            $('#companies h3:eq(0)').css('color', '#ea3223');                 
+             $('#companies h3:eq( 1 )').css('color', '#f2a83b'); 
+             $('#companies h3:eq( 2 )').css('color', '#9fc2f7');                        
+            $('#companies h3:eq( 0 )').on('click', function() {
+                    loadGraphData(2);
+            });
+            $('#companies h3:eq( 1 )').on('click', function() {
+                    loadGraphData(1);
+            });  
+            $('#companies h3:eq( 2 )').on('click', function() {
+                    loadGraphData(0);
+            });                       
+               
+            }, "2000");            
+
         });
 
         let from, to;

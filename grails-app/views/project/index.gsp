@@ -102,6 +102,9 @@
             padding-left: 5px;
             font-size: 13px;
         }
+        #list-project {
+            padding-top: 40px;
+        }
  
         </style>
     </head>
@@ -130,8 +133,8 @@
         </div>
         </div>
         <div id="list-project" class="content scaffold-list" role="main">
-            <div class="col-8" style="display: block;float: left;"><h1><g:message code="default.list.label" args="[entityName]" /></h1></div>
-            <div class="col-3" style="display: block;float: left;margin-left: 100px;"><h1>Insights</h1></div>
+            <%-- <div class="col-8" style="display: block;float: left;"><h1><g:message code="default.list.label" args="[entityName]" /></h1></div>
+            <div class="col-3" style="display: block;float: left;margin-left: 100px;"><h1>Insights</h1></div> --%>
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
@@ -148,7 +151,7 @@
                     <g:sortableColumn property="description" title="Project Description" />
                     <g:sortableColumn property="users" title="Team" width="100" />
                     <g:sortableColumn property="users" title="." class="team-blank"/>
-                    <g:sortableColumn property="views" title="Views" />
+                    <g:sortableColumn property="views" title="Lens" />
                     <g:sortableColumn property="insights" title="Insights" />
                     <g:sortableColumn property="comments" title="Comments" />
                     <%-- <g:sortableColumn property="status" title="Status" /> --%>

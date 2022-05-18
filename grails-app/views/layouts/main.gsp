@@ -93,7 +93,7 @@
                 <g:if test="${u.isAdmin()}">
                     <li><a href="/user/index">Users</a></li>
                     <g:if test="${u.isAdmin()}">
-                    <li><a href="/organization/index">Organizations</a></li>
+                    <%-- <li><a href="/organization/index">Organizations</a></li> --%>
                     </g:if>
                 </g:if>
                
