@@ -131,7 +131,7 @@ class ApiService {
         Integer radar
         ViewResp(Set<CompanyViewObject> r, Integer rad){
             resp=r
-            radar = rad
+            radar = rad?:0
         }
     }
 
