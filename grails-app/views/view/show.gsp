@@ -400,10 +400,11 @@
                                 companyList += '<li>' + company + '</li>';
                             }
                             companyList += '</ul>'
+                            html += ' <h3>'+head+' ('+len+')</h3>'+companyList
                         } else {
                             len = companies.radar
+                            html += ' <h3>'+head+' ('+len+')</h3>'
                         }
-                        html += ' <h3>'+head+' ('+len+')</h3>'+((companyList===undefined)?'':companyList);
                     });
                     $('#companies').html(html);
                     // $('#companies ul:last-child').css('display', 'none'); // 4th button?
