@@ -23,10 +23,10 @@ class EntityViewEvent {
     String type
     String state
 
-    static List<EntityViewEvent> findAllByEntityUUIDAndViewUUID(String companyId, String viewUUID) {
+    static List<EntityViewEvent> findAllByEntityUUIDAndViewUUID(String companyUUID, String viewUUID) {
         ApplicationContext ctx = Holders.grailsApplication.mainContext
         ApiService apiService = ctx.getBean(ApiService)
-        apiService.eventsForCompanyAndView(viewUUID,  companyId)
+        apiService.eventsForCompanyAndView(viewUUID,  companyUUID)
     }
 
     @Override

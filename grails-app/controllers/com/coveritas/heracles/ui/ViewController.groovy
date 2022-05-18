@@ -105,14 +105,13 @@ class ViewController {
     }
 
     def edit(Long id) {
-        Set<Company> companies = new LinkedHashSet<>(Company.list())
+//        Set<Company> companies = new LinkedHashSet<>(Company.list())
         View view = viewService.get(id)
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         Boolean[] isDirtyRef = [false]
         Set<CompanyViewObject> cvos = apiService.remoteViewCompanies(view, u, isDirtyRef)
-        companies.removeAll(cvos*.company)
-        respond view, model:[companies: companies, levels:CompanyViewObject.LEVELS]
+        respond view, model:[companies: [], levels:CompanyViewObject.LEVELS]
     }
 
     def addCompany() {
@@ -120,19 +119,19 @@ class ViewController {
         String url = params.url
         View view = View.get(params.get("view").id as long)
         cvo.view = view
-        Company company = apiService.getCompanyFromAPI(params.companyUUID as String)
+        String companyUUID = params.companyUUID as String
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         Project project = view.project
         if (project.organization==u.organization|| u.isSysAdmin()) {
-            Map<String, Object> result = httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, viewUUID: view.uuid, companyUUID: company.uuid, level: cvo.level], false)
+            Map<String, Object> result = httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, viewUUID: view.uuid, companyUUID: companyUUID, level: cvo.level], false)
 //            String uuid = result.uuid
             if (result) {
                 try {
                     cvo.uuid        = cvo.uuid?:UUID.randomUUID()
                     cvo.projectUUID = project.uuid
                     cvo.viewUUID    = view.uuid
-                    cvo.company     = company
+                    cvo.companyUUID = companyUUID
                     cvo.organizationUUID = project.organization.uuid
                     companyViewObjectService.save(cvo)
                     apiService.updateRvcCache(view.id)
@@ -168,10 +167,6 @@ class ViewController {
     def addComment() {
         String url = params.url
         View view = View.get(params.get("view").id as long)
-        Company company = null
-        if (params.companyUUID!=null) {
-            company = apiService.getCompanyFromAPI(params.companyUUID as String)
-        }
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         Project project = view.project
@@ -180,7 +175,7 @@ class ViewController {
         if (project.organization==u.organization|| u.isSysAdmin()) {
             if (comment) {
                 try {
-                    annotation = apiService.addComment(u, project.uuid, view.uuid, company?.uuid, comment)
+                    annotation = apiService.addComment(u, project.uuid, view.uuid, params.companyUUID as String, comment)
                 } catch (ValidationException e) {
                     respond view.errors, view:'show'
                     return

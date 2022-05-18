@@ -1,6 +1,7 @@
 package com.coveritas.heracles.ui
 
 import com.coveritas.heracles.HttpClientService
+import com.coveritas.heracles.json.Company
 import com.coveritas.heracles.json.EntityViewEvent
 import com.coveritas.heracles.utils.APIException
 import com.coveritas.heracles.utils.Meta
@@ -23,8 +24,6 @@ class ApiService {
     ProjectService projectService
     @Autowired
     ViewService viewService
-    @Autowired
-    CompanyService companyService
     @Autowired
     CompanyViewObjectService companyViewObjectService
 
@@ -136,7 +135,7 @@ class ApiService {
 
     Set<CompanyViewObject> remoteViewCompanies(View lv, User user, Boolean[] isDirtyRef) {
         ViewReq viewReq = new ViewReq(lv, user)
-        return rvcCache.get(viewReq).resp
+        return rvcCache.get(viewReq)
     }
 
     Set<CompanyViewObject> remoteViewCompanies(long lvId, long userId) {
@@ -152,11 +151,11 @@ class ApiService {
         }
     }
 
-    LoadingCache<ViewReq, ViewResp> rvcCache = Caffeine.newBuilder()
+    LoadingCache<ViewReq, Set<CompanyViewObject>> rvcCache = Caffeine.newBuilder()
             .maximumSize(100).expireAfterWrite(2, TimeUnit.MINUTES)
             .build({ ViewReq viewReq -> remoteViewCompanies(viewReq)})
 
-    ViewResp remoteViewCompanies(ViewReq viewReq) {
+    Set<CompanyViewObject> remoteViewCompanies(ViewReq viewReq) {
         View.withTransaction { TransactionStatus status ->
             boolean isDirty = false
             View lv = View.get(viewReq.viewId)
@@ -184,31 +183,19 @@ class ApiService {
 //                    String level = companyStatusMap.level?:CompanyViewObject.UNKNOWN
                     String level = node.level?:CompanyViewObject.UNKNOWN
                     if (CompanyViewObject.LEVELS.contains(level)) {
-                        CompanyViewObject lcvo = localCompanies.find { it.company.uuid = rcUuid }
-                        Company lc
+                        CompanyViewObject lcvo = localCompanies.find { it.companyUUID = rcUuid }
                         if (lcvo==null) {
-                            lc = Company.findByUuid(rcUuid)
-                            if (!lc) {
-                                lc = getCompanyFromAPI(rcUuid)
-                            }
                             //create company locally and add to view with view level
-                            CompanyViewObject companyViewObject = CompanyViewObject.createDontSave(lc, lv, level)
+                            CompanyViewObject companyViewObject = CompanyViewObject.createDontSave(rcUuid, lv, level)
                             lcvo = companyViewObject.save(update:false, flush:true, failOnError:true)
                             lnrCompanies.add(companyViewObject)
-    //                        isDirty=true
                         } else {
-                            lc = lcvo.company
                             localCompanies.remove(lcvo)
                             if (lcvo.level!=level) {
                                 isDirty = true
                                 lcvo.level = level
                             }
-                            if (lc.overrideBackend) {
-                                lnrCompanies << lcvo
-                                //todo get and merge rc.attributes = ???
-                            } else {
-                                lcvo.company = getCompanyFromAPI(rcUuid)
-                            }
+                            lcvo.company = getCompanyFromAPI(rcUuid)
                         }
                         lnrCompanies << lcvo
                     }
@@ -222,7 +209,7 @@ class ApiService {
                 lv.save(update:true)
             }
 
-            new ViewResp(lnrCompanies)
+            lnrCompanies
         }
     }
 
@@ -235,46 +222,8 @@ class ApiService {
             .build({ eid -> createOrUpdateCompanyFromApi(eid as String) }) as LoadingCache<String, Company>
 
     Company createOrUpdateCompanyFromApi(String uuid) {
-        Company.withTransaction { status ->
-            Company lc = Company.findByUuid(uuid)
-
-            if (lc == null) {
-                Map rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: uuid, plain:true], true)
-                rc.id = null
-                Company rco = new Company(rc)
-                rco.overrideBackend = false
-                Set <CompanyAttribute> cas = []
-                def attributes = rco.attributes
-                if (attributes !=null && attributes.size()!=0) {
-                    for (ca in attributes) {
-                        CompanyAttribute a = ca as CompanyAttribute
-                        a.id = null
-                        a.company = rco
-                        cas.add(a)
-                    }
-                    rco.attributes = cas
-                }
-                lc = rco.save(update:false, flush:true, failOnError:true)
-//            } else {
-//                lc = Company.get(lc.id)
-//                if (!lc.overrideBackend) {
-//                    lc.canonicalName    = rc.canonicalName
-//                    lc.normalizedName   = rc.normalizedName
-//                    lc.ticker           = rc.ticker
-//                    lc.exchange         = rc.exchange
-//                    lc.countryIso       = rc.countryIso
-//                    lc.source           = rc.source
-//                    lc.sourceId         = rc.sourceId
-//                    lc.category         = rc.category
-//                    lc.preferred        = rc.preferred
-//                    lc.overrideBackend  = false
-//                    lc.deleted          = rc.deleted
-//                    //todo get and merge rc.attributes = ???
-//                }
-//                lc.save(update: true, flush:true, failOnError:true)
-            }
-            return lc
-        }
+        Map rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: uuid, plain:true], true)
+        new Company(rc)
     }
 
     View createOrUpdateViewFromApi(String vUuid, String pUuid, String userOrgUUID, User user, Boolean[] isDirtyRef, View lv=null) {
@@ -454,12 +403,13 @@ class ApiService {
     }
 
     boolean addCompanyToVew(User user, String companyUUID, long viewId) {
-        Company.withTransaction { status ->
+        CompanyViewObject.withTransaction { status ->
             View view = View.get(viewId)
             Project project = view.project
             if (project.organization==user.organization|| user.isSysAdmin()) {
                 CompanyViewObject cvo = new CompanyViewObject()
                 Company company = getCompanyFromAPI(companyUUID)
+                cvo.companyUUID = companyUUID
                 cvo.company = company
                 cvo.view = view
                 httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid, level: cvo.level], false)
@@ -751,8 +701,7 @@ class ApiService {
             View view = View.findByUuid(viewUUID)
             ViewObject vo
             if (companyUUID) {
-                Company company = Company.findByUuid(companyUUID)
-                vo = CompanyViewObject.findByViewAndCompany(view, company)
+                vo = CompanyViewObject.findByViewAndCompanyUUID(view, companyUUID)
             } else {
                 if (viewUUID != null) {
                     vo = ExtraViewObject.findByViewAndType(view, ExtraViewObject.T_VIEW)
@@ -823,14 +772,12 @@ class ApiService {
     }
 
     List<Annotation> commentsForProjectAndCompany(String projectUUID, String companyUUID) {
-        Company company = Company.findByUuid(companyUUID)
-        List<ViewObject> vos = CompanyViewObject.findAllByProjectUUIDAndCompany(projectUUID, company)
+        List<ViewObject> vos = CompanyViewObject.findAllByProjectUUIDAndCompanyUUID(projectUUID, companyUUID)
         extractAllAnnotations(vos)
     }
 
     List<Annotation> commentsForViewAndCompany(String viewUUID, String companyUUID) {
-        Company company = Company.findByUuid(companyUUID)
-        List<ViewObject> vos = CompanyViewObject.findAllByViewUUIDAndCompany(viewUUID, company)
+        List<ViewObject> vos = CompanyViewObject.findAllByViewUUIDAndCompanyUUID(viewUUID, companyUUID)
         extractAllAnnotations(vos)
     }
 

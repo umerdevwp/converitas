@@ -1,5 +1,8 @@
-package com.coveritas.heracles.ui
+package com.coveritas.heracles.json
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class CompanyAttribute {
     static String T_ID = 'id'  // Canonical id in source e.g. Q number in wikidata
     static String T_CATEGORY = 'category' // Crunch base like categories this company is in (e.g. Android, AI)
@@ -22,21 +25,21 @@ class CompanyAttribute {
     Integer iValue
     Company company
 
-//    static belongsTo = [company:Company]
-
-    static mapping = {
-        table name: 'ma_company_attribute'
-        id generator : 'sequence', params:[sequence:'seq_id_company_attribute_pk']
+    CompanyAttribute(){
     }
 
-    static constraints = {
-        uuid nullable: false, blank: false, unique: true
-        company nullable: false
-        companyUuid nullable: false
-        shortDescription nullable: true
-        sValue nullable: true
-        fValue nullable: true
-        iValue nullable: true
-
+    CompanyAttribute(Map ra){
+//        id          = ra["id"]
+        uuid        = ra["uuid"]
+        companyUuid = ra["companyUuid"]
+        type        = ra["type"]
+        source      = ra["source"]
+        sValue      = ra["sValue"]
+        fValue      = ra["fValue"]
+        iValue      = ra["iValue"]
+//        ts          = ra["ts"]
+//        svalue      = ra["svalue"]
+//        fvalue      = ra["fvalue"]
+//        ivalue      = ra["ivalue"]
     }
 }

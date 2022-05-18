@@ -33,27 +33,6 @@ class ApiController {
         }
     }
 
-    def addEvent() {
-        call {
-            String eventUUID = UUID.randomUUID()
-            View v = View.get(params.viewId as long)
-            String viewUUID = v.uuid
-            Company c = Company.get(params.companyId as long)
-            String entityUUID = c.uuid
-            long ts = System.currentTimeMillis()
-            User u = User.get(session['userID'] as long)
-            Map eve = apiService.addEntityViewEvent(
-                    u.uuid,
-                    u.organization.uuid,
-                    eventUUID, viewUUID,entityUUID,
-                    params.type as String,
-                    params.title as String,
-                    params.state as String, ts)
-
-            [entityViewEvent:eve]
-        }
-    }
-
     def viewtimeline(long id, @Nullable Long from, @Nullable Long to) {
         call {
             apiService.itemsForTimeline(View.get(id).uuid, from, to)

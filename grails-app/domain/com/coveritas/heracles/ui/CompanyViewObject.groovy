@@ -1,5 +1,9 @@
 package com.coveritas.heracles.ui
 
+import com.coveritas.heracles.json.Company
+import grails.util.Holders
+import org.springframework.context.ApplicationContext
+
 class CompanyViewObject extends ViewObject {
     final static String UNKNOWN = 'unknown'
     final static String TRACKING = 'tracking'
@@ -9,57 +13,54 @@ class CompanyViewObject extends ViewObject {
     final static String REMOVING = 'removing'
     final static List<String> LEVELS = [UNKNOWN, TRACKING, WATCHING, SURFACING, IGNORING, REMOVING]
 
-    Company company
+    String companyUUID
     String  level
+
+    private Company company = null
+
+    Company getCompany(){
+        if (company==null) {
+            ApplicationContext ctx = Holders.grailsApplication.mainContext
+            ApiService apiService = ctx.getBean(ApiService)
+            company = apiService.getCompanyFromAPI(companyUUID)
+        }
+        company
+    }
+
+    static transients = ['company']
 
     static mapping = {
         table name: 'ma_company_view'
     }
 
     static constraints = {
-        company nullable: false, unique: ['view']
+        companyUUID nullable: false, unique: ['view']
         level nullable: false, inList: LEVELS
     }
 
-    def  onLoad() {
-        log.debug "Loading ${id}"
-    }
-
     def afterInsert() {
-        log.debug "${id} inserted"
-        company.addViewObject(this)
         view.addViewObject(this)
     }
 
     def afterUpdate() {
-        log.debug "Updating ${id}"
-        if (company!=null) {
-            company.addViewObject(this)
-        }
         view.addViewObject(this)
         return true
     }
 
-    def beforeDelete() {
-        log.debug "Updating ${id}"
-        company.removeViewObject(this)
-        view.removeViewObject(this)
-    }
-
-    static createDontSave(Company lc, View lv, String level) {
+    static createDontSave(String companyUUID, View lv, String level) {
         Project lp = lv.project
         new CompanyViewObject(uuid: UUID.randomUUID(),
                 projectUUID: lp.uuid,
                 view: lv,
                 viewUUID: lv.uuid,
-                company: lc,
+                companyUUID: companyUUID,
                 organizationUUID: lp.organization.uuid,
                 level: level)
     }
 
     @Override
     String toString() {
-        return (company.toString())+"@"+level+((view == null) ? "" : "@"+view.toString())
+        return (getCompany().toString())+"@"+level+((view == null) ? "" : "@"+view.toString())
     }
 
     boolean equals(o) {
@@ -68,12 +69,12 @@ class CompanyViewObject extends ViewObject {
 
         CompanyViewObject that = (CompanyViewObject) o
 
-        return (company == that.company) && (view == that.view)
+        return (companyUUID == that.companyUUID) && (view == that.view)
     }
 
     int hashCode() {
         int result
-        result = (company != null ? company.hashCode() : 0)
+        result = (companyUUID != null ? companyUUID.hashCode() : 0)
         return 31 * result + (view != null ? view.hashCode() : 0)
     }
 }

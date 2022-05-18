@@ -232,10 +232,10 @@
                                     <li>
                                         <a href="/companyViewObject/show/${cvo.id}">${cvo.toString()}</a>
                                         <ol>
-                                            <g:each in="${com.coveritas.heracles.json.EntityViewEvent.findAllByEntityUUIDAndViewUUID(cvo.company.uuid,cvo.view.uuid)}" var="eve">
+                                            <g:each in="${com.coveritas.heracles.json.EntityViewEvent.findAllByEntityUUIDAndViewUUID(cvo.companyUUID,cvo.view.uuid)}" var="eve">
                                                 <li><a href="/entityViewEvent/edit?id=${eve.id}">${eve}</a></li>
                                             </g:each>
-                                            <button onclick="requestUrl('/api/addEvent?companyId=${cvo.companyId}&viewId=${cvo.viewId}&type=${com.coveritas.heracles.json.EntityViewEvent.T_ARTICLE}&title=${UUID.randomUUID()}')">add Event</button>
+                                            <button onclick="requestUrl('/api/addEvent?companyUUID=${cvo.companyUUID}&viewId=${cvo.viewId}&type=${com.coveritas.heracles.json.EntityViewEvent.T_ARTICLE}&title=${UUID.randomUUID()}')">add Event</button>
                                         </ol>
                                     </li>
                                 </g:each>

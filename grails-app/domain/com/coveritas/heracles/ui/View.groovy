@@ -1,5 +1,7 @@
 package com.coveritas.heracles.ui
 
+import com.coveritas.heracles.json.Company
+
 class View {
     String uuid                 // View ID in backend
     String name
@@ -27,50 +29,6 @@ class View {
                     companies[cvo.company] = cvo.level
                 }
             }
-        }
-    }
-
-    def afterInsert() {
-        log.debug "${id} inserted"
-        updateCompanyViewObjects()
-    }
-
-    def beforeUpdate() {
-        log.debug "Updating ${id}"
-        updateCompanyViewObjects()
-        return true
-    }
-
-    def beforeDelete() {
-        log.debug "Updating ${id}"
-        List<CompanyViewObject> currentCvos = ViewObject.findAllByView(this).find { it instanceof CompanyViewObject }
-        currentCvos.each {it.delete(flush: true)}
-    }
-
-    void updateCompanyViewObjects() {
-        List<CompanyViewObject> currentCvos = CompanyViewObject.findAllByView(this)
-        for (Company company in companies.keySet()) {
-            String level = companies[company]
-            CompanyViewObject wanted = currentCvos.find { it.company == company }
-            Boolean update = null
-            if (wanted == null) {
-                wanted = CompanyViewObject.createDontSave(Company.get(company.id), this, level)
-                update = false
-            } else {
-                currentCvos.remove(wanted)
-                if (wanted.level != level) {
-                    wanted.level = level
-                    update = true
-                }
-            }
-            if (update != null) {
-                wanted.save(update: update, flush: true)
-                company.addViewObject(wanted)
-            }
-        }
-        for (CompanyViewObject unwanted in currentCvos) {
-            unwanted.company.removeViewObject(unwanted)
-            unwanted.delete()
         }
     }
 
