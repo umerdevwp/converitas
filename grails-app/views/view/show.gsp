@@ -123,7 +123,7 @@
             <div class="col-sm-2  p-0">
             <h2>Project ${view.project.name}</h2>
                 <div class="companies-wrapper">
-                    <a href="#" class="back-link">&lt; Back to Lens</a>
+                    <a class="back-link" style="cursor: pointer;color: #336699">&lt; Back to Lens</a>
                 <div id="companies" class="companies-panel"></div>
                 </div>
             </div>
@@ -326,8 +326,9 @@
 
         $( document ).ready(() => {
             $('.back-link').on('click', function(){
-                location.reload();
-            });            
+                // location.reload();
+                loadProjectContent();
+            });
             pageURL = window.location.href;
             $('#url').val(pageURL);
             setTimeout(() => {    
@@ -542,6 +543,7 @@
                         $("#btn4item").hide()
                         switch (head.toLowerCase().substring(0,4)) {
                             case 'desc':
+                                $('#breadcrumb').html('${view.name}')
                                 html = formatDescriptionContent(content);
                                 count = -1
                                 break;
