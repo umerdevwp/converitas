@@ -397,7 +397,8 @@
                                     companyList += '<a>(+)</a>';
                                     break;
                                 }
-                                companyList += '<li>' + company + '</li>';
+                                //<a onclick="loadProjectContent(\'' + node.id + '\')" style="text-decoration: none">
+                                companyList += '<li><a class="loadcompany" id="load_' + company.uuid + '">' + company.name + '</a></li>';
                             }
                             companyList += '</ul>'
                             html += ' <h3>'+head+' ('+len+')</h3>'+companyList
@@ -408,6 +409,9 @@
                     });
                     $('#companies').html(html);
                     $('#companies ul:last-child').css('display', 'none');
+                    $('.loadcompany').on('click', function() {
+                        loadProjectContent(this.id.split('_')[1]);
+                    });
                 },
                 error: function(err, status) {
                     console.log(err);

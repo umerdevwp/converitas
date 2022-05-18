@@ -407,8 +407,14 @@ class ApiService {
         ]
     }
 
-    List<String> sortedCannonicalNamesFilteredByLevel(Set<CompanyViewObject> cvos, String level) {
-        (cvos.findAll({ it.level == level })*.company.canonicalName).sort()
+    List<List<Map<String,String>>> sortedCannonicalNamesFilteredByLevel(Set<CompanyViewObject> cvos, String level) {
+//        (cvos.findAll({ it.level == level })*.company.canonicalName).sort()
+        List<Map<String,String>> result = []
+        cvos.findAll({ it.level == level }).each { CompanyViewObject cvo ->
+            Company company = cvo.company
+            result.add( [name:company.canonicalName, uuid:company.uuid] )
+        }
+        result.sort({ a, b -> (a.name.compareToIgnoreCase(b.name))})
     }
 
     boolean addCompanyToVew(User user, String companyUUID, long viewId) {
