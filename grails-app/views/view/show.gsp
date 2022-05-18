@@ -384,23 +384,29 @@
                     let html = ''
                     Object.keys(data.companies).map(function(head) {
                         const companies = data.companies[head];
-                        let len = companies.length;
-                        console.log(head, len);
-                        let companyList = '<ul>'
-                        // for (const company of companies) {
-                        for (let i=0; i<len; i++) {
-                            const company  = companies[i];
-                            if (i>=10) {
-                                companyList   += '<a>(+)</a>';
-                                break;
+                        let len = 0;
+                        let companyList = undefined;
+                        if (companies.radar===undefined) {
+                            len = companies.length;
+                            console.log(head, len);
+                            let companyList = '<ul>'
+                            // for (const company of companies) {
+                            for (let i = 0; i < len; i++) {
+                                const company = companies[i];
+                                if (i >= 10) {
+                                    companyList += '<a>(+)</a>';
+                                    break;
+                                }
+                                companyList += '<li>' + company + '</li>';
                             }
-                            companyList   += '<li>'+company+'</li>';
+                            companyList += '</ul>'
+                        } else {
+                            len = companies.radar
                         }
-                        companyList    += '</ul>'
-                        html += ' <h3>'+head+' ('+len+')</h3>'+companyList;
+                        html += ' <h3>'+head+' ('+len+')</h3>'+((companyList===undefined)?'':companyList);
                     });
                     $('#companies').html(html);
-                    $('#companies ul:last-child').css('display', 'none'); // 4th button?
+                    // $('#companies ul:last-child').css('display', 'none'); // 4th button?
                 },
                 error: function(err, status) {
                     console.log(err);

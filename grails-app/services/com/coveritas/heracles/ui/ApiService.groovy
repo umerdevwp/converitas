@@ -101,9 +101,9 @@ class ApiService {
             userId = user.id
         }
 
-        ViewReq(long lv, long user){
-            viewId = lv.id
-            userId = user.id
+        ViewReq(long vId, long uId){
+            this.viewId = vId
+            this.userId = uId
         }
 
         boolean equals(o) {
@@ -128,19 +128,26 @@ class ApiService {
 
     class ViewResp implements Serializable {
         Set<CompanyViewObject> resp
-        ViewResp(Set<CompanyViewObject> r){
+        Integer radar
+        ViewResp(Set<CompanyViewObject> r, Integer rad){
             resp=r
+            radar = rad
         }
     }
 
     Set<CompanyViewObject> remoteViewCompanies(View lv, User user, Boolean[] isDirtyRef) {
         ViewReq viewReq = new ViewReq(lv, user)
-        return rvcCache.get(viewReq)
+        return rvcCache.get(viewReq).resp
     }
 
     Set<CompanyViewObject> remoteViewCompanies(long lvId, long userId) {
         ViewReq viewReq = new ViewReq(lv, user)
-        return rvcCache.get(viewReq).resp
+        rvcCache.get(viewReq).resp
+    }
+
+    ViewResp remoteViewCompaniesWithRadar(long lvId, long userId) {
+        ViewReq viewReq = new ViewReq(lvId, userId)
+        rvcCache.get(viewReq)
     }
 
     void updateRvcCache(Long viewId) {
@@ -151,51 +158,52 @@ class ApiService {
         }
     }
 
-    LoadingCache<ViewReq, Set<CompanyViewObject>> rvcCache = Caffeine.newBuilder()
+    LoadingCache<ViewReq, ViewResp> rvcCache = Caffeine.newBuilder()
             .maximumSize(100).expireAfterWrite(2, TimeUnit.MINUTES)
             .build({ ViewReq viewReq -> remoteViewCompanies(viewReq)})
 
-    Set<CompanyViewObject> remoteViewCompanies(ViewReq viewReq) {
+    ViewResp remoteViewCompanies(ViewReq viewReq) {
         View.withTransaction { TransactionStatus status ->
             boolean isDirty = false
             View lv = View.get(viewReq.viewId)
             User user = User.get(viewReq.userId)
             List<CompanyViewObject> localCompanies = CompanyViewObject.findAllByView(lv)
-//            if (true) {
-//                return localCompanies
-//            }
             String vUuid = lv.uuid
             Project lp = lv.project
             String pUuid = lp.uuid
             Organization organization = lp.organization
-//            Map remoteCoMap = httpClientService.getParamsExpectObject("view/${organization.uuid}/${user.uuid}/${pUuid}/${vUuid}", null, LinkedHashMap.class, true)
-            def graphData =httpClientService.getParamsExpectResult("/view/graph/${organization.uuid}/${user.uuid}/${pUuid}/${vUuid}", null, true)
+            Map remoteCoMap = httpClientService.getParamsExpectObject("view/${organization.uuid}/${user.uuid}/${pUuid}/${vUuid}", null, LinkedHashMap.class, true)
+//            def graphData =httpClientService.getParamsExpectResult("/view/graph/${organization.uuid}/${user.uuid}/${pUuid}/${vUuid}", null, true)
             Set<CompanyViewObject> lnrCompanies = []
-//            if (remoteCoMap.containsKey("companies")) {
-            if (graphData.containsKey("nodes")) {
-//                List<Map<String, Object>> remoteCompanies = remoteCoMap.companies
-                List<Map> nodes = graphData.nodes
-//                for (Map companyStatusMap in remoteCompanies) {
-                for (Map node in nodes) {
-//                    Map cStateObj = companyStatusMap.company
-//                    String rcUuid = cStateObj.uuid
-                    String rcUuid = node.id
-//                    String level = companyStatusMap.level?:CompanyViewObject.UNKNOWN
-                    String level = node.level?:CompanyViewObject.UNKNOWN
-                    if (CompanyViewObject.LEVELS.contains(level)) {
-                        CompanyViewObject lcvo = localCompanies.find { it.companyUUID = rcUuid }
+            if (remoteCoMap.containsKey("companies")) {
+//            if (graphData.containsKey("nodes")) {
+                List<Map<String, Object>> remoteCompanies = remoteCoMap.companies
+//                List<Map> nodes = graphData.nodes
+                Set<String> duplicateCompanyUUIDs = []
+                for (Map companyStatusMap in remoteCompanies) {
+//                for (Map node in nodes) {
+                    Map cStateObj = companyStatusMap.company
+                    String rcUuid = cStateObj.uuid
+//                    String rcUuid = node.id
+                    String level = companyStatusMap.level?:CompanyViewObject.UNKNOWN
+//                    String level = node.level?:CompanyViewObject.UNKNOWN
+                    if (CompanyViewObject.LEVELS.contains(level)&&!duplicateCompanyUUIDs.contains(rcUuid)) {
+                        duplicateCompanyUUIDs.add(rcUuid)
+//                        CompanyViewObject lcvo = localCompanies.find { it.companyUUID = rcUuid }
+                        CompanyViewObject lcvo = CompanyViewObject.findByCompanyUUIDAndView(rcUuid, lv)
                         if (lcvo==null) {
                             //create company locally and add to view with view level
                             CompanyViewObject companyViewObject = CompanyViewObject.createDontSave(rcUuid, lv, level)
                             lcvo = companyViewObject.save(update:false, flush:true, failOnError:true)
-                            lnrCompanies.add(companyViewObject)
                         } else {
                             localCompanies.remove(lcvo)
                             if (lcvo.level!=level) {
                                 isDirty = true
                                 lcvo.level = level
                             }
-                            lcvo.company = getCompanyFromAPI(rcUuid)
+                            Company company = new Company(cStateObj)
+                            companyCache.put(rcUuid, company)
+                            lcvo.company = company //getCompanyFromAPI(rcUuid)
                         }
                         lnrCompanies << lcvo
                     }
@@ -209,7 +217,7 @@ class ApiService {
                 lv.save(update:true)
             }
 
-            lnrCompanies
+            new ViewResp(lnrCompanies, remoteCoMap.radar as Integer)
         }
     }
 
@@ -384,7 +392,8 @@ class ApiService {
         View lv = View.findByUuid(vUuid)
         Boolean lpIsDirty = false
         Boolean[] isDirtyRef = {lpIsDirty}
-        Set<CompanyViewObject> cvos = remoteViewCompanies(lv,  user, isDirtyRef)
+        ViewResp response = remoteViewCompaniesWithRadar(lv.id,  user.id)
+        Set<CompanyViewObject> cvos = response.resp
 //        ["companies":["Tracked" :sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
 //                      "Surfaced":sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING),
 //                      "Watched" :sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.WATCHING)]]
@@ -393,7 +402,7 @@ class ApiService {
         ["companies" : [
               "Tracked" : sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
               "Surfaced" : sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING),
-              "Watched" : sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.WATCHING)
+              "Watched" : [radar:response.radar]
             ]
         ]
     }
@@ -501,14 +510,6 @@ class ApiService {
                                        "Category:  Business Intelligence,  Data Warehouse",
                                        "Industry:  All"]
                 break;
-            case "Blackbird":
-                profile.Themes = ["Virtual Reality",
-                                  "Augmented Reality"]
-                profile.Constraints = ["Geography: Global",
-                                       "Size:  \$5M+ Revenue",
-                                       "Category:  Software",
-                                       "Industry:  All"]
-                break;
             case "Nightingale":
                 profile.Themes = ["IT Call Center"]
                 profile.Constraints = ["Geography: Global",
@@ -524,7 +525,13 @@ class ApiService {
                                        "Category:  Services",
                                        "Industry:  All"]
                 break;
-
+            default:
+                profile.Themes = ["Virtual Reality",
+                                  "Augmented Reality"]
+                profile.Constraints = ["Geography: Global",
+                                       "Size:  \$5M+ Revenue",
+                                       "Category:  Software",
+                                       "Industry:  All"]
         }
         [
          Description:[project.name,project.description],
