@@ -109,10 +109,10 @@ class Company {
 
     static mapping = {
         table name: 'ma_company'
+        id generator : 'sequence', params:[sequence:'seq_id_company_pk']
     }
 
     static constraints = {
-        id generator : 'increment'
         uuid nullable: false, blank: false, unique: true
         source  nullable: true
         sourceId  nullable: true

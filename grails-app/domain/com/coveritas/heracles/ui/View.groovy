@@ -95,10 +95,10 @@ class View {
 
     static mapping = {
         table name: 'ma_view'
+        id generator : 'sequence', params:[sequence:'seq_id_view_pk']
     }
 
     static constraints = {
-        id generator : 'increment'
         uuid nullable: false, blank: false, unique: true
         name nullable: false, unique: ['project']
     }

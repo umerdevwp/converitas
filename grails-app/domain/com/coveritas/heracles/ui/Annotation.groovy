@@ -14,7 +14,6 @@ class Annotation extends ViewObject {
     }
 
     static constraints = {
-        id              generator:'increment'
         textContent     nullable:true
         annotationType  nullable:true
         binContent      nullable:true

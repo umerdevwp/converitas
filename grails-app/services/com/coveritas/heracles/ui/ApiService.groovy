@@ -321,7 +321,53 @@ class ApiService {
         return lv
     }
 
+    class TimelineReq implements Serializable {
+        String vUuid
+        Long from
+        Long to
+
+        TimelineReq(String vUuid, Long from, Long to) {
+            this.vUuid = vUuid
+            this.from = from
+            this.to = to
+        }
+
+        boolean equals(o) {
+            if (this.is(o)) return true
+            if (getClass() != o.class) return false
+
+            TimelineReq that = (TimelineReq) o
+
+            if (from != that.from) return false
+            if (to != that.to) return false
+            if (vUuid != that.vUuid) return false
+
+            return true
+        }
+
+        int hashCode() {
+            int result
+            result = (vUuid != null ? vUuid.hashCode() : 0)
+            result = 31 * result + (from != null ? from.hashCode() : 0)
+            result = 31 * result + (to != null ? to.hashCode() : 0)
+            return result
+        }
+    }
+
     Map itemsForTimeline(String vUuid, Long from = null, Long to = null) {
+        TimelineReq tlReq = new TimelineReq(vUuid, from, to)
+        return timelineCache.get(tlReq)
+    }
+
+    LoadingCache<TimelineReq, Map> timelineCache = Caffeine.newBuilder()
+            .maximumSize(100).expireAfterWrite(10, TimeUnit.MINUTES)
+            .build({ TimelineReq tlReq -> itemsForTimeline(tlReq)})
+
+    Map itemsForTimeline(TimelineReq tlReq) {
+        String vUuid = tlReq.vUuid
+        Long from    = tlReq.from
+        Long to      = tlReq.to
+
         to = to ?: System.currentTimeMillis()
         from = from ?: to - Duration.ofHours(24).toMillis()
 

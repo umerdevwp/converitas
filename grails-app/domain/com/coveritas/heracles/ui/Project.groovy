@@ -15,10 +15,10 @@ class Project {
 
     static mapping = {
         table name: 'ma_project'
+        id generator : 'sequence', params:[sequence:'seq_id_project_pk']
     }
 
     static constraints = {
-        id generator : 'increment'
         uuid nullable: false, blank: false, unique: true
         name nullable: false, unique: ['organization']
         users lazy: false

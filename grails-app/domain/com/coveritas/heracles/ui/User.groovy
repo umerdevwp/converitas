@@ -35,10 +35,10 @@ class User {
 
     static mapping = {
         table name: 'ma_user'
+        id generator : 'sequence', params:[sequence:'seq_id_user_pk']
     }
 
     static constraints = {
-        id generator : 'increment'
         uuid nullable: false, blank: false, unique: true
         roles lazy: false
         name blank: false, minSize: 3, unique: ['organization']

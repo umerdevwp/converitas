@@ -12,7 +12,7 @@ class Role {
 
     static mapping = {
         table name: 'ma_role'
-        id generator : 'increment'
+        id generator : 'sequence', params:[sequence:'seq_id_role_pk']
     }
 
     static constraints = {

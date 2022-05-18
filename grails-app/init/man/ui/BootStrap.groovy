@@ -2,19 +2,24 @@ package man.ui
 
 import com.coveritas.heracles.ui.ApiService
 import com.coveritas.heracles.ui.Color
-import com.coveritas.heracles.ui.CompanyAttribute
 import com.coveritas.heracles.ui.Organization
 import com.coveritas.heracles.ui.Project
 import com.coveritas.heracles.ui.Role
 import com.coveritas.heracles.ui.User
 import grails.util.Holders
+import org.hibernate.dialect.Dialect
+import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver
+import org.hibernate.engine.jdbc.dialect.spi.DialectResolver
+import org.hibernate.exception.JDBCConnectionException
 import org.springframework.context.ApplicationContext
 import org.springframework.transaction.TransactionStatus
-import org.apache.commons.codec.binary.Hex
 
 import javax.servlet.ServletContext
 import javax.sql.DataSource
 import java.sql.Connection
+import java.sql.ResultSet
+import java.sql.SQLException
+import java.sql.Statement
 
 //@CompileStatic
 class BootStrap {
@@ -174,11 +179,53 @@ class BootStrap {
                 User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, Color.get(8))
             } else {
                 ApplicationContext ctx = Holders.grailsApplication.mainContext
-//                DataSource  ds = ctx.getBean(DataSource)
-//                Connection c = null
-//                try {
-//                    c = ds.connection
-//                    if (CompanyAttribute.count()==0) {
+                DataSource  ds = ctx.getBean(DataSource)
+                Connection c = null
+                try {
+                    c = ds.connection
+                    ResultSet rs = c.createStatement().executeQuery("""select relname from pg_class where relkind='S'""")
+                    boolean sequenceExists = false
+                    while (rs.next()) {
+                        String seq = rs.getString("relname");
+                        if (seq=="seq_id_color_pk") {
+                            sequenceExists = true
+                            break
+                        }
+                    }
+                    if (!sequenceExists) {
+                        c.createStatement().executeUpdate("""
+ create sequence IF NOT EXISTS man-ui.public.seq_id_color_pk start 1000 increment 1;
+ create sequence IF NOT EXISTS man-ui.public.seq_id_company_attribute_pk start 1000 increment 1;
+ create sequence IF NOT EXISTS man-ui.public.seq_id_company_pk start 1000 increment 1;
+ create sequence IF NOT EXISTS man-ui.public.seq_id_organization_pk start 1000 increment 1;
+ create sequence IF NOT EXISTS man-ui.public.seq_id_project_pk start 1000 increment 1;
+ create sequence IF NOT EXISTS man-ui.public.seq_id_role_pk start 1000 increment 1;
+ create sequence IF NOT EXISTS man-ui.public.seq_id_user_event_pk start 1000 increment 1;
+ create sequence IF NOT EXISTS man-ui.public.seq_id_user_pk start 1000 increment 1;
+ create sequence IF NOT EXISTS man-ui.public.seq_id_view_object_pk start 1000 increment 1;
+ create sequence IF NOT EXISTS man-ui.public.seq_id_view_pk start 1000 increment 1;
+""")
+                    } else {
+                        ResultSet rs1 = c.createStatement().executeQuery("""SELECT nextval('seq_id_color_pk') as TOTAL;""")
+                        int total = 0
+                        while (rs1.next()) {
+                            total = rs1.getInt("TOTAL");
+                        }
+                        if (total<1000) {
+                            c.createStatement().executeUpdate( """
+SELECT setval('"seq_id_color_pk"', 1000, false);
+SELECT setval('"seq_id_company_attribute_pk"', 1000, false);
+SELECT setval('"seq_id_company_pk"', 1000, false);
+SELECT setval('"seq_id_organization_pk"', 1000, false);
+SELECT setval('"seq_id_project_pk"', 1000, false);
+SELECT setval('"seq_id_role_pk"', 1000, false);
+SELECT setval('"seq_id_user_event_pk"', 1000, false);
+SELECT setval('"seq_id_user_pk"', 1000, false);
+SELECT setval('"seq_id_view_object_pk"', 1000, false);
+SELECT setval('"seq_id_view_pk"', 1000, false);
+""")
+                        }
+                    }
 //                        c.createStatement().executeUpdate("drop table if exists ma_company_attribute cascade;" )
 //                        c.createStatement().executeUpdate("create table if not exists ma_company_attribute (\n" +
 //                                "    id                bigint       not null\n" +
@@ -202,12 +249,11 @@ class BootStrap {
 //                                "alter table ma_company_attribute\n" +
 //                                "    owner to postgres;\n" +
 //                                "\n;" )
-//                    }
-//                } finally {
-//                    if (c!=null) {
-//                        c.close()
-//                    }
-//                }
+                } finally {
+                    if (c!=null) {
+                        c.close()
+                    }
+                }
                 ApiService apiService = ctx.getBean(ApiService)
                 apiService.activateAllViews()
                 Project.all.each { Project project ->

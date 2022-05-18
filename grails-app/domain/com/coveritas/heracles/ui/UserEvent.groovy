@@ -13,7 +13,6 @@ class UserEvent {
     final static List<String> STATES = [E_LOGIN, E_LOGOUT, E_FAILED, E_PASSWORDCHANGE]
 
     static constraints = {
-        id generator : 'sequence'
         user nullable: true  // maybe empty on failed attempts for unknow nusers
         ts DefaultValue: "now()"
         event nullable: false, inList: STATES
@@ -21,5 +20,6 @@ class UserEvent {
 
     static mapping = {
         table name: 'ma_user_event'
+        id generator : 'sequence', params:[sequence:'seq_id_user_event_pk']
     }
 }

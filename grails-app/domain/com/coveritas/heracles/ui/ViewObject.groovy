@@ -12,6 +12,7 @@ class ViewObject {
     static mapping = {
         tablePerHierarchy false
         table name: 'ma_view_object'
+        id generator : 'sequence', params:[sequence:'seq_id_view_object_pk']
     }
 
     static constraints = {

@@ -29,7 +29,7 @@ class Organization {
 
     static mapping = {
         table name: 'ma_organization'
-        id generator : 'increment'
+        id generator : 'sequence', params:[sequence:'seq_id_organization_pk']
     }
 
     static constraints = {

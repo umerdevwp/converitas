@@ -7,10 +7,10 @@ class Color {
 
     static mapping = {
         table name: 'ma_color'
+        id generator : 'sequence', params:[sequence:'seq_id_color_pk']
     }
 
     static constraints = {
-        id generator : 'increment'
         name blank: false, unique:true
         code blank: false
     }
