@@ -511,13 +511,15 @@
             let html= '<table class="project-table"> <tbody style="height: auto">';
             for (let i=0; i<content.length; i++) {
                 const c = content[i];
-                if (c.k==='Name') {
-                    $('#breadcrumb').html(c.v)
+                if (c.k!=='UUID') {
+                    if (c.k==='Name') {
+                        $('#breadcrumb').html(c.v)
+                    }
+                    html+= '  <tr  style="height: auto">\n'+
+                        '    <td>'+c.k+'</td>\n'+
+                        '    <td>'+c.v+'</td>\n'+
+                        '  </tr>\n';
                 }
-                html+= '  <tr  style="height: auto">\n'+
-                    '    <td>'+c.k+'</td>\n'+
-                    '    <td>'+c.v+'</td>\n'+
-                    '  </tr>\n';
             }
             html+='</tbody></table>';
 
