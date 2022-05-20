@@ -21,12 +21,12 @@
     </script>
 </head>
 <body>
+<h1><g:message code="default.prompt.login.label" /></h1>
+<g:if test="${flash.message}">
+    <div class="message" role="status">${flash.message}</div>
+</g:if>
 
-<!-- <div id="show-organization" class="content scaffold-show" role="main">
-    <h1><g:message code="default.prompt.login.label" /></h1>
-    <g:if test="${flash.message}">
-        <div class="message" role="status">${flash.message}</div>
-    </g:if>
+%{--<!-- <div id="show-organization" class="content scaffold-show" role="main">
     <g:form controller="auth" action="authentication" method="POST">
         <g:hiddenField name="url" id="url" value="${url}"></g:hiddenField>
         <div class="form-group">
@@ -48,7 +48,7 @@
             <input class="login" type="submit" value="${message(code: 'default.button.login.label', default: 'Login')}" />
         </fieldset>
     </g:form>
-</div> -->
+</div>--}%
 
 
  <div class="container py-5">
@@ -71,6 +71,7 @@
                         </div>
                         <div class="card-body">
                             <g:form controller="auth" action="authentication" method="POST">
+                                <g:hiddenField name="url" id="url" value="${url}"></g:hiddenField>
                                 <div class="form-group">
                                     <label for="uname1">Username</label>
                                     
