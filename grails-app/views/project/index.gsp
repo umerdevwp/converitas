@@ -152,6 +152,7 @@
                     <g:sortableColumn property="users" title="Team" width="100" />
                     <g:sortableColumn property="users" title="." class="team-blank"/>
                     <g:sortableColumn property="views" title="Lens" />
+                    <g:sortableColumn property="views" title="." class="team-blank"/>
                     <g:sortableColumn property="insights" title="Insights" />
                     <g:sortableColumn property="comments" title="Comments" />
                     <%-- <g:sortableColumn property="status" title="Status" /> --%>
@@ -174,9 +175,16 @@
                                 </g:each>
                             </ul>
                         </td>
-                        <td class="pl-0"><span class="material-icons">add_circle</span></td>                        
-                        <td><f:display bean="${bean}" property="views" displayStyle="${'table'}"/></td>
-                         <td>
+                        <td class="pl-0"><span class="material-icons">add_circle</span></td>
+                        <td class="pr-0">
+                            <ul>
+                                <g:each in="${bean.views}" var="pv">
+                                    <li><a href="/view/show/${pv.id}">${pv.name}</a></li>
+                                </g:each>
+                            </ul>
+                        </td>
+                        <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td>
+                        <td>
                             <span class="material-icons">
                                     view_list
                             </span>
