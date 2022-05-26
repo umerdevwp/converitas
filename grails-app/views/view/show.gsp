@@ -470,11 +470,14 @@
             return html;
         }
 
-        function formatCommentsContent(content, companyUUID)  {
+        function formatCommentsContent(content, companyUUID, company2UUID)  {
             //todo iterate through map, convert timestamp to date, + tab + text
             let html= '<form method=\'post\' action=\'/view/addComment\'>';
             if (companyUUID!==undefined) {
                 html += '<input type=\'hidden\'  name=\'companyUUID\' value=\''+companyUUID+'\'/>'
+                if (company2UUID!==undefined) {
+                    html += '<input type=\'hidden\'  name=\'company2UUID\' value=\''+company2UUID+'\'/>'
+                }
             }
             html+= '<input type=\'hidden\'  name=\'view.id\' value=\'${this.view.id}\'/>'+
                   '<input id=\'comment\' name=\'comment\' placeholder=\'Enter a Comment\' class=\'form-control\'>' +
@@ -573,7 +576,7 @@
                                 $icon.html('insights')
                                 break;
                             case 'comm':
-                                html = formatCommentsContent(content, companyUUID);
+                                html = formatCommentsContent(content, companyUUID, company2UUID);
                                 $icon.html('comment')
                                 break;
                             case 'para':

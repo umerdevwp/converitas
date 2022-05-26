@@ -442,6 +442,7 @@ class ApiService {
                            String eventUUID,
                            String viewUUID,
                            String entityUUID,
+                           String entity2UUID,
                            String type,
                            String title,
                            String state,
@@ -452,6 +453,7 @@ class ApiService {
                 eventUUID:      eventUUID,
                 viewUUID:       viewUUID,
                 entityUUID:     entityUUID,
+                entity2UUID:     entity2UUID,
                 type:           type,
                 title:          title,
                 state:          state,
@@ -757,7 +759,7 @@ class ApiService {
             View view = View.findByUuid(viewUUID)
             ViewObject vo
             if (companyUUID) {
-                if (company2UUID) {
+                if (!company2UUID) {
                     vo = CompanyViewObject.findByViewAndCompanyUUID(view, companyUUID)
                 } else {
                     vo = EdgeViewObject.findByViewAndCompanyUUIDAndCompany2UUID(view, companyUUID, company2UUID)
@@ -820,7 +822,9 @@ class ApiService {
                     viewUUID: viewUUID,
                     title: comment, ts: ts,
                     annotationType: 'text').save(update: false, flush: true, failOnError: true)
-            addEntityViewEvent( user.uuid, user.organization.uuid, UUID.randomUUID() as String, viewUUID, companyUUID,
+            addEntityViewEvent( user.uuid, user.organization.uuid, UUID.randomUUID() as String, viewUUID,
+                    companyUUID,
+                    company2UUID,
                     'comment', comment+', by: '+user.name, null, ts)
             annotation
         }
