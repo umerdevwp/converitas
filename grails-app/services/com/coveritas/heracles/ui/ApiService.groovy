@@ -402,7 +402,7 @@ class ApiService {
         ["companies" : [
               "Tracked" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
               "Surfaced" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING),
-              "Watched" : [radar:response.radar]
+              "Linked" : [radar:response.radar]
             ]
         ]
     }

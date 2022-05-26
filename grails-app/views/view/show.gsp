@@ -425,8 +425,9 @@
                             companyList += '</ul>'
                             html += ' <h3>'+head+' ('+len+')</h3>'+companyList
                         } else {
-                            len = companies.radar
-                            html += ' <h3>'+head+' ('+len+')</h3>'
+                            // len = companies.radar
+                            // html += ' <h3>'+head+' ('+len+')</h3>'
+                            html += ' <h3>'+head+'</h3>'
                         }
                     });
                     $('#companies').html(html);
@@ -620,6 +621,14 @@
             nodes: {
                 shape: 'dot',
                 mass: 1,
+                font: {
+                    size: 42,
+                    // color: "red",
+                    // face: "courier",
+                    face: "arial",
+                    strokeWidth: 3
+                    // strokeColor: "#ffffff",
+                },
                 scaling: {
                     label: {
                         enabled: true
@@ -648,7 +657,11 @@
 
         window.loadGraphData = function(mode) {
 
-            function modeFilter(d) { d.mode = d.level==='watching' ? 0 : d.level === 'surfacing' ? 1 : 2; return d.mode >= mode; }
+            function modeFilter(d) {
+                d.mode = d.level==='watching' ? 0 : d.level === 'surfacing' ? 1 : d.level === 'tracking' ? 2 : 0;
+                // d.fontsize
+                return d.mode >= mode;
+            }
 
             $.ajax({
                 url: "/api/activecompanygraph" + qts,
@@ -659,45 +672,28 @@
                 },
                 success: function (data) {
                     console.log('data:', data);
+                    const filteredNodes = data.nodes.filter(modeFilter);
+                    const id2node = filteredNodes.reduce(function(map, node) {
+                        map[node.id] = node;
+                        return map;
+                    }, {});
+                    let arrSize = filteredNodes.length
+                    const size = arrSize>90?42:arrSize>50?32:15;
+                    // alert("arrSize="+arrSize+" -> font: "+size);
+                    graphOptions.nodes.font.size= size;
                     const network = new vis.Network(graphContainer, {
-                        nodes: data.nodes.filter(modeFilter),
+                        nodes: filteredNodes,
                         edges: data.edges
                     }, graphOptions);
-
-                    $('#num_cos').html(data.nodes.length);
-                    $('#mode').html( mode === 0 ? 'Watching' : mode === 1 ? 'Surfacing' : 'Tracking')
-
-                    // Indexed by node mode. Note we have  modes 3,4 for children in the graph. It is ignored in counts
-                    let cos_html = [{t: '', s: 0}, {t: '', s: 0}, {t: '', s: 0}, {t: '', s: 0}, {t: '', s: 0}];
-
-                    $('#tracked_cos_size').html('')
-
-                    for (let i = 0; i < data.nodes.length; ++i) {
-                        const node = data.nodes[i];
-                        let co_html = '<a onclick="loadProjectContent(\'' + node.id + '\')" style="text-decoration: none">';
-                        co_html += '<div>' + node.label + '</div></a>';
-                        const nodeMode = node.mode;
-                        cos_html[nodeMode].t += co_html;
-                        cos_html[nodeMode].s++;
-                    }
-
-                    $('#watched_cos').html(cos_html[0].t);
-                    $('#pinned_cos').html(cos_html[1].t);
-                    $('#tracked_cos').html(cos_html[2].t);
-                    $('#num_watched').html(cos_html[0].s);
-                    $('#num_pinned').html(cos_html[1].s);
-                    $('#num_tracked').html(cos_html[2].s);
 
                     network.on('click', function (properties) {
                         let haveNode = false; // Manage code continuation after window_location
 
                         if ([] !== properties.items) {
-                            let index = properties.nodes[0];
-                            for (let i = 0; i < data.nodes.length; ++i) {
-                                if (index === data.nodes[i].id) {
-                                    haveNode = true;
-                                    loadProjectContent(data.nodes[i].id)
-                                }
+                            let id = properties.nodes[0];
+                            if (id2node[id]) {
+                                haveNode = true;
+                                loadProjectContent(id)
                             }
                         }
                         if ([] !== properties.edges && !haveNode)
