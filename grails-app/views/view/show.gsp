@@ -584,7 +584,8 @@
                                 count = content.Themes.length+content.Constraints.length
                                 count = -1
                                 $("#btn4item").show();
-                                $icon.html('settings')
+                                // $icon.html('settings')
+                                $icon.html('dehaze')
                                 break;
                         }
                         $button.html(buttonText)
