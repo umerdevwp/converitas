@@ -175,7 +175,7 @@ class ViewController {
         if (project.organization==u.organization|| u.isSysAdmin()) {
             if (comment) {
                 try {
-                    annotation = apiService.addComment(u, project.uuid, view.uuid, params.companyUUID as String, comment)
+                    annotation = apiService.addComment(u, project.uuid, view.uuid, params.companyUUID as String, params.company2UUID as String, comment)
                 } catch (ValidationException e) {
                     respond view.errors, view:'show'
                     return

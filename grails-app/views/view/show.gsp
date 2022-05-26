@@ -155,7 +155,7 @@
                                         <li class="nav-item">
                                             <a class="nav-link active" href="#profile" data-toggle="tab">
                                                 <span>
-                                                    <i class="material-icons md-36 orange600">
+                                                    <i class="material-icons md-36 orange600" id="icon1">
                                                         business
                                                     </i>
                                                 </span>
@@ -165,21 +165,27 @@
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="#insight" data-toggle="tab">
-                                                <span><i class="material-icons md-36 blue600">insights</i></span>
+                                                <span><i class="material-icons md-36 blue600" id="icon2">
+                                                    insights
+                                                </i></span>
                                                 <span class="length" id="count2">25</span>
                                                 <span class="title" id="button2">Insights</span>                                        
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="#comments" data-toggle="tab">
-                                                <span><i class="material-icons md-36">comment</i></span>
+                                                <span><i class="material-icons md-36" id="icon3">
+                                                    comment
+                                                </i></span>
                                                 <span class="length" id="count3">120</span>
                                                 <span class="title" id="button3">Comments</span>
                                             </a>
                                         </li>
                                         <li class="nav-item" id="btn4item">
                                             <a class="nav-link" href="#similar-company" data-toggle="tab">
-                                                <span><i class="material-icons md-36 orange600">business</i></span>
+                                                <span><i class="material-icons md-36 blue600" id="icon4">
+                                                    business
+                                                </i></span>
                                                 <span class="length" id="count4">30</span>
                                                 <span class="title" id="button4">Similar Companies</span>
                                             </a>
@@ -326,7 +332,6 @@
 
         $( document ).ready(() => {
             $('.back-link').on('click', function(){
-                // location.reload();
                 loadProjectContent();
             });
             pageURL = window.location.href;
@@ -527,50 +532,68 @@
             return html;
         }
 
-        function loadProjectContent(companyUUID) {
+        function loadProjectContent(companyUUID, company2UUID) {
             $.ajax({
-                url: companyUUID ? '/api/contentForCompanyInView?companyUUID='+companyUUID+'&viewId=${view.id}&':'/api/contentForProject/${view.project.id}',
+                url: companyUUID ? (company2UUID ?'/api/contentForEdgeInView?companyUUID='+companyUUID+'&company2UUID='+company2UUID+'&viewId=${view.id}'
+                                                 :'/api/contentForCompanyInView?companyUUID='+companyUUID+'&viewId=${view.id}')
+                                 : '/api/contentForProject/${view.project.id}',
                 success: function(data) {
+                    let profiles = 0
                     let i=0
+                    $("#btn4item").hide()
                     Object.keys(data).map(function(head) {
                         i++;
                         console.log( "buttons:"+head)
                         const content = data[head];
                         console.log(content)
-                        $('#button'+i).html(head)
+                        let $button = $('#button'+i);
+                        let buttonText =  head;
                         let html = ''
                         let count = content.length;
-                        $("#btn4item").hide()
+                        const $icon = $('#icon'+i);
                         switch (head.toLowerCase().substring(0,4)) {
                             case 'desc':
                                 $('#breadcrumb').html('${view.name}')
                                 html = formatDescriptionContent(content);
                                 count = -1
+                                $icon.html('business')
                                 break;
                             case 'comp':
                                 count = content.pop()["count"]
+                                buttonText = 'Details '+content[0].v
+                                count = -1
                                 html = formatProfileContent(content);
+                                $icon.html('business')
+                                if (profiles++ === 1) {
+                                    $("#btn4item").show();
+                                }
                                 break;
                             case 'insi':
                                 html = formatInsightsContent(content);
+                                $icon.html('insights')
                                 break;
                             case 'comm':
                                 html = formatCommentsContent(content, companyUUID);
+                                $icon.html('comment')
                                 break;
                             case 'para':
                                 html = formatParametersContent(content);
                                 count = content.Themes.length+content.Constraints.length
                                 count = -1
                                 $("#btn4item").show();
+                                $icon.html('settings')
                                 break;
                         }
+                        $button.html(buttonText)
                         $('#content'+i).html(html)
                         // $('#count'+i).html(count)
                         const $count = $('#count'+i);
                         if (count<0) {
                             $count.hide()
+                        } else {
+                            $count.html(count)
+                            $count.show()
                         }
-                        $count.html(count)
                     });
                     // $('#companies').html(html);
                 },
@@ -622,13 +645,6 @@
         window.loadGraphData = function(mode) {
 
             function modeFilter(d) { d.mode = d.level==='watching' ? 0 : d.level === 'surfacing' ? 1 : 2; return d.mode >= mode; }
-
-            function nodeById(nodes, id) {
-                for(let i = 0; i < nodes.length; ++i) {
-                    if (nodes[i].id === id)
-                        return nodes[i];
-                }
-            }
 
             $.ajax({
                 url: "/api/activecompanygraph" + qts,
@@ -685,9 +701,7 @@
                             let index = properties.edges[0];
                             for (let i = 0; i < data.edges.length; ++i) {
                                 if (index === data.edges[i].id) {
-                                    const fromNode = nodeById(data.nodes, data.edges[i].from).uuid;
-                                    const toNode = nodeById(data.nodes, data.edges[i].to).uuid;
-                                    window.location = '/company/shadow?uuid=' + fromNode + '&shadow=' + toNode + ts ;
+                                    loadProjectContent(data.edges[i].from, data.edges[i].to)
                                 }
                             }
                         }

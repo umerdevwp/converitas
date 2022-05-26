@@ -400,21 +400,21 @@ class ApiService {
 
         // todo group by level, order by level-ordinal+ name
         ["companies" : [
-              "Tracked" : sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
-              "Surfaced" : sortedCannonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING),
+              "Tracked" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
+              "Surfaced" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING),
               "Watched" : [radar:response.radar]
             ]
         ]
     }
 
-    List<List<Map<String,String>>> sortedCannonicalNamesFilteredByLevel(Set<CompanyViewObject> cvos, String level) {
+    List<Map<String,String>> sortedCanonicalNamesFilteredByLevel(Set<CompanyViewObject> cvos, String level) {
 //        (cvos.findAll({ it.level == level })*.company.canonicalName).sort()
         List<Map<String,String>> result = []
-        cvos.findAll({ it.level == level }).each { CompanyViewObject cvo ->
+        cvos.findAll({ CompanyViewObject cvo -> cvo.level == level }).each { CompanyViewObject cvo ->
             Company company = cvo.company
             result.add( [name:company.canonicalName, uuid:company.uuid] )
         }
-        result.sort({ a, b -> (a.name.compareToIgnoreCase(b.name))})
+        result.sort({ Map<String,String> a, Map<String,String> b -> (a.name.compareToIgnoreCase(b.name))})
     }
 
     boolean addCompanyToVew(User user, String companyUUID, long viewId) {
@@ -600,30 +600,73 @@ class ApiService {
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
         //todo 'det' in view with content formatter
         //todo conversion rc map -> list of Maps with name, value
-        Map<String,Object> rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: companyUUID], true)
-        List profile = []
-        int profileCount=0
-        for (String k in rc.keySet()) {
-            def v = rc[k]
-            k = k=="uuid"?"UUID":StringUtils.capitalize(k);
-            if (v!=null && v!="") {
-                if (v instanceof Collection) {
-                    if (!v.isEmpty()) {
-                        profileCount+= v.size()
-                        profile << [k:k,v:v]
-                    }
-                } else {
-                    profileCount++
-                    profile << [k:k,v:v]
-                }
-            }
-        }
-        profile << [count:profileCount]
+        List profile = companyProfile(companyUUID)
         [
          "Company Details":profile,
          Insights:insights,
          Comments:comments
         ]
+    }
+
+    List<EntityViewEvent> allEventsForEdgeInView(User user, String vUUID, String cUUID, String c2UUID) {
+        Map events = httpClientService.getParamsExpectMap("eve/edges/view/${user.organization.uuid}/${user.uuid}/${vUUID}/${cUUID}/${c2UUID}", null, true)
+        eveIt(events)
+    }
+
+    Map contentForEdgeInView(User user, String viewUUID, String companyUUID, String company2UUID) {
+        View view = View.findByUuid( viewUUID )
+
+        String projectUUID = view.project.uuid
+        List<EntityViewEvent> eves = allEventsForEdgeInView(user, viewUUID, companyUUID, company2UUID)
+        List insights = []
+        eves.each {EntityViewEvent e ->
+            // todo change the content based on event type and state
+            if (e.type!='comment') {
+                insights.add([
+                        title     : e.title,
+                        time      : format.format(new Date(e.ts as long)),
+                        type      : e.type,
+                        state     : e.state,
+                        entityUUID: e.entityUUID
+                ])
+            }
+        }
+        Set<Annotation> annotations = commentsForViewAndEdge(viewUUID, companyUUID, company2UUID)
+        Set<Map> comments = []
+        annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
+        //todo 'det' in view with content formatter
+        //todo conversion rc map -> list of Maps with name, value
+        List profile = companyProfile(companyUUID)
+        List profile2 = companyProfile(company2UUID)
+        [
+         "Company A Details":profile,
+         "Company B Details":profile2,
+         Comments:comments,
+         Insights:insights
+        ]
+    }
+
+    public List companyProfile(String companyUUID) {
+        Map<String, Object> rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: companyUUID], true)
+        List profile = []
+        int profileCount = 0
+        for (String k in rc.keySet()) {
+            def v = rc[k]
+            k = k == "uuid" ? "UUID" : StringUtils.capitalize(k)
+            if (v != null && v != "") {
+                if (v instanceof Collection) {
+                    if (!v.isEmpty()) {
+                        profileCount += v.size()
+                        profile << [k: k, v: v]
+                    }
+                } else {
+                    profileCount++
+                    profile << [k: k, v: v]
+                }
+            }
+        }
+        profile << [count: profileCount]
+        profile
     }
 
     Map contentForCompanyInProject(User user, String projectUUID, String companyUUID) {
@@ -709,12 +752,27 @@ class ApiService {
         }
     }
 
-    ViewObject findOrCreateViewObject(Organization org, String projectUUID, String viewUUID, String companyUUID) {
+    ViewObject findOrCreateViewObject(Organization org, String projectUUID, String viewUUID, String companyUUID, String company2UUID) {
         ViewObject.withTransaction { status ->
             View view = View.findByUuid(viewUUID)
             ViewObject vo
             if (companyUUID) {
-                vo = CompanyViewObject.findByViewAndCompanyUUID(view, companyUUID)
+                if (company2UUID) {
+                    vo = CompanyViewObject.findByViewAndCompanyUUID(view, companyUUID)
+                } else {
+                    vo = EdgeViewObject.findByViewAndCompanyUUIDAndCompany2UUID(view, companyUUID, company2UUID)
+                    if (vo == null) {
+                        new EdgeViewObject(
+                                uuid: UUID.randomUUID(),
+                                organizationUUID: org.uuid,
+                                projectUUID: projectUUID,
+                                view:view,
+                                viewUUID: viewUUID,
+                                companyUUID: companyUUID,
+                                company2UUID: company2UUID ).save(update: false, flush: true)
+                        vo = EdgeViewObject.findByViewAndCompanyUUIDAndCompany2UUID(view, companyUUID, company2UUID)
+                    }
+                }
             } else {
                 if (viewUUID != null) {
                     vo = ExtraViewObject.findByViewAndType(view, ExtraViewObject.T_VIEW)
@@ -745,7 +803,7 @@ class ApiService {
         }
     }
 
-    Annotation addComment(User user, String projectUUID, String viewUUID, String companyUUID, String comment) {
+    Annotation addComment(User user, String projectUUID, String viewUUID, String companyUUID, String company2UUID, String comment) {
         ViewObject.withTransaction { status ->
             if (projectUUID == null) {
                 if (viewUUID == null) {
@@ -753,7 +811,7 @@ class ApiService {
                 }
                 projectUUID = View.findByUuid(viewUUID).projUUID
             }
-            ViewObject vo = findOrCreateViewObject(user.organization, projectUUID, viewUUID, companyUUID)
+            ViewObject vo = findOrCreateViewObject(user.organization, projectUUID, viewUUID, companyUUID, company2UUID)
             long ts = System.currentTimeMillis()
             Annotation annotation = new Annotation(
                     user: user, annotatedVO: vo, uuid: UUID.randomUUID(),
@@ -791,6 +849,11 @@ class ApiService {
 
     List<Annotation> commentsForViewAndCompany(String viewUUID, String companyUUID) {
         List<ViewObject> vos = CompanyViewObject.findAllByViewUUIDAndCompanyUUID(viewUUID, companyUUID)
+        extractAllAnnotations(vos)
+    }
+
+    List<Annotation> commentsForViewAndEdge(String viewUUID, String companyUUID, String company2UUID) {
+        List<ViewObject> vos = EdgeViewObject.findAllByViewUUIDAndCompanyUUIDAndCompany2UUID(viewUUID, companyUUID, company2UUID)
         extractAllAnnotations(vos)
     }
 

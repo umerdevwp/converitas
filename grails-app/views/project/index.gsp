@@ -188,13 +188,15 @@
                             <span class="material-icons">
                                     view_list
                             </span>
+                            %{-- todo fill in real values for insights since last login/insights --}%
                             <span class="number">2/3</span>
                         </td>         
                         <td>
                             <span class="material-icons">
                                 chat_bubble
                             </span>
-                            <span class="number">5</span>                          
+                            %{-- todo fill in real values for comments --}%
+                            <span class="number">5</span>
                         </td>                  
                         <%-- <td class="project-status"><div style="background-color: ${bean.color?.code?:'#00FFFF'}">Status</div></td> --%>
                         <%-- <td>
@@ -216,6 +218,7 @@
                                 </span>
                                 <span class="section-title">NEW INSIGHTS</span>
                             </li>
+                            %{-- todo fill in latest 10 insights --}%
                             <li>
                                 <span>03:05:01 05/17/2022</span>
                                 <h3>Apple Inc. article</h3>

@@ -1,5 +1,8 @@
 package com.coveritas.heracles.ui
 
+/**
+ * View Object to annotate projects/views
+ */
 class ExtraViewObject extends ViewObject {
     public final static String T_PROJECT   = 'project'
     public final static String T_VIEW      = 'view'

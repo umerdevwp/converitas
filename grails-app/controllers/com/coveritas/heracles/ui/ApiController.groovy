@@ -68,6 +68,14 @@ class ApiController {
         }
     }
 
+    def contentForEdgeInView(String companyUUID, String company2UUID, long viewId) {
+        call {
+            User u = User.get(session['userID'] as long)
+            View view = View.get(viewId)
+            apiService.contentForEdgeInView(u, view.uuid, companyUUID, company2UUID)
+        }
+    }
+
     def contentForCompanyInProject(String companyUUID, long viewId) {
         call {
             User u = User.get(session['userID'] as long)
@@ -76,10 +84,10 @@ class ApiController {
         }
     }
 
-    def addComment(String projectUUID, String viewUUID, String companyUUID, String comment) {
+    def addComment(String projectUUID, String viewUUID, String companyUUID, String company2UUID, String comment) {
         call {
             User u = User.get(session['userID'] as long)
-            apiService.addComment(u, projectUUID, viewUUID, companyUUID, comment)
+            apiService.addComment(u, projectUUID, viewUUID, companyUUID, company2UUID, comment)
         }
     }
 
