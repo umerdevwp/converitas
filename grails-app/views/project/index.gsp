@@ -159,7 +159,7 @@
                     <%-- <th>Action</th> --%>
                 </thead>
                 <g:each in="${projectList}" var="bean" status="i">
-                    <g:set var="rowspan" value="${bean.views.size()<1?1:bean.views.size()}"/>
+                    <g:set var="rowspan" value="${bean.views.size()}"/>
                     <tbody>
                         <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
                         <td rowspan="${rowspan}"><g:link method="GET" resource="${bean}"><f:display bean="${bean}" property="name" displayStyle="table"/></g:link></td>
@@ -172,21 +172,13 @@
                             </ul>
                         </td>
                         <td rowspan="${rowspan}" class="pl-0"><span class="material-icons">add_circle</span></td>
-                        <g:if test="${"${bean.views.size()==0}"}">
+                        <g:if test="${rowspan==0}">
                             <td class="pr-0">
                             </td>
                             <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td>
                             <td>
-                                <span class="material-icons">
-                                    view_list
-                                </span>
-                                <span class="number">0/0</span>
                             </td>
                             <td>
-                                <span class="material-icons">
-                                    chat_bubble
-                                </span>
-                                <span class="number">0/0</span>
                             </td>
                         </g:if>
                         <g:else>
