@@ -5,6 +5,16 @@
         <meta name="layout" content="main" />
         <g:set var="entityName" value="${message(code: 'project.label', default: 'Project')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
+%{--
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+
+        <!-- (Optional) Latest compiled and minified JavaScript translation files -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/i18n/defaults-*.min.js"></script>
+--}%
 
         <style>
         .projectTable {
@@ -256,30 +266,64 @@
                 </div>
             </div>
 
-            <%-- <div class="pagination">
-                <g:paginate total="${projectCount ?: 0}" />
-            </div> --%>
         </div>
-        <%-- Modal Start --%>
+        %{-- Modal Start --}%
         <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createModalLabel">New Project</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ...
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createModalLabel">New Project</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <g:form url="/project/save" method="POST" >
+                        <g:hiddenField name="organization.id" value="${u.organization.id}" />
+                        <g:hiddenField name="url" class="url" value="${u.organization.id}" />
+                        <div class="modal-body">
+                            <fieldset class="form">
+                                <div class="fieldcontain required">
+                                    <label for="name">Name<span class="required-indicator">*</span></label>
+                                    <input type="text" name="name" value="" required="" id="name">
+                                </div>
+                                <div class="fieldcontain required">
+                                    <label for="description">Description<span class="required-indicator">*</span>
+                                    </label><input type="text" name="description" value="" required="" id="description" kl_vkbd_parsed="true">
+                                </div>
+                                <div class="fieldcontain required">
+                                    <label for="color.id">Color</label>
+                                    %{-- <select name="color.id" id="color.id" class="selectpicker">
+                                        <option data-icon="glyphicon glyphicon-eye-open" data-subtext="petrification">Eye of Medusa</option>--}%
+                                    <select name="color.id" id="color.id">
+                                        <option value="">-Choose your color-</option>
+                                        <g:each in="${com.coveritas.heracles.ui.Color.list()}" var="color">
+                                            <option value="${color.id}" style="background-color: ${color.code} !important" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>
+%{--                                            <option value="${color.id}" data-color="${color.code}" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>--}%
+                                        </g:each>
+                                    </select>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <input type="submit" name="create" class="btn btn-primary" value="Create">
+                        </div>
+                    </g:form>
+                </div>
             </div>
         </div>
-        </div>
-        <%-- Modal End --%>         
+        %{-- Modal End --}%
+        <script type="module">
+            // import "/assets/vis-timeline-graph2d.min.js";
+            // import "/assets/vis-network.min.js";
+
+            const refreshInterval = 60000;
+            let pageURL = '';
+
+            $( document ).ready(() => {
+                pageURL = window.location.href;
+                $('#url').val(pageURL);
+            })
+        </script>
     </body>
 </html>

@@ -37,6 +37,7 @@ class ProjectController {
             notFound()
             return
         }
+        String url = params.url
 
         Long userID = session['userID'] as Long
         User u = User.get(userID)
@@ -64,7 +65,11 @@ class ProjectController {
                 request.withFormat {
                     form multipartForm {
                         flash.message = message(code: 'default.created.message', args: [message(code: 'project.label', default: 'Project'), project.id])
-                        redirect project
+                        if (url!=null) {
+                            redirect url:url
+                        } else {
+                            redirect project
+                        }
                     }
                     '*' { respond project, [status: CREATED] }
                 }

@@ -223,82 +223,9 @@
                 </div>
             </div>
         </div>
-           <div id="show-view" class="content scaffold-show" role="main">
-%{--
-                      <h1><g:message code="default.show.label" args="[entityName]" /></h1>
---}%
-                      <g:set var="u" value="${User.get(session["userID"])}"/>
-                      <g:if test="${u.organization==view.project.organization||u.isSysAdmin()}">
-%{--
-                          <ol class="property-list user">
-                              <li class="fieldcontain">
-                                  <span id="name-label" class="property-label"><g:message code="view.name.label" default="Name" /></span>
-                                  <div class="property-value" aria-labelledby="name-label"><f:display bean="view" property="name"/></div>
-                              </li>
-                              <li class="fieldcontain">
-                                  <span id="project-label" class="property-label"><g:message code="view.project.label" default="Project" /></span>
-                                  <div class="property-value" aria-labelledby="project-label"><f:display bean="view" property="project"/></div>
-                              </li>
-                              <li class="fieldcontain">
-                                  <span id="description-label" class="property-label"><g:message code="view.description.label" default="Description" /></span>
-                                  <div class="property-value" aria-labelledby="description-label"><f:display bean="view" property="description"/></div>
-                              </li>
-                              <li class="fieldcontain">
-                                  <span id="uuid-label" class="property-label"><g:message code="view.uuid.label" default="UUID" /></span>
-                                  <div class="property-value" aria-labelledby="uuid-label"><f:display bean="view" property="uuid"/></div>
-                              </li>
-                              <li class="fieldcontain">
-                                  <span id="companyViewObject-label" class="property-label">Company View Object</span>
-                                  <div class="property-value" aria-labelledby="companyViewObject-label">
-                                      <ul>
-                                          <g:each in="${view.companyViewObjects}" var="cvo">
-                                              <li>
-                                                  <a href="/companyViewObject/show/${cvo.id}">${cvo.toString()}</a>
-                                                  <ol>
-                                                      <g:each in="${com.coveritas.heracles.json.EntityViewEvent.findAllByEntityUUIDAndViewUUID(cvo.companyUUID,cvo.view.uuid)}" var="eve">
-                                                          <li><a href="/entityViewEvent/edit?id=${eve.id}">${eve}</a></li>
-                                                      </g:each>
-                                                      <button onclick="requestUrl('/api/addEvent?companyUUID=${cvo.companyUUID}&viewId=${cvo.viewId}&type=${com.coveritas.heracles.json.EntityViewEvent.T_ARTICLE}&title=${UUID.randomUUID()}')">add Event</button>
-                                                  </ol>
-                                              </li>
-                                          </g:each>
-
-                                          <div id="addCompanyToView" style="display: none">
-                                              <g:form method="POST" url="/view/addCompany">
-                                                  <fieldset class="form">
-
-                                                   <g:hiddenField name="view.id" value="${this.view.id}"/>
-                                                   <g:hiddenField name="level" value="${CompanyViewObject.TRACKING}"/>
-                                                   <g:hiddenField name="url" value="" id="url"/>
-
-                                                   <div class="fieldcontain required">
-                                                       <label for="companyUUID">Company<span class="required-indicator">*</span></label>
-                                                       <input id="companyInput" placeholder="Add a Company" size="40">
-                                                       <div style="display:inline-block;width:150px;background-color: transparent">
-                                                           <input type="hidden" id="companyUUID" name="companyUUID"/>
-                                                       </div>
-                                                       <div style="width:400px;height:30px;background-color: transparent">
-                                                           <select class="form-control list-group" id="companyOptions" style="display:none">
-                                                           </select>
-                                                       </div>
-                                                       <div class="messageSection hide">Start tracking the selected company</div>
-                                                   </div>
-                                               </fieldset>
-                                               <fieldset class="buttons">
-                                                   <button style="display: none" class="save" type="submit" id="addButton">Add Company</button>
-                                               </fieldset>
-                                           </g:form>
-                                       </div>
-
-                                   </ul>
-                               </div>
-                           </li>
-                           <li class="fieldcontain">
-                               <span id="companies-label" class="property-label"><g:message code="view.companies.label" default="Companies" /></span>
-                               <div class="property-value" aria-labelledby="companies-label"><f:display bean="view" property="companies"/></div>
-                           </li>
-                       </ol>
-    --}%
+        <div id="show-view" class="content scaffold-show" role="main">
+            <g:set var="u" value="${User.get(session["userID"])}"/>
+            <g:if test="${u.organization==view.project.organization||u.isSysAdmin()}">
                 <g:form resource="${this.view}" method="DELETE">
                     <fieldset class="buttons">
                         <g:link class="edit" action="edit" resource="${this.view}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
@@ -307,7 +234,7 @@
                     </fieldset>
                 </g:form>
             </g:if>
-    </div>
+        </div>
 
 %{--    <script src="https://d3js.org/d3.v3.min.js"></script>--}%
 %{--    <script src="/assets/d3.layout.cloud.js"></script>--}%
