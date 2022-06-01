@@ -1,6 +1,9 @@
 package com.coveritas.heracles.ui
 
+import com.coveritas.heracles.HttpClientService
 import com.coveritas.heracles.json.Company
+import grails.util.Holders
+import org.springframework.context.ApplicationContext
 
 class View {
     String uuid                 // View ID in backend
@@ -10,7 +13,7 @@ class View {
     String projUUID                 // project ID in backend
 
     Map<Company,String> companies = [:]
-    Set<Annotation> annotations
+    Set<Annotation> annotations = []
     Set<CompanyViewObject> companyViewObjects = []
     Set<ViewObject> viewObjects = []
 
@@ -29,14 +32,22 @@ class View {
                     companies[cvo.company] = cvo.level
                 }
             }
+            annotations.addAll(vo.annotations)
         }
     }
 
     void addViewObject(ViewObject vo) {
-        viewObjects.add(vo)
-        if (vo instanceof CompanyViewObject) {
-            companyViewObjects.add(vo)
-            companies[vo.company] = vo.level
+        if (vo) {
+            viewObjects.add(vo)
+            if (vo instanceof CompanyViewObject) {
+                companyViewObjects.add(vo)
+                companies[vo.company] = vo.level
+            } else if (vo instanceof Annotation) {
+                annotations.add(vo)
+            }
+            if (vo.annotations){
+                annotations.addAll(vo.annotations)
+            }
         }
     }
 
@@ -47,8 +58,9 @@ class View {
             companyViewObjects.remove(vo)
             companies.remove(vo.company)
         } else if (vo instanceof Annotation) {
-            annotations.add(vo)
+            annotations.remove(vo)
         }
+        annotations.removeAll(vo.annotations)
     }
 
     static mapping = {
@@ -76,5 +88,37 @@ class View {
 
     int hashCode() {
         return (uuid != null ? uuid.hashCode() : 0)
+    }
+
+    Set<Annotation> annotationsSince(long ts) {
+        return annotations.findAll({it.ts>ts })
+    }
+
+    Set<Annotation> seenAnnotations(long ts) {
+        return annotations.findAll({it.ts<=ts })
+    }
+
+    long insightsSince(long ts) {
+        ApplicationContext ctx = Holders.grailsApplication.mainContext
+        HttpClientService httpClientService = ctx.getBean(HttpClientService)
+        Map events = httpClientService.getParamsExpectMap("eve/count/view/${this.uuid}/${ts}/${System.currentTimeMillis()}", null, true)
+
+        events.count as long
+    }
+
+    long seenInsightsCount(long ts) {
+        ApplicationContext ctx = Holders.grailsApplication.mainContext
+        HttpClientService httpClientService = ctx.getBean(HttpClientService)
+        Map events = httpClientService.getParamsExpectMap("eve/count/view/${this.uuid}/${0}/${ts}", null, true)
+
+        events.count as long
+    }
+
+    long insightsCount() {
+        ApplicationContext ctx = Holders.grailsApplication.mainContext
+        HttpClientService httpClientService = ctx.getBean(HttpClientService)
+        Map events = httpClientService.getParamsExpectMap("eve/count/view/${this.uuid}", null, true)
+
+        events.count as long
     }
 }

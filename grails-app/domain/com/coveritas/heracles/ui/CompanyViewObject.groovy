@@ -39,11 +39,15 @@ class CompanyViewObject extends ViewObject {
     }
 
     def afterInsert() {
-        view.addViewObject(this)
+        if (view) {
+            view.addViewObject(this)
+        }
     }
 
     def afterUpdate() {
-        view.addViewObject(this)
+        if (view) {
+            view.addViewObject(this)
+        }
         return true
     }
 

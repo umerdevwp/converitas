@@ -158,53 +158,49 @@
                     <%-- <g:sortableColumn property="status" title="Status" /> --%>
                     <%-- <th>Action</th> --%>
                 </thead>
-                <tbody>
-
                 <g:each in="${projectList}" var="bean" status="i">
-                    <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-                        <td><g:link method="GET" resource="${bean}"><f:display bean="${bean}" property="name" displayStyle="table"/></g:link></td>
-%{--                        <g:if test="${u.isSysAdmin()}">--}%
-%{--                            <td><f:display bean="${bean}" property="organization"  displayStyle="${'table'}" /></td>--}%
-%{--                        </g:if>--}%
-%{--                        <td><f:display bean="${bean}" property="uuid"  displayStyle="${'table'}" /></td>--}%
-                        <td><f:display bean="${bean}" property="description" displayStyle="${'table'}"/></td>
-                        <td class="pr-0">
+                    <g:set var="rowspan" value="${bean.views.size()<1?1:bean.views.size()}"/>
+                    <tbody>
+                        <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                        <td rowspan="${rowspan}"><g:link method="GET" resource="${bean}"><f:display bean="${bean}" property="name" displayStyle="table"/></g:link></td>
+                        <td rowspan="${rowspan}"><f:display bean="${bean}" property="description" displayStyle="${'table'}"/></td>
+                        <td rowspan="${rowspan}" class="pr-0">
                             <ul>
                                 <g:each in="${bean.users}" var="pu">
                                     <li style="background:${pu.color?.code?:'#0815'}"><a style="color: ghostwhite" href="/user/show/${pu.id}">${(pu.name as String).substring(0,2)}</a></li>
                                 </g:each>
                             </ul>
                         </td>
-                        <td class="pl-0"><span class="material-icons">add_circle</span></td>
-                        <td class="pr-0">
-                            <ul>
-                                <g:each in="${bean.views}" var="pv">
-                                    <li><a href="/view/show/${pv.id}">${pv.name}</a></li>
-                                </g:each>
-                            </ul>
-                        </td>
-                        <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td>
-                        <td>
-                            <span class="material-icons">
-                                    view_list
-                            </span>
-                            %{-- todo fill in real values for insights since last login/insights --}%
-                            <span class="number">2/3</span>
-                        </td>         
-                        <td>
-                            <span class="material-icons">
-                                chat_bubble
-                            </span>
-                            %{-- todo fill in real values for comments --}%
-                            <span class="number">5</span>
-                        </td>                  
-                        <%-- <td class="project-status"><div style="background-color: ${bean.color?.code?:'#00FFFF'}">Status</div></td> --%>
-                        <%-- <td>
-                            <a href="/view/create?project.id=${bean.id}">Add View</a>
-                        </td> --%>
+                        <td rowspan="${rowspan}" class="pl-0"><span class="material-icons">add_circle</span></td>
+                        <g:each in="${bean.views}" var="pv" status="j">
+                            <g:if test="${j>0}">
+                                <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                            </g:if>
+                            <td class="pr-0">
+                                <a href="/view/show/${pv.id}">${pv.name}</a>
+                            </td>
+                            <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td>
+                            <td>
+                                <span class="material-icons">
+                                        view_list
+                                </span>
+                                %{-- todo fill in real values for insights since last login/insights --}%
+                                <span class="number">${pv.annotations.size()}/${pv.annotations.size()}</span>
+                            </td>
+                            <td>
+                                <span class="material-icons">
+                                    chat_bubble
+                                </span>
+                                %{-- todo fill in real values for comments --}%
+                                <span class="number">${pv.seenInsightsCount(u.lastLogin())}/${pv.insightsCount()}</span>
+                            </td>
+                            <g:if test="${j>0}">
+                                </tr>
+                            </g:if>
+                        </g:each>
                     </tr>
+                    </tbody>
                 </g:each>
-                </tbody>
             </table>
 
 

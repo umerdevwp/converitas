@@ -33,6 +33,8 @@ class User {
         }
     }
 
+    static transients = ['lastLogin']
+
     static mapping = {
         table name: 'ma_user'
         id generator : 'sequence', params:[sequence:'seq_id_user_pk']
@@ -108,5 +110,14 @@ class User {
 
     boolean isAdmin() {
         return roles.contains(Role.admin())
+    }
+
+    Long lastLogin = null
+    long lastLogin() {
+        if (lastLogin==null) {
+            List<UserEvent> lastLogins = UserEvent.findAllByUserAndEvent(this, 'login', [max: 2, sort: 'ts', order: 'desc'])
+            lastLogin = (lastLogins.size() > 1) ? lastLogins.get(1).ts : 0L
+        }
+        lastLogin
     }
 }
