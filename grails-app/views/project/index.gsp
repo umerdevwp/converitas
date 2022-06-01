@@ -124,13 +124,20 @@
         </div> --%>
 
         <div>
-        <div class="btn btn-primary" style="margin-left: 20px;margin-top: 45px;">
+        <%-- <div class="btn btn-primary" style="margin-left: 20px;margin-top: 45px;">
         
                 <g:link class="create" action="create">
                     <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
                     <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;"><g:message code="default.new.label" args="[entityName]" /></span>
                 </g:link>
-        </div>
+        </div> --%>
+        <div class="btn btn-primary" style="margin-left: 20px;margin-top: 45px;">
+        
+                <g:link class="create" data-toggle="modal" data-target="#createModal">
+                    <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
+                    <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;"><g:message code="default.new.label" args="[entityName]" /></span>
+                </g:link>
+        </div>         
         </div>
         <div id="list-project" class="content scaffold-list" role="main">
             <%-- <div class="col-8" style="display: block;float: left;"><h1><g:message code="default.list.label" args="[entityName]" /></h1></div>
@@ -253,5 +260,26 @@
                 <g:paginate total="${projectCount ?: 0}" />
             </div> --%>
         </div>
+        <%-- Modal Start --%>
+        <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createModalLabel">New Project</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+            </div>
+        </div>
+        </div>
+        <%-- Modal End --%>         
     </body>
 </html>
