@@ -97,75 +97,14 @@ class ApiController {
             apiService.newGraph(User.get(session['userID'] as long), View.get(viewId), from, to, null)
         }
     }
-/*
 
-    def companytimeline(String uuid, @Nullable Long from, @Nullable Long to) {
+    def article( String articleUUID ) {
         call {
-            organizationService.itemsForTimeline(uuid, from, to)
+            ///view/graph/org-uuid/user-uuid/project-uuid/view-uuid
+            apiService.article(articleUUID)
         }
     }
 
-    def globaltimeline() {
-        call {
-            httpClientService.getParamsExpectMap("system/tldata", [from: params.from, to: params.to])
-        }
-    }
-
-    def companygraph(@Nullable Long ts, @Nullable Long from, @Nullable Long to, @Nullable Integer depth) {
-        call {
-            to = to ?: ts
-            from = from ?: to-6*3600*1000
-            organizationService.newGraph((String)params.uuid, from, to, depth)
-        }
-    }
-
-    def activecompanystate() {
-        call {
-            httpClientService.getParamsExpectList("system/activecompanystate", params, LinkedHashMap)
-        }
-    }
-
-    def bindingarticles(String co1uuid, String co2uuid, @Nullable Long from, @Nullable Long to) {
-        call {
-            [
-                company: organizationService.byId(co1uuid),
-                shadow: organizationService.byId(co2uuid),
-                articles: organizationService.bindingArticles(co1uuid, co2uuid, from, to)
-            ]
-        }
-    }
-
-    def companyarticles(String uuid, Long from, Long to) {
-        call {
-            [articles: organizationService.articlesForCompany(uuid, from, to)]
-        }
-    }
-
-    def edgestate(String co1uuid, String co2uuid, @Nullable Long ts) {
-        call {
-            organizationService.edgeState(co1uuid, co2uuid, ts)
-        }
-    }
-
-    def shadowstrength(String co1uuid, String co2uuid, @Nullable Long from, @Nullable Long to) {
-        call {
-            Map result = httpClientService.getParamsExpectMap("organization/shadow/strength/${co1uuid}/${co2uuid}", params)
-
-            result.values = result.values.collect {
-                Map m = (Map) it
-                [x: m.ts, y: m.val]
-            }.findAll { it.y }
-            result
-        }
-    }
-
-    def articleByUuid(String uuid) {
-        call {
-            organizationService.articleByUuid(uuid)
-        }
-    }
-
-    */
 /**
      * Returns times series of *tracked* organization state one per bucket in time range
      *

@@ -91,6 +91,12 @@ class ApiService {
         allLocalProjects
     }
 
+    Map article(String uuid) {
+        Map article  = httpClientService.getParamsExpectObject("article/${uuid}", null, LinkedHashMap.class, true) as Map
+        article.time = format.format(new Date(article.contentTs as long))
+        article
+    }
+
     class ViewReq implements Serializable {
 
         long viewId
@@ -492,19 +498,7 @@ class ApiService {
     Map contentForProject(User user, String projectUUID) {
 //        Project project = remoteProjects(user).find({ Project p -> p.uuid == projectUUID })
         Project project = Project.findByUuid( projectUUID )
-
-        List<EntityViewEvent> eves = allEventsForProject(user, projectUUID)
-        List insights = []
-        eves.each {EntityViewEvent e ->
-            // todo change the content based on event type and state
-            insights.add([
-                    title:e.title,
-                    time:format.format(new Date(e.ts as long)),
-                    type:e.type,
-                    state:e.state,
-                    entityUUID:e.entityUUID
-                    ])
-        }
+        List insights = formatInsights(allEventsForProject(user, projectUUID))
         Set<Annotation> annotations = commentsForProject(projectUUID)
         Set<Map> comments = []
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
@@ -517,14 +511,14 @@ class ApiService {
                                        "Size:  \$10M+ Revenue",
                                        "Category:  Business Intelligence,  Data Warehouse",
                                        "Industry:  All"]
-                break;
+                break
             case "Nightingale":
                 profile.Themes = ["IT Call Center"]
                 profile.Constraints = ["Geography: Global",
                                        "Size:  \$10M+ Revenue",
                                        "Category:  All",
                                        "Industry:  All"]
-                break;
+                break
             case "Samba":
                 profile.Themes = ["Systems House",
                                   "Software Consulting"]
@@ -532,7 +526,7 @@ class ApiService {
                                        "Size:  \$10M+ Revenue",
                                        "Category:  Services",
                                        "Industry:  All"]
-                break;
+                break
             default:
                 profile.Themes = ["Virtual Reality",
                                   "Augmented Reality"]
@@ -549,22 +543,25 @@ class ApiService {
         ]
     }
 
+    public List formatInsights(List<EntityViewEvent> eves) {
+        List insights = []
+        eves.each { EntityViewEvent e ->
+            // todo change the content based on event type and state
+            insights.add([
+                    title     : e.title,
+                    time      : format.format(new Date(e.ts as long)),
+                    type      : e.type,
+                    state     : e.state,
+                    entityUUID: e.entityUUID
+            ])
+        }
+        insights
+    }
+
     Map contentForView(User user, String viewUUID) {
 //        Project project = remoteProjects(user).find({ Project p -> p.uuid == viewUUID })
         View view = View.findByUuid( viewUUID )
-
-        List<EntityViewEvent> eves = allEventsForView(user, viewUUID)
-        List insights = []
-        eves.each {EntityViewEvent e ->
-            // todo change the content based on event type and state
-            insights.add([
-                    title:e.title,
-                    time:format.format(new Date(e.ts as long)),
-                    type:e.type,
-                    state:e.state,
-                    entityUUID:e.entityUUID
-            ])
-        }
+        List insights = formatInsights(allEventsForView(user, viewUUID))
         Set<Annotation> annotations = commentsForView(viewUUID)
         Set<Map> comments = []
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
@@ -583,20 +580,7 @@ class ApiService {
         View view = View.findByUuid( viewUUID )
 
         String projectUUID = view.project.uuid
-        List<EntityViewEvent> eves = allEventsForCompanyInView(user, viewUUID, companyUUID)
-        List insights = []
-        eves.each {EntityViewEvent e ->
-            // todo change the content based on event type and state
-            if (e.type!='comment') {
-                insights.add([
-                        title     : e.title,
-                        time      : format.format(new Date(e.ts as long)),
-                        type      : e.type,
-                        state     : e.state,
-                        entityUUID: e.entityUUID
-                ])
-            }
-        }
+        List insights = formatInsights(allEventsForCompanyInView(user, viewUUID, companyUUID))
         Set<Annotation> annotations = commentsForViewAndCompany(viewUUID, companyUUID)
         Set<Map> comments = []
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
@@ -619,20 +603,7 @@ class ApiService {
         View view = View.findByUuid( viewUUID )
 
         String projectUUID = view.project.uuid
-        List<EntityViewEvent> eves = allEventsForEdgeInView(user, viewUUID, companyUUID, company2UUID)
-        List insights = []
-        eves.each {EntityViewEvent e ->
-            // todo change the content based on event type and state
-            if (e.type!='comment') {
-                insights.add([
-                        title     : e.title,
-                        time      : format.format(new Date(e.ts as long)),
-                        type      : e.type,
-                        state     : e.state,
-                        entityUUID: e.entityUUID
-                ])
-            }
-        }
+        List insights = formatInsights(allEventsForEdgeInView(user, viewUUID, companyUUID, company2UUID))
         Set<Annotation> annotations = commentsForViewAndEdge(viewUUID, companyUUID, company2UUID)
         Set<Map> comments = []
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
@@ -675,18 +646,7 @@ class ApiService {
         Project project = Project.findByUuid( viewUUID )
 
 //        String projectUUID = view.project.uuid
-        List<EntityViewEvent> eves = allEventsForCompanyInProject(user, projectUUID, companyUUID)
-        List insights = []
-        eves.each {EntityViewEvent e ->
-            // todo change the content based on event type and state
-            insights.add([
-                    title:e.title,
-                    time:format.format(new Date(e.ts as long)),
-                    type:e.type,
-                    state:e.state,
-                    entityUUID:e.entityUUID
-            ])
-        }
+        List insights = formatInsights(allEventsForCompanyInProject(user, projectUUID, companyUUID))
         Set<Annotation> annotations = commentsForProjectAndCompany(projectUUID, companyUUID)
         Set<Map> comments = []
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
