@@ -283,14 +283,17 @@
                     </div>
                     <div class="modal-body">
                         <h3 id="articleTitle">Apple Inc. article</h3>
-                        <span id="articleTime">03:05:01 05/17/2022</span>
-                        <span id="articleAuthor"></span>
+                        <br/>
+                        <span id="articleAuthorSp">by <span id="articleAuthor"></span>,</span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="articleTime" style="float: right">03:05:01 05/17/2022</span>
+                        <br/>
+                        <br/>
                         <p id="articleContent">Meta halts plans to build a large data center in the Netherlands, amid rising opposition from the government over environmental concerns (April Roach/Bloomberg)</p>
+                        <br/>
                         <span id="articleSource"></span>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <input type="submit" name="create" class="btn btn-primary" value="Done">
+%{--                        <input type="submit" name="create" class="btn btn-primary" value="Done">--}%
                     </div>
                 </div>
             </div>
@@ -602,10 +605,15 @@
                 success: function(article) {
                     console.log(article)
                     $('#articleTitle'   ).html(article.title);
-                    $('#articleAuthor'  ).html(article.author);
+                    if (article.author===undefined || article.author.length==0) {
+                        $('#articleAuthorSp').hide()
+                    } else {
+                        $('#articleAuthorSp').show()
+                        $('#articleAuthor').html(article.author);
+                    }
                     $('#articleTime'    ).html(article.time);
                     $('#articleContent' ).html(article.content);
-                    $('#articleSource'  ).html(article.source);
+                    $('#articleSource'  ).html('<a href='+article.source+' target="_blank" rel="noopener noreferrer">'+article.source+'</a>');
                 },
                 error: function(err, status) {
                     console.log(err);
