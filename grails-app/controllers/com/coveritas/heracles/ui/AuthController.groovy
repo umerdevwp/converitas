@@ -15,7 +15,7 @@ class AuthController {
                 if (user.authenticate(password)) {
                     session['userID'] = user.id
                     new UserEvent(user:user, event: UserEvent.E_LOGIN, ts: System.currentTimeMillis()).save(update:false, flush:true)
-                    if (url) {
+                    if (url && !url.endsWith('authentication')) {
                         redirect url: url
                     } else {
                         redirect controller: "project", action: "index"
