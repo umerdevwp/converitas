@@ -226,6 +226,42 @@
         <div id="show-view" class="content scaffold-show" role="main">
             <g:set var="u" value="${User.get(session["userID"])}"/>
             <g:if test="${u.organization==view.project.organization||u.isSysAdmin()}">
+                <div id="addCompanyToView" style="display: none">
+                    <g:form method="POST" url="/view/addCompany">
+                        <fieldset class="form">
+                            %{--<f:all bean="companyViewObject"/>--}%
+                            <g:hiddenField name="view.id" value="${this.view.id}"/>
+                            <g:hiddenField name="level" value="${CompanyViewObject.TRACKING}"/>
+                            <g:hiddenField name="url" value="" id="url"/>
+                            %{--<f:field bean="companyViewObject" property="company"/>--}%
+                            <div class="fieldcontain required">
+                                <label for="companyUUID">Company<span class="required-indicator">*</span></label>
+                                <input id="companyInput" placeholder="Add a Company" size="40">
+                                <div style="display:inline-block;width:150px;background-color: transparent">
+                                    <input type="hidden" id="companyUUID" name="companyUUID"/>
+                                </div>
+                                <div style="width:400px;height:30px;background-color: transparent">
+                                    <select class="form-control list-group" id="companyOptions" style="display:none">
+                                    </select>
+                                </div>
+                                <div class="messageSection hide">Start tracking the selected company</div>
+                            </div>
+                            %{--
+                            <div class="fieldcontain required">
+                                <label for="level">Level<span class="required-indicator">*</span></label>
+                                <select name="level" id="level" class="form-control list-group">
+                                    <g:each in="${com.coveritas.heracles.ui.CompanyViewObject.LEVELS}" var="l">
+                                        <option value="${l}">${l}</option>
+                                    </g:each>
+                                </select>
+                           </div>
+                            --}%
+                        </fieldset>
+                        <fieldset class="buttons">
+                            <button style="display: none" class="save" type="submit" id="addButton">Add Company</button>
+                        </fieldset>
+                    </g:form>
+                </div>
                 <g:form resource="${this.view}" method="DELETE">
                     <fieldset class="buttons">
                         <g:link class="edit" action="edit" resource="${this.view}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
@@ -235,6 +271,31 @@
                 </g:form>
             </g:if>
         </div>
+        %{-- Modal Start --}%
+        <div class="modal fade" id="articleModal" tabindex="-1" role="dialog" aria-labelledby="articleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="articleModalLabel">Article</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h3 id="articleTitle">Apple Inc. article</h3>
+                        <span id="articleTime">03:05:01 05/17/2022</span>
+                        <span id="articleAuthor"></span>
+                        <p id="articleContent">Meta halts plans to build a large data center in the Netherlands, amid rising opposition from the government over environmental concerns (April Roach/Bloomberg)</p>
+                        <span id="articleSource"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input type="submit" name="create" class="btn btn-primary" value="Done">
+                    </div>
+                </div>
+            </div>
+        </div>
+        %{-- Modal End --}%
 
 %{--    <script src="https://d3js.org/d3.v3.min.js"></script>--}%
 %{--    <script src="/assets/d3.layout.cloud.js"></script>--}%
@@ -382,7 +443,7 @@
                 html+= '  <tr  style="height: auto">\n'+
                     '    <td>'+c['time']+'</td>\n'
                     if (c['type']==='article') {
-                     html+= '    <td><a data-uuid="' + c['state'] + '" class="article" href="#">' + c['title'] + '</a></td>\n'
+                     html+= '    <td><a data-uuid="' + c['state'] + '" data-toggle="modal" data-target="#articleModal" class="article" href="#">' + c['title'] + '</a></td>\n'
                     } else {
                         html+= '    <td>' + c['title'] + '</td>\n'
                     }
@@ -538,9 +599,13 @@
         function showArticle(articleUUID) {
             $.ajax({
                 url: '/api/article?articleUUID='+articleUUID,
-                success: function(data) {
-                    console.log(data)
-                    // $('#companies').html(html);
+                success: function(article) {
+                    console.log(article)
+                    $('#articleTitle'   ).html(article.title);
+                    $('#articleAuthor'  ).html(article.author);
+                    $('#articleTime'    ).html(article.time);
+                    $('#articleContent' ).html(article.content);
+                    $('#articleSource'  ).html(article.source);
                 },
                 error: function(err, status) {
                     console.log(err);

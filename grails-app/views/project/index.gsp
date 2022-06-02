@@ -142,11 +142,10 @@
                 </g:link>
         </div> --%>
         <div class="btn btn-primary" style="margin-left: 20px;margin-top: 45px;">
-        
-                <g:link class="create" data-toggle="modal" data-target="#createModal">
-                    <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
-                    <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;"><g:message code="default.new.label" args="[entityName]" /></span>
-                </g:link>
+            <g:link class="create" data-toggle="modal" data-target="#createModal">
+                <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
+                <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;"><g:message code="default.new.label" args="[entityName]" /></span>
+            </g:link>
         </div>         
         </div>
         <div id="list-project" class="content scaffold-list" role="main">
