@@ -191,7 +191,8 @@
                         <g:if test="${rowspan==0}">
                             <td class="pr-0">
                             </td>
-                            <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td>
+                            <%-- <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td> --%>
+                             <td class="pl-0"><a data-toggle="modal" data-target="#create-view" class="material-icons">add_circle</a></td>
                             <td>
                             </td>
                             <td>
@@ -205,7 +206,8 @@
                                 <td class="pr-0">
                                     <a href="/view/show/${pv.id}">${pv.name}</a>
                                 </td>
-                                <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td>
+                                <%-- <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td> --%>
+                                <td class="pl-0"><a data-toggle="modal" data-target="#create-view" class="material-icons">add_circle</a></td>
                                 <td>
                                     <span class="material-icons">
                                             view_list
@@ -268,10 +270,61 @@
         </div>
         %{-- Modal Start --}%
         <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="createModalLabel">New Project</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <g:form url="/project/save" method="POST" >
+                        <g:hiddenField name="organization.id" value="${u.organization.id}" />
+                        <g:hiddenField name="url" class="url" value="${u.organization.id}" />
+                        <div class="modal-body">
+                            <fieldset class="form">
+                                <div class="fieldcontain required">
+                                    <label for="name">Name<span class="required-indicator">*</span></label>
+                                    <input type="text" name="name" value="" required="" id="name">
+                                </div>
+                                <div class="fieldcontain required">
+                                    <label for="description">Description<span class="required-indicator">*</span>
+                                    </label>
+                                    <textarea name="description" value="" required="" cols="40" rows="5" id="description"></textarea>
+                                </div>
+                                <div class="fieldcontain required">
+                                    <label for="color.id">Color</label>
+                                    %{-- <select name="color.id" id="color.id" class="selectpicker">
+                                        <option data-icon="glyphicon glyphicon-eye-open" data-subtext="petrification">Eye of Medusa</option>--}%
+                                    <select name="color.id" id="color.id">
+                                        <option value="">-Choose your color-</option>
+                                        <g:each in="${com.coveritas.heracles.ui.Color.list()}" var="color">
+                                            <option value="${color.id}" style="background-color: ${color.code} !important" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>
+%{--                                            <option value="${color.id}" data-color="${color.code}" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>--}%
+                                        </g:each>
+                                    </select>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <input type="submit" name="create" class="btn btn-primary" value="Create">
+                        </div>
+                    </g:form>
+                </div>
+            </div>
+        </div>
+        %{-- Modal End --}%
+
+
+
+    <!--Create View Modal-->
+        %{-- Modal Start --}%
+        <div class="modal fade" id="create-view" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createModalLabel">Create View</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                         </button>
@@ -311,7 +364,11 @@
                 </div>
             </div>
         </div>
-        %{-- Modal End --}%
+        %{-- Modal End --}%        
+
+
+
+
         <script type="module">
             // import "/assets/vis-timeline-graph2d.min.js";
             // import "/assets/vis-network.min.js";
