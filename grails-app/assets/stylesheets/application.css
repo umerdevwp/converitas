@@ -32,6 +32,8 @@
 .companies-panel ul {
   list-style: none;
   padding: .5rem 0 0 0;
+  height: 180px;
+  overflow-y: auto;
 }
 
 nav.sidebar-menu ul{

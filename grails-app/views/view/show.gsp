@@ -13,7 +13,7 @@
             padding-top: 25px;
         }
         
-        #companies { padding-bottom: 300px; }
+        #companies { padding-bottom: 175px; }
         .home-nav { display: none;}
 
         .vis-item .vis-item-content {
