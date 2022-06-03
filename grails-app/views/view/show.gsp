@@ -13,7 +13,7 @@
             padding-top: 25px;
         }
         
-        #companies { padding-bottom: 175px; }
+        #companies { padding-bottom: px; }
         .home-nav { display: none;}
 
         .vis-item .vis-item-content {
@@ -95,6 +95,10 @@
             font-weight: bold;
             font-size: 13px;
         }
+        .modal-body.fixedHeight {
+            height: 600px;
+            overflow-y: auto;
+        }
         </style>
 
         <script>
@@ -148,7 +152,7 @@
             </div>
             <div class="col-sm-4">
 %{--                <h2>${view.project.name} > <a class="back-link" style="cursor: pointer;color: #336699"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>--}%
-                <h2>${view.project.name} <a href="#">&gt;</a> <a class="back-link" href="#"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>
+                <h2>${view.project.name} <a href="#" data-toggle="modal" data-target="#signModal" >&gt;</a> <a class="back-link" href="#"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>
                     <!-- Tabs with icons on Card -->
                     <div class="card card-nav-tabs">
                         <div class="card-header card-header-primary">
@@ -273,7 +277,7 @@
         </div>
         %{-- Modal Start --}%
         <div class="modal fade" id="articleModal" tabindex="-1" role="dialog" aria-labelledby="articleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="articleModalLabel">Article</h5>
@@ -281,7 +285,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body fixedHeight">
                         <h3 id="articleTitle">Apple Inc. article</h3>
                         <br/>
                         <span id="articleAuthorSp">by <span id="articleAuthor"></span>,</span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="articleTime" style="float: right">03:05:01 05/17/2022</span>
@@ -299,6 +303,31 @@
             </div>
         </div>
         %{-- Modal End --}%
+
+<!--Greater Sign Modal-->
+        %{-- Modal Start --}%
+            <div class="modal fade" id="signModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Sign Modal</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+                </div>
+            </div>
+            </div>
+        %{-- Modal End --}%
+<!--End greater sign modal-->        
+
 
 %{--    <script src="https://d3js.org/d3.v3.min.js"></script>--}%
 %{--    <script src="/assets/d3.layout.cloud.js"></script>--}%
