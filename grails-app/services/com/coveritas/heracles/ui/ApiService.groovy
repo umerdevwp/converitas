@@ -97,6 +97,18 @@ class ApiService {
         article
     }
 
+    void deleteProject(User user, Project project) {
+        try {
+            Boolean response = httpClientService.deleteParamsExpectObject("project/${user.organization.uuid}/${user.uuid}/${project.uuid}", null, Boolean.class, true)
+        } catch (Exception ignore) {}
+    }
+
+    void deleteView(User user, View view) {
+        try {
+            httpClientService.deleteParamsGeneric("view/${user.organization.uuid}/${user.uuid}/${view.project.uuid}/${view.uuid}", null)
+        } catch (Exception ignore) {}
+    }
+
     class ViewReq implements Serializable {
 
         long viewId

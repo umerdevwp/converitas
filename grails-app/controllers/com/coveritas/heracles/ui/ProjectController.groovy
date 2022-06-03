@@ -118,7 +118,9 @@ class ProjectController {
         }
         Long userID = session['userID'] as Long
         User u = User.get(userID)
-        if ( u.isAdmin(organization)||u.isSysAdmin()) {
+        Project project = Project.get(id)
+        if ( u.isAdmin(project.organization)||u.isSysAdmin()) {
+            apiService.deleteProject(u, project)
             projectService.delete(id)
 
             request.withFormat {

@@ -240,8 +240,10 @@ class ViewController {
         }
         Long userID = session['userID'] as Long
         User u = User.get(userID)
+        View view = View.get(id)
         Project project = view.project
         if ( u.organization==project.organization||u.isSysAdmin()) {
+            apiService.deleteView(u, view)
             viewService.delete(id)
 
             request.withFormat {

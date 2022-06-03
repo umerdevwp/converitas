@@ -131,6 +131,23 @@ class HttpClientService implements GrailsConfigurationAware {
         response.getBody()
     }
 
+    /**
+     * The method httpGetRequest performs a get request to the given URL
+     *
+     * @param url contains the url to be called
+     *
+     * @String with response for the call
+     *
+     * @throws IOException in case of low level errors with the call (e.g. network or server availability)
+     */
+    String httpDeleteRequest(String url) throws IOException {
+        Map<String, String> completedHeaders = completedHeaders(null)
+        logRequestAsCurl("DELETE", completedHeaders, url, null)
+        HttpResponse<String> response = Unirest.delete(url)
+                .headers(completedHeaders)
+                .asString()
+        response.getBody()
+    }
 
     String getParamsGeneric(String task, Map params) throws IOException {
         String url = getUrl(task) + paramsFromMap(params)
@@ -192,6 +209,10 @@ class HttpClientService implements GrailsConfigurationAware {
         Meta.fromMap(clazz, getParamsExpectResult(task, params, noException) as Map<String, Object>)
     }
 
+    Object deleteParamsExpectObject(String task, Map params, Class clazz, boolean noException) throws IOException, APIException {
+        Meta.fromMap(clazz, deleteParamsExpectResult(task, params, noException) as Map<String, Object>)
+    }
+
     /**
      *
      * @param task
@@ -204,6 +225,10 @@ class HttpClientService implements GrailsConfigurationAware {
         getParamsExpectResult(task, params, noException) as Map<String, Object>
     }
 
+    Object deleteParamsExpectResult(String task, Map params, boolean noException) throws IOException, APIException {
+        String content = deleteParamsGeneric(task, params)
+        extractResult(content, task, noException)
+    }
 
     /**
      * The method postParams performs a call to the eventing support service that returns a list with results of type clazz
@@ -244,7 +269,7 @@ class HttpClientService implements GrailsConfigurationAware {
      * @throws APIException - mostly for API level errors (hopefully never)
      */
     List postParamsExpectList(String task, Map params, Class clazz) throws IOException, APIException {
-        //typedListFromJson(postParamsGeneric(task, params), clazz)
+        typedListFromJson(postParamsGeneric(task, params) as List<Map>, clazz)
     }
 
     /**
@@ -277,7 +302,14 @@ class HttpClientService implements GrailsConfigurationAware {
         sResponse
     }
 
-
+    String deleteParamsGeneric(String task, Map params) throws IOException {
+        String url = getUrl(task) + paramsFromMap(params)
+        String sResponse = httpDeleteRequest(url)
+        if (isDebug) {
+            log.info("Response for delete request to \"${url}\" is:\n ${sResponse}")
+        }
+        sResponse
+    }
 
     /**
      * The method httpGetRequest performs a get request to the given URL

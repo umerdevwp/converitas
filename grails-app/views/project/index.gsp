@@ -192,7 +192,7 @@
                             <td class="pr-0">
                             </td>
                             <%-- <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td> --%>
-                             <td class="pl-0"><a data-toggle="modal" data-target="#create-view" class="material-icons">add_circle</a></td>
+                             <td class="pl-0"><a data-toggle="modal" data-target="#create-view" data-projectId="${bean.id}" class="material-icons">add_circle</a></td>
                             <td>
                             </td>
                             <td>
@@ -207,7 +207,7 @@
                                     <a href="/view/show/${pv.id}">${pv.name}</a>
                                 </td>
                                 <%-- <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td> --%>
-                                <td class="pl-0"><a data-toggle="modal" data-target="#create-view" class="material-icons">add_circle</a></td>
+                                <td class="pl-0"><a data-toggle="modal" data-target="#create-view" data-projectid="${bean.id}" class="material-icons create-view-link">add_circle</a></td>
                                 <td>
                                     <span class="material-icons">
                                             view_list
@@ -229,7 +229,6 @@
                     </tbody>
                 </g:each>
             </table>
-
 
             <div class="col-2 leftElement">
                 <div class="table-wrapper-scroll-y table-scrollbar insight-section">
@@ -266,7 +265,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
         %{-- Modal Start --}%
         <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
@@ -280,7 +278,7 @@
                     </div>
                     <g:form url="/project/save" method="POST" >
                         <g:hiddenField name="organization.id" value="${u.organization.id}" />
-                        <g:hiddenField name="url" class="url" value="${u.organization.id}" />
+                        <g:hiddenField name="url" class="url" value="/project/index" />
                         <div class="modal-body">
                             <fieldset class="form">
                                 <div class="fieldcontain required">
@@ -329,30 +327,18 @@
                         <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <g:form url="/project/save" method="POST" >
-                        <g:hiddenField name="organization.id" value="${u.organization.id}" />
-                        <g:hiddenField name="url" class="url" value="${u.organization.id}" />
+                    <g:form url="/view/save" method="POST" >
+                        <g:hiddenField name="project.id" id="createViewProjectId"  value="" />
+                        <g:hiddenField name="url" class="url" value="/project/index" />
                         <div class="modal-body">
                             <fieldset class="form">
                                 <div class="fieldcontain required">
                                     <label for="name">Name<span class="required-indicator">*</span></label>
-                                    <input type="text" name="name" value="" required="" id="name">
+                                    <input type="text" name="name" value="" required="">
                                 </div>
                                 <div class="fieldcontain required">
-                                    <label for="description">Description<span class="required-indicator">*</span>
-                                    </label><input type="text" name="description" value="" required="" id="description" kl_vkbd_parsed="true">
-                                </div>
-                                <div class="fieldcontain required">
-                                    <label for="color.id">Color</label>
-                                    %{-- <select name="color.id" id="color.id" class="selectpicker">
-                                        <option data-icon="glyphicon glyphicon-eye-open" data-subtext="petrification">Eye of Medusa</option>--}%
-                                    <select name="color.id" id="color.id">
-                                        <option value="">-Choose your color-</option>
-                                        <g:each in="${com.coveritas.heracles.ui.Color.list()}" var="color">
-                                            <option value="${color.id}" style="background-color: ${color.code} !important" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>
-%{--                                            <option value="${color.id}" data-color="${color.code}" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>--}%
-                                        </g:each>
-                                    </select>
+                                    <label for="description">Description<span class="required-indicator">*</span></label>
+                                    <input type="text" name="description" value="" required="">
                                 </div>
                             </fieldset>
                         </div>
@@ -366,9 +352,6 @@
         </div>
         %{-- Modal End --}%        
 
-
-
-
         <script type="module">
             // import "/assets/vis-timeline-graph2d.min.js";
             // import "/assets/vis-network.min.js";
@@ -379,6 +362,10 @@
             $( document ).ready(() => {
                 pageURL = window.location.href;
                 $('#url').val(pageURL);
+                $('.create-view-link').on('click', function(event) {
+                    const projectId = $(this).data("projectid");
+                    $('#createViewProjectId').val( projectId )
+                })
             })
         </script>
     </body>
