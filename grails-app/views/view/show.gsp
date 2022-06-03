@@ -127,7 +127,6 @@
             <div class="col-sm-2  p-0">
             <h2>Project ${view.project.name}</h2>
                 <div class="companies-wrapper">
-                    <a class="back-link" style="cursor: pointer;color: #336699">&lt; Back to Lens</a>
                 <div id="companies" class="companies-panel"></div>
                 </div>
             </div>
@@ -148,7 +147,8 @@
                 </td>
             </div>
             <div class="col-sm-4">
-                <h2>${view.project.name} > <span id="breadcrumb">${view.name}</span></h2>
+%{--                <h2>${view.project.name} > <a class="back-link" style="cursor: pointer;color: #336699"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>--}%
+                <h2>${view.project.name} <a href="#">&gt;</a> <a class="back-link" href="#"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>
                     <!-- Tabs with icons on Card -->
                     <div class="card card-nav-tabs">
                         <div class="card-header card-header-primary">
@@ -509,7 +509,8 @@
                 const c = content[i];
                 if (c.k!=='UUID') {
                     if (c.k==='Name') {
-                        $('#breadcrumb').html(c.v)
+                        $('#breadcrumb1').html(c.v)
+                        $('#bcCompanySelected').show()
                     }
                     html+= '  <tr  style="height: auto">\n'+
                         '    <td>'+c.k+'</td>\n'+
@@ -544,6 +545,7 @@
                         switch (head.toLowerCase().substring(0,4)) {
                             case 'desc':
                                 $('#breadcrumb').html('${view.name}')
+                                $('#bcCompanySelected').hide()
                                 html = formatDescriptionContent(content);
                                 count = -1
                                 $icon.html('business')
