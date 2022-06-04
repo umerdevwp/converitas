@@ -90,6 +90,7 @@ class ProjectController {
             notFound()
             return
         }
+        String url = params.url
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         if ( u.organization==project.organization||u.isSysAdmin()) {
@@ -102,7 +103,11 @@ class ProjectController {
             request.withFormat {
                 form multipartForm {
                     flash.message = message(code: 'default.updated.message', args: [message(code: 'project.label', default: 'Project'), project.id])
-                    redirect project
+                    if (url!=null) {
+                        redirect url:url
+                    } else {
+                        redirect project
+                    }
                 }
                 '*'{ respond project, [status: OK] }
             }
