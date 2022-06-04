@@ -52,10 +52,13 @@
         .tabs .buttons { 
             padding:5px 10px !important;
         }
+        .material-icons.md-18 { font-size: 18px;}
         .material-icons.md-36 { font-size: 36px;}
         .material-icons.orange600 { color: #FB8C00; }
         .material-icons.blue600 { color: #38a9dd; }
         .material-icons.red600 { color: #fb0000; }
+        .material-icons.skyblue { color: #00BFFF3F; }
+        .material-icons.skyblue:hover { color: #00BFFFFF; }
         .form-control {
             width: 65%;
             float: left;
@@ -125,11 +128,12 @@
         .dropdown-content {
         display: none;
         position: absolute;
-        background-color: #fff;
+        /*background-color: #fff;*/
+        background-color: #e1e1e1;
         min-width: 200px;
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
         z-index: 1;
-        left: 100px;
+        left: 0px;
         top: -15px;
         }
 
@@ -147,35 +151,6 @@
         /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
         .show {display:block;}        
         </style>
-
-        <script>
-        setTimeout(() => {
-            $('.tabs .buttons').on('click', function(e) {
-            $('.tabs .buttons').removeClass('selectedTab');
-            $(this).addClass('selectedTab');
-        });
-        }, "2000");
-
-        /* When the user clicks on the button,
-        toggle between hiding and showing the dropdown content */
-        function myFunction() {
-        document.getElementById("myDropdown").classList.toggle("show");
-        }
-
-        // Close the dropdown menu if the user clicks outside of it
-        window.onclick = function(event) {
-        if (!event.target.matches('.dropbtn')) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            var i;
-            for (i = 0; i < dropdowns.length; i++) {
-            var openDropdown = dropdowns[i];
-            if (openDropdown.classList.contains('show')) {
-                openDropdown.classList.remove('show');
-            }
-            }
-        }
-        }        
-        </script>
     </head>
     <body>
         <a href="#show-view" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
@@ -196,9 +171,10 @@
 
             <div class="row p-1">
             <div class="col-sm-2  p-0">
-            <h2>Project ${view.project.name}</h2>
+                <g:set var="project" value="${view.project}"/>
+                <h2>Project ${project.name}</h2>
                 <div class="companies-wrapper">
-                <div id="companies" class="companies-panel"></div>
+                    <div id="companies" class="companies-panel"></div>
                 </div>
             </div>
             <div class="col-sm-6">
@@ -218,17 +194,21 @@
                 </td>
             </div>
             <div class="col-sm-4">
-%{--                <h2>${view.project.name} > <a class="back-link" style="cursor: pointer;color: #336699"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>--}%
-                <h2>${view.project.name} <a href="#" onclick="myFunction()" class="dropbtn" >&gt;</a> <a class="back-link" href="#"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>
+%{--                <h2>${project.name} > <a class="back-link" style="cursor: pointer;color: #336699"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>--}%
+                <h2>${project.name} <a href="#" class="dropbtn" >&gt;</a> <a class="back-link" href="#"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>
                 <div class="dropdown">
-                <div id="myDropdown" class="dropdown-content">
-                    <a href="#">Link 1</a>
-                    <a href="#">Link 2</a>
-                    <a href="#">Link 3</a>
+                    <g:set var="views" value="${project.views}"/>
+                    <g:if test="${views.size()>1}">
+                        <div id="lensDropdown" class="dropdown-content">
+                            <g:each in="${views}" var="v">
+                                <g:if test="${v.id!=view.id}">
+                                  <a href="${v.id}">${v.name}</a>
+                                </g:if>
+                            </g:each>
+                        </div>
+                    </g:if>
                 </div>
-                </div>          
-                    
-                    <!-- Tabs with icons on Card -->
+                <!-- Tabs with icons on Card -->
                     <div class="card card-nav-tabs">
                         <div class="card-header card-header-primary">
                             <!-- colors: "header-primary", "header-info", "header-success", "header-warning", "header-danger" -->
@@ -304,14 +284,14 @@
         </div>
         <div id="show-view" class="content scaffold-show" role="main">
             <g:set var="u" value="${User.get(session["userID"])}"/>
-            <g:if test="${u.organization==view.project.organization||u.isSysAdmin()}">
+            <g:if test="${u.organization==project.organization||u.isSysAdmin()}">
                 <div id="addCompanyToView" style="display: none">
                     <g:form method="POST" url="/view/addCompany">
                         <fieldset class="form">
                             %{--<f:all bean="companyViewObject"/>--}%
                             <g:hiddenField name="view.id" value="${this.view.id}"/>
                             <g:hiddenField name="level" value="${CompanyViewObject.TRACKING}"/>
-                            <g:hiddenField name="url" value="" id="url"/>
+                            <g:hiddenField name="url" value="" class="url"/>
                             %{--<f:field bean="companyViewObject" property="company"/>--}%
                             <div class="fieldcontain required">
                                 <label for="companyUUID">Company<span class="required-indicator">*</span></label>
@@ -379,29 +359,119 @@
         </div>
         %{-- Modal End --}%
 
-<!--Greater Sign Modal-->
         %{-- Modal Start --}%
-            <div class="modal fade" id="signModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
+    <div class="modal fade" id="editLensModal" tabindex="-1" role="dialog" aria-labelledby="editLensModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createModalLabel">Sign Modal</h5>
+                    <h5 class="modal-title" id="editLensModalLabel">Edit Lens</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-                </div>
+                <g:form url="/view/update" method="PUT" >
+                    <g:hiddenField name="version" value="${view.version}" />
+                    <g:hiddenField name="project.id" value="${project.id}" />
+                    <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                    <g:hiddenField name="id" value="${view.id}" />
+                    <g:hiddenField name="uuid" value="${view.uuid}" />
+                    <div class="modal-body">
+                        <fieldset class="form">
+                            <div class="fieldcontain required">
+                                <label for="name">Name<span class="required-indicator">*</span></label>
+                                <input type="text" name="name" value="${view.name}" required="">
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="description">Description<span class="required-indicator">*</span></label>
+                                <input type="text" name="description" value="${view.description}" required="">
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-primary" value="Update">
+                    </div>
+                </g:form>
             </div>
+        </div>
+    </div>
+    %{-- Modal End --}%
+
+        %{-- Modal Start --}%
+    <div class="modal fade" id="editProjectModal" tabindex="-1" role="dialog" aria-labelledby="editProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProjectModalLabel">Edit Project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <g:form url="/project/update" method="PUT" >
+                    <g:hiddenField name="version" value="${project.version}" />
+                    <g:hiddenField name="id" value="${project.id}" />
+                    <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                    <g:hiddenField name="uuid" value="${project.uuid}" />
+                    <g:hiddenField name="organization" value="${project.organization.id}" />
+                    <div class="modal-body">
+                        <fieldset class="form">
+                            <div class="fieldcontain required">
+                                <label for="name">Name<span class="required-indicator">*</span></label>
+                                <input type="text" name="name" value="${project.name}" required="">
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="description">Description<span class="required-indicator">*</span></label>
+                                <input type="text" name="description" value="${project.description}" required="">
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="color.id">Color</label>
+                                <select name="color.id" id="color">
+                                    <option value="">-Choose your color-</option>
+                                    <g:each in="${com.coveritas.heracles.ui.Color.list()}" var="color">
+                                        <g:if test="${color.id==project.color.id}">
+                                            <option selected="selected" value="${color.id}" style="background-color: ${color.code} !important" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>
+                                        </g:if>
+                                        <g:else>
+                                            <option value="${color.id}" style="background-color: ${color.code} !important" data-color="${color.code}">${color.name}</option>
+                                        </g:else>
+                                    </g:each>
+                                </select>
+                                <div id="colorSample"></div>
+                                <script type="module">
+                                    let $color = $("#color");
+                                    let $sample = $("#colorSample");
+                                    $color.on('change', function(){
+                                        const selected = $color.find(":selected");
+                                        $sample.html(selected.text());
+                                        $sample.css('background-color', selected.data('color'))
+                                    })
+                                </script>
+                            </div>
+                            <div class="fieldcontain">
+                                <label for="users">Users</label>
+                                <select name="users" id="users" multiple="">
+                                    <g:set var="projectUserIds" value="${project.users*.id}"/>
+                                    <g:each in="${User.findAllByOrganization(project.organization)}" var="user">
+                                        <g:if test="${user.id in projectUserIds}">
+                                            <option selected="selected" value="${user.id}">${user.toString()}</option>
+                                        </g:if>
+                                        <g:else>
+                                            <option value="${user.id}">${user.toString()}</option>
+                                        </g:else>
+                                    </g:each>
+                            </select>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-primary" value="Update">
+                    </div>
+                </g:form>
             </div>
-        %{-- Modal End --}%
-<!--End greater sign modal-->        
+        </div>
+    </div>
+    %{-- Modal End --}%
 
 
 %{--    <script src="https://d3js.org/d3.v3.min.js"></script>--}%
@@ -414,6 +484,36 @@
         import "/assets/vis-timeline-graph2d.min.js";
         import "/assets/vis-network.min.js";
 
+        setTimeout(() => {
+            $('.tabs .buttons').on('click', function(e) {
+                $('.tabs .buttons').removeClass('selectedTab');
+                $(this).addClass('selectedTab');
+            });
+        }, 2000 );
+
+        /* When the user clicks on the button,
+        toggle between hiding and showing the dropdown content */
+        $('.dropbtn').on('click', function () {
+            const dropdown = document.getElementById("lensDropdown");
+            const breadcrumb = document.getElementById("breadcrumb")
+            dropdown.style.left = ""+(breadcrumb.offsetLeft-30)+"px"
+            // let    offset   = elemRect.top - bodyRect.top;
+            dropdown.classList.toggle("show");
+        })
+
+        // Close the dropdown menu if the user clicks outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
         const refreshInterval = 60000;
         let pageURL = '';
 
@@ -422,7 +522,7 @@
                 loadProjectContent();
             });
             pageURL = window.location.href;
-            $('#url').val(pageURL);
+            $('.url').val(pageURL);
             setTimeout(() => {    
             $('#companies h3:eq(0)').css('color', '#ea3223');                 
              $('#companies h3:eq( 1 )').css('color', '#f2a83b'); 
@@ -532,10 +632,24 @@
 
         function formatDescriptionContent(content)  {
             let html= '<table class="project-table"> <tbody style="height: auto">';
-            for (let i=0; i<content.length; i++) {
+            for (let i=0; i<2; i++) {
                 const c = content[i];
                 html+= '  <tr  style="height: auto">\n'+
-                    '    <td>'+ (i===0?"<h3>":"") + c+ (i===0?"</h3>":"") +'</td>\n'+
+                    '    <td>'+ (i===0?"<h3>":"") + c+
+                    "<a data-toggle=\"modal\" data-target=\"#editProjectModal\"><i class=\"material-icons md-18 skyblue\">mode_edit_outline</i></a>" +
+                    (i===0?" Project</h3>":"") +'</td>\n'+
+                    '  </tr>\n';
+            }
+            html+='</tbody></table>';
+
+            html += '<table class="project-table"> <tbody style="height: auto">';
+            for (let i=2; i<content.length; i++) {
+                const c = content[i];
+                html+= '  <tr  style="height: auto">\n'+
+                    '    <td>'+ (i===2?"<h3>":"") + c +
+                    "<a data-toggle=\"modal\" data-target=\"#editLensModal\"><i class=\"material-icons md-18 skyblue\">mode_edit_outline</i></a>" +
+                    (i===2?'Lens</h3>':'') +'</td>\n'+
+                    // <div data-v-63f07fb9="" draggable="true" class="app-icon grid-icon__icon is-m_outlined"><img alt="Edit icon" srcset="https://img.icons8.com/material-outlined/2x/edit.png 2x" style="filter: invert(0%) sepia(0%) saturate(7470%) hue-rotate(193deg) brightness(95%) contrast(106%);"> <!----></div>
                     '  </tr>\n';
             }
             html+='</tbody></table>';
@@ -631,7 +745,7 @@
             $.ajax({
                 url: companyUUID ? (company2UUID ?'/api/contentForEdgeInView?companyUUID='+companyUUID+'&company2UUID='+company2UUID+'&viewId=${view.id}'
                                                  :'/api/contentForCompanyInView?companyUUID='+companyUUID+'&viewId=${view.id}')
-                                 : '/api/contentForProject/${view.project.id}',
+                                 : '/api/contentForProject/${project.id}?viewId=${view.id}',
                 success: function(data) {
                     let profiles = 0
                     let i=0
@@ -648,11 +762,11 @@
                         const $icon = $('#icon'+i);
                         switch (head.toLowerCase().substring(0,4)) {
                             case 'desc':
-                                $('#breadcrumb').html('${view.name}')
-                                $('#bcCompanySelected').hide()
+                                $('#breadcrumb').html('${view.name}');
+                                $('#bcCompanySelected').hide();
                                 html = formatDescriptionContent(content);
-                                count = -1
-                                $icon.html('business')
+                                count = -1;
+                                $icon.html('business');
                                 break;
                             case 'comp':
                                 count = content.pop()["count"]

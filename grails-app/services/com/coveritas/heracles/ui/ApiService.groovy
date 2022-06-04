@@ -507,7 +507,7 @@ class ApiService {
 
     static SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss MM/dd/YYYY")
 
-    Map contentForProject(User user, String projectUUID) {
+    Map contentForProject(User user, String projectUUID, View view=null) {
 //        Project project = remoteProjects(user).find({ Project p -> p.uuid == projectUUID })
         Project project = Project.findByUuid( projectUUID )
         List insights = formatInsights(allEventsForProject(user, projectUUID))
@@ -547,8 +547,13 @@ class ApiService {
                                        "Category:  Software",
                                        "Industry:  All"]
         }
+        List<String> description = [project.name, project.description]
+        if (view!=null) {
+            description.add(view.name)
+            description.add(view.description)
+        }
         [
-         Description:[project.name,project.description],
+         Description: description,
          Insights:insights,
          Comments:comments,
          Parameters:profile

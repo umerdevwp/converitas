@@ -210,21 +210,26 @@ class ViewController {
             notFound()
             return
         }
+        String url = params.url
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         Project project = view.project
         if ( u.organization==project.organization||u.isSysAdmin()) {
+            Map<String, Object> result = httpClientService.postParamsExpectMap('view', [uuid:view.uuid, userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, name: view.name, description:view.description], false)
             try {
                 viewService.save(view)
             } catch (ValidationException e) {
                 respond view.errors, view:'edit'
                 return
             }
-
             request.withFormat {
                 form multipartForm {
                     flash.message = message(code: 'default.updated.message', args: [message(code: 'view.label', default: 'View'), view.id])
-                    redirect view
+                    if (url!=null) {
+                        redirect url:url
+                    } else {
+                        redirect view
+                    }
                 }
                 '*'{ respond view, [status: OK] }
             }

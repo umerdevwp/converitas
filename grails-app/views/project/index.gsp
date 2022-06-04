@@ -314,15 +314,13 @@
         </div>
         %{-- Modal End --}%
 
-
-
-    <!--Create View Modal-->
+    <!--Create Lens Modal-->
         %{-- Modal Start --}%
         <div class="modal fade" id="create-view" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createModalLabel">Create View</h5>
+                        <h5 class="modal-title" id="createModalLabel">Create Lens</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                         </button>
@@ -356,7 +354,6 @@
             // import "/assets/vis-timeline-graph2d.min.js";
             // import "/assets/vis-network.min.js";
 
-            const refreshInterval = 60000;
             let pageURL = '';
 
             $( document ).ready(() => {

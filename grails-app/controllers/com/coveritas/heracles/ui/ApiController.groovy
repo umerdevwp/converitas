@@ -49,7 +49,8 @@ class ApiController {
     def contentForProject(long id) {
         call {
             User u = User.get(session['userID'] as long)
-            apiService.contentForProject(u, Project.get(id).uuid)
+            View view = params.viewId?View.get(params.viewId as long):null
+            apiService.contentForProject(u, Project.get(id).uuid, view)
         }
     }
 
