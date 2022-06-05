@@ -13,7 +13,8 @@
             padding-top: 25px;
         }
         
-        #companies { padding-bottom: px; }
+        #companies { min-height: 655px; }
+        #show-view { min-height: 350px;}
         .home-nav { display: none;}
 
         .vis-item .vis-item-content {
@@ -49,7 +50,7 @@
             background: #FFF;
             padding-top: 40px;
         }
-        .tabs .buttons { 
+        .tabs .showButtons { 
             padding:5px 10px !important;
         }
         .material-icons.md-18 { font-size: 18px;}
@@ -144,6 +145,45 @@
         text-decoration: none;
         display: block;
         }
+        #addCompanyToView form {
+            background: #f1f6fb;
+        }
+
+        #addCompanyToView label {
+            display: inline;
+        }
+
+        .sub-company {
+            width:400px;
+            height:30px;
+            background-color: transparent;
+            margin-top: 20px;
+            margin-left: 88px;
+        }
+
+        #addButton {
+            background-color: #f59423;
+            border: none;
+            color: white;
+            padding: 4px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            margin-left: 88px;            
+        }
+
+        a.edit {
+            background-color: #fcfcfc;
+            border: 1px solid #cccccc;
+            font-size: 1em;
+            padding: 0.4em 0.6em;
+        }
+        #show-view input {
+            cursor: pointer
+        }
 
         /* Change color of dropdown links on hover */
         .dropdown-content a:hover {background-color: #ddd}
@@ -181,9 +221,9 @@
                 <h2>Company Association</h2>
                 <td style="width:50%; padding-left: 5px; max-height:600px; border: solid 1px #ccc">
                     <%-- <div class="tabs">
-                        <button class="buttons selectedTab" onclick="loadGraphData(2)">Tracking</button>
-                        <button class="buttons" onclick="loadGraphData(1)">Surfaced</button>
-                        <button class="buttons" onclick="loadGraphData(0)">Watched</button>
+                        <button class="showButtons selectedTab" onclick="loadGraphData(2)">Tracking</button>
+                        <button class="showButtons" onclick="loadGraphData(1)">Surfaced</button>
+                        <button class="showButtons" onclick="loadGraphData(0)">Watched</button>
                     </div> --%>
                     <%-- <h2 class="modeHeading"><span id="mode"></span> Companies</h2> --%>
                     <div class="spinnerWrapper hide">
@@ -285,6 +325,13 @@
         <div id="show-view" class="content scaffold-show" role="main">
             <g:set var="u" value="${User.get(session["userID"])}"/>
             <g:if test="${u.organization==project.organization||u.isSysAdmin()}">
+                <g:form resource="${this.view}" method="DELETE">
+                    <fieldset class="">
+                        <g:link class="edit" action="edit" resource="${this.view}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
+                        <input class="edit" id="addCompany" type="button" value="Add Company"/>
+                        <input class="delete" type="submit" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                    </fieldset>
+                </g:form>
                 <div id="addCompanyToView" style="display: none">
                     <g:form method="POST" url="/view/addCompany">
                         <fieldset class="form">
@@ -299,7 +346,7 @@
                                 <div style="display:inline-block;width:150px;background-color: transparent">
                                     <input type="hidden" id="companyUUID" name="companyUUID"/>
                                 </div>
-                                <div style="width:400px;height:30px;background-color: transparent">
+                                <div class="sub-company">
                                     <select class="form-control list-group" id="companyOptions" style="display:none">
                                     </select>
                                 </div>
@@ -316,18 +363,11 @@
                            </div>
                             --}%
                         </fieldset>
-                        <fieldset class="buttons">
+                        <fieldset class="showButtons">
                             <button style="display: none" class="save" type="submit" id="addButton">Add Company</button>
                         </fieldset>
                     </g:form>
                 </div>
-                <g:form resource="${this.view}" method="DELETE">
-                    <fieldset class="buttons">
-                        <g:link class="edit" action="edit" resource="${this.view}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
-                        <input class="edit" id="addCompany" type="button" value="Add Company"/>
-                        <input class="delete" type="submit" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-                    </fieldset>
-                </g:form>
             </g:if>
         </div>
         %{-- Modal Start --}%
@@ -485,8 +525,8 @@
         import "/assets/vis-network.min.js";
 
         setTimeout(() => {
-            $('.tabs .buttons').on('click', function(e) {
-                $('.tabs .buttons').removeClass('selectedTab');
+            $('.tabs .showButtons').on('click', function(e) {
+                $('.tabs .showButtons').removeClass('selectedTab');
                 $(this).addClass('selectedTab');
             });
         }, 2000 );
@@ -602,10 +642,10 @@
                             // for (const company of companies) {
                             for (let i = 0; i < len; i++) {
                                 const company = companies[i];
-                                if (i >= 10) {
-                                    companyList += '<a>(+)</a>';
-                                    break;
-                                }
+                                // if (i >= 10) {
+                                //     companyList += '<a>(+)</a>';
+                                //     break;
+                                // }
                                 //<a onclick="loadProjectContent(\'' + node.id + '\')" style="text-decoration: none">
                                 companyList += '<li><a class="loadcompany" id="load_' + company.uuid + '">' + company.name + '</a></li>';
                             }
@@ -752,7 +792,7 @@
                     $("#btn4item").hide()
                     Object.keys(data).map(function(head) {
                         i++;
-                        console.log( "buttons:"+head)
+                        console.log( "showButtons:"+head)
                         const content = data[head];
                         console.log(content)
                         let $button = $('#button'+i);
@@ -956,7 +996,7 @@
         setInterval(
             function() {
                 if (now === null)
-                    $('.buttons.selectedTab').click();
+                    $('.showButtons.selectedTab').click();
             }, refreshInterval);
 
         //#############################################   E N D   G R A P H   ##########################################
