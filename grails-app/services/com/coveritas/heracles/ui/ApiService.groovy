@@ -159,13 +159,23 @@ class ApiService {
     }
 
     Set<CompanyViewObject> remoteViewCompanies(long lvId, long userId) {
-        ViewReq viewReq = new ViewReq(lv, user)
+        ViewReq viewReq = new ViewReq(View.get(lvId), User.get(userId))
         rvcCache.get(viewReq).resp
     }
 
     ViewResp remoteViewCompaniesWithRadar(long lvId, long userId) {
         ViewReq viewReq = new ViewReq(lvId, userId)
         rvcCache.get(viewReq)
+    }
+
+    List<Map> getLatestRelevantArticles(int max) {
+        Set<String> trackedCoUUIDs =[]
+        for (ViewReq viewReq in rvcCache.asMap().keySet()) {
+            List<String> vCoUuids = rvcCache.get(viewReq).resp.findAll { CompanyViewObject cvo -> cvo.level == CompanyViewObject.TRACKING }*.companyUUID
+            trackedCoUUIDs.addAll(vCoUuids)
+        }
+        List<Map> articles = httpClientService.postParamsExpectResult('article/relevant', [uuids:trackedCoUUIDs, max:10], true) as List<Map>
+        articles.each{Map a -> a.time=format.format(new Date(a.contentTs as long))}
     }
 
     void updateRvcCache(Long viewId) {

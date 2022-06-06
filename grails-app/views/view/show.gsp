@@ -468,7 +468,7 @@
                                 <select name="color.id" id="color">
                                     <option value="">-Choose your color-</option>
                                     <g:each in="${com.coveritas.heracles.ui.Color.list()}" var="color">
-                                        <g:if test="${color.id==project.color.id}">
+                                        <g:if test="${color.id==(project.color?.id?:-1)}">
                                             <option selected="selected" value="${color.id}" style="background-color: ${color.code} !important" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>
                                         </g:if>
                                         <g:else>

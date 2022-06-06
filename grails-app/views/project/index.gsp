@@ -241,26 +241,13 @@
                                 <span class="section-title">NEW INSIGHTS</span>
                             </li>
                             %{-- todo fill in latest 10 insights --}%
-                            <li>
-                                <span>03:05:01 05/17/2022</span>
-                                <h3>Apple Inc. article</h3>
-                                <p>Meta halts plans to build a large data center in the Netherlands, amid rising opposition from the government over environmental concerns (April Roach/Bloomberg)</p>
-                            </li>
-                            <li>
-                                <span>03:05:01 05/17/2022</span>
-                                <h3>Nintendo Switch Looper</h3>
-                                <p></p>
-                            </li>
-                            <li>
-                                <span>03:05:01 05/17/2022</span>
-                                <h3>Apple Inc. article</h3>
-                                <p>The Zacks Analyst Blog Highlights Apple,  The Proctor & Gamble, Chevron, Novo Nordisk and Canadian Natural Resources Limited</p>
-                            </li>
-                            <li>
-                                <span>03:05:00 05/17/2022</span>
-                                <h3>Apple Inc. article</h3>
-                                <p>Flagship Apple Store in Toronto in Jeopardy Due to Legal Battle - Mac Rumors</p>
-                            </li>
+                            <g:each in="${articles}" var="a">
+                                <li>
+                                    <span>${a.time}</span>
+                                    <h3>${a.title}</h3>
+                                    <p><a href="${a.source}" target="_blank" rel="noopener noreferrer">${a.content.substring(0,160)}</a></p>
+                                </li>
+                            </g:each>
                         </ul>
                     </div>
                 </div>
