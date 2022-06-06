@@ -245,7 +245,7 @@
                                 <li>
                                     <span>${a.time}</span>
                                     <h3>${a.title}</h3>
-                                    <p><a href="${a.source}" target="_blank" rel="noopener noreferrer">${a.content.substring(0,160)}</a></p>
+                                    <p><a href="${a.source}" target="_blank" rel="noopener noreferrer">${a.content.substring(0,200)}...</a></p>
                                 </li>
                             </g:each>
                         </ul>
