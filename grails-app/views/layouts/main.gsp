@@ -23,6 +23,9 @@
         margin-left: 115px;
         padding-top: 10px;
     }
+    .navbar-brand img {
+        background: #FFF;
+    }
     /* .navbar {
         padding: 0;
     } */
@@ -32,7 +35,7 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark navbar-static-top" role="navigation" >
-    <a class="navbar-brand" href="/project/index"><asset:image width="88px" src="coveritas.svg"
+    <a class="navbar-brand" href="/project/index"><asset:image width="68px" src="coveritas.svg"
                                                                     alt="Coveritas Logo"/></a>
                                                                 
     <span class="client-logo"><asset:image class="sap-logo" width="75px" src="SAP_logo.png" alt="SAP Logo"/></span>
@@ -51,7 +54,30 @@
 
     <div class="collapse navbar-collapse" aria-expanded="false" style="height: 0.8px;" id="navbarContent">
     
+
+
+
         <ul class="nav navbar-nav ml-auto" style="color: white">
+
+
+                <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+                <g:set var="u" value="${User.get(session["userID"])}"/>
+                    <g:if test="${u!=null}">
+                        <%-- <li><a href="/project/index">Projects</a></li> --%>
+                        <li><a href="#" class="dropbtn">Projects</a></li>
+                        
+                        <g:if test="${u.isAdmin()}">
+                            <li><a href="/user/index">Users</a></li>
+                            <g:if test="${u.isAdmin()}">
+                            <%-- <li><a href="/organization/index">Organizations</a></li> --%>
+                            </g:if>
+                        </g:if>
+                    
+                    </g:if>
+                    <g:else>
+                        
+                    </g:else>
+
             <g:pageProperty name="page.nav"/>
             <%-- <input type="text"  id="q" style="font-size: 10pt; width: 24em"></ul>&nbsp;
                 <a href="#" onclick="window.search()">
@@ -75,6 +101,8 @@
         <g:else>
             <a href="/auth/login">Login</a>
         </g:else>
+  
+
         </ul>
     </div>
 
@@ -82,27 +110,6 @@
 
 <g:set var="u" value="${User.get(session["userID"])}"/>
             <g:if test="${u!=null}">
-
-<nav class="sidebar-menu">
-    <ul>
-        <li class="logo"><a class="navbar-brand" href="/project/index"><asset:image width="88px" src="coveritas.svg" alt="Coveritas Logo"/></a></li>
-        <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-        <g:set var="u" value="${User.get(session["userID"])}"/>
-            <g:if test="${u!=null}">
-                <li><a href="/project/index">Projects</a></li>
-                <g:if test="${u.isAdmin()}">
-                    <li><a href="/user/index">Users</a></li>
-                    <g:if test="${u.isAdmin()}">
-                    <%-- <li><a href="/organization/index">Organizations</a></li> --%>
-                    </g:if>
-                </g:if>
-               
-            </g:if>
-            <g:else>
-                
-            </g:else>
-    </ul>
-</nav>
 
 
  </g:if>

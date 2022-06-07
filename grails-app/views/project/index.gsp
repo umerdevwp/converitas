@@ -155,7 +155,7 @@
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
 %{--            <f:table collection="${projectList}" />--}%
-            <table class="projectTable col-8 leftElement">
+            <table class="projectTable col-9 leftElement">
                 <thead>
                 <tr>
                     <g:sortableColumn property="name" title="Project Name" />
