@@ -26,9 +26,46 @@
     .navbar-brand img {
         background: #FFF;
     }
-    /* .navbar {
-        padding: 0;
-    } */
+/* Dropdown Button */
+
+/* Dropdown button on hover & focus */
+/* .dropbtn:hover, .dropbtn:focus {
+  background-color: #2980B9;
+} */
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown1 {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown1  .material-icons {
+    font-size: 14px;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content1 {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 999;
+}
+
+/* Links inside the dropdown */
+.dropdown-content1 a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content1 a:hover {background-color: #ddd}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
     </style>
 </head>
 
@@ -55,16 +92,35 @@
     <div class="collapse navbar-collapse" aria-expanded="false" style="height: 0.8px;" id="navbarContent">
     
 
-
+        <%-- <div class="dropdown1">
+        <button onclick="myFunction1()" class="dropbtn1">Dropdown</button>
+        <div id="myDropdown1" class="dropdown-content1">
+            <a href="#">Link 1</a>
+            <a href="#">Link 2</a>
+            <a href="#">Link 3</a>
+        </div>
+        </div> --%>
 
         <ul class="nav navbar-nav ml-auto" style="color: white">
+
 
 
                 <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
                 <g:set var="u" value="${User.get(session["userID"])}"/>
                     <g:if test="${u!=null}">
                         <%-- <li><a href="/project/index">Projects</a></li> --%>
-                        <li><a href="#" class="dropbtn">Projects</a></li>
+                        <li>                        
+                            <div class="dropdown1">
+                            <a onclick="myFunction1()" class="dropbtn1">Projects                                    
+                             <span class="material-icons" style="padding-top: 5px">keyboard_arrow_down</span>
+                            </a>
+                            <div id="myDropdown1" class="dropdown-content1">
+                                <a href="#">Link 1</a>
+                                <a href="#">Link 2</a>
+                                <a href="#">Link 3</a>
+                            </div>
+                            </div>                        
+                        </li>
                         
                         <g:if test="${u.isAdmin()}">
                             <li><a href="/user/index">Users</a></li>
@@ -120,14 +176,20 @@
 
 
 <script>
-/*
-    document.getElementById('q').addEventListener("keyup", function(event) {
-        if (event.keyCode === 13) {
-            event.preventDefault();
-            window.search();
-        }
-    });
-*/
+/* When the user clicks on the button, 
+toggle between hiding and showing the dropdown content */
+function myFunction1() {
+  document.getElementById("myDropdown1").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn1')) {
+      $('#myDropdown1').removeClass('show');
+
+  }
+} 
 </script>
 <g:layoutBody/>
 <div id="spinner" class="spinner" style="display:none;">
@@ -145,6 +207,7 @@
     if ($('.login.btn').length) {
         $('.navbar').css('display', 'none')
     }
+
 </script>
 </div>
 </body>

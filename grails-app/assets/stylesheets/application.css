@@ -264,9 +264,9 @@ thead th {
 .nav a {
   color: #FFF !important;
   font-size: 14px !important;
-  margin-right: 20px;
+  /* margin-right: 20px;
   border: solid 1px #FFF;
-  border-radius: 8px;            
+  border-radius: 8px;             */
 }
 
 .nav a:focus, .nav a:hover {
@@ -275,4 +275,10 @@ thead th {
 }
 .list-project h1 {
   margin-left: 5px;
+}
+#myDropdown1 a {
+  color: #333 !important;
+}
+#myDropdown1 { 
+  margin-top: 15px;
 }

@@ -91,6 +91,8 @@
         }
         .col-2.leftElement {
             margin-left: 75px;
+            height: 850px;
+            overflow-y: scroll;
         }
         .btn-primary {
             color: #fff;
