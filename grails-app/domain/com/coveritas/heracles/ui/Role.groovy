@@ -76,7 +76,11 @@ class Role {
 
     public String makeUsefulName(DomainClass domainObject) {
         String name = domainObject.class.name
-        name.substring(0,name.indexOf('$'))
+        int cut = name.indexOf('$')
+        if (cut>0){
+            name = name.substring(0,cut)
+        }
+        name
     }
 
     boolean isEntitled(Policy.Permission permission, DomainClass domainObject) {

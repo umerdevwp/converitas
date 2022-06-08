@@ -190,43 +190,27 @@ class BootStrap {
                     r.grandPermission(Policy.Permission.ADMIN, u.organization)
                 }
             }
-//            for (View v in View.list()) {
-//                if (v.users.isEmpty()) {
-//                    for (u in v.project.users) {
-//                        v.users.add(u)
-//                    }
-//                }
-//            }
-//            ApplicationContext ctx = Holders.grailsApplication.mainContext
-//            DataSource  ds = ctx.getBean(DataSource)
-//            Connection c = null
-//            try {
-//                c = ds.connection
-//                ResultSet rs = c.createStatement().executeQuery("""select relname from pg_class where relkind='S'""")
-//                boolean sequenceExists = false
-//                while (rs.next()) {
-//                    String seq = rs.getString("relname");
-//                    if (seq=="ma_view_users") {
-//                            sequenceExists = true
-//                            break
-//                        }
-//                    }
-//                    if (!sequenceExists) {
-//                        c.createStatement().executeUpdate("""
-//create table ma_view_users
-//(
-//    user_id bigint not null constraint fk_ma_view_users__user_id references ma_user,
-//    view_id bigint not null constraint fk_ma_view_users__view_id references ma_view,
-//    primary key (view_id, user_id)
-//);
-//alter table ma_view_users owner to postgres;
-//""")
-//                    }
-//                } finally {
-//                    if (c!=null) {
-//                        c.close()
-//                    }
-//                }
+            if (Policy.all.size()==1) {
+                ApplicationContext ctx = Holders.grailsApplication.mainContext
+                DataSource  ds = ctx.getBean(DataSource)
+                Connection c = null
+                try {
+                    c = ds.connection
+                    ResultSet rs = c.createStatement().executeQuery("""select user_id, project_id from ma_project_users""")
+                    while (rs.next()) {
+                        Project p = Project.get(rs.getLong("project_id"))
+                        User u = User.get(rs.getLong("user_id"))
+                        p.addUser(u)
+                        for (View v in p.getViews()) {
+                            v.addUser(u)
+                        }
+                    }
+                } finally {
+                    if (c!=null) {
+                        c.close()
+                    }
+                }
+            }
 //                ApiService apiService = ctx.getBean(ApiService)
 //                apiService.activateAllViews()
 //                Project.all.each { Project project ->

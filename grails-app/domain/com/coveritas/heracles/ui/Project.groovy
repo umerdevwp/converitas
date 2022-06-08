@@ -56,10 +56,14 @@ class Project {
     Set<User> addUser(User u) {
         getUsers()
         if (!users.contains(u)) {
-            users = withTransaction { status ->
-                Role r = Role.findOrCreateWhere(name: name, organization: organization)
+            withTransaction { status ->
+                Role r = withTransaction { status1 ->
+                    Role r = Role.findOrSaveByNameAndOrganization("read & comment project ${name}", organization)
+                    r.save(update: false, flush: true, failOnError: true)
+                    r
+                }
                 if (r.policies.isEmpty()) {
-                    r = r.save(update: false, flush: true, failOnError: true)
+//                    r =
                     r.grandPermission(Policy.Permission.READ, this)
                     r.grandPermission(Policy.Permission.ANNOTATE, this)
                 }
