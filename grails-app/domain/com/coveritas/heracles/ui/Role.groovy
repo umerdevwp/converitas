@@ -1,14 +1,19 @@
 package com.coveritas.heracles.ui
 
+import grails.artefact.DomainClass
+
+import javax.naming.NoPermissionException
+
 class Role {
     public final static String ADMIN = "Admin"
     public final static String USER = "User"
-    private static Role ADMIN_ROLE = null
     static hasMany = [users: User]
     static belongsTo = User
 
     Long id
     String name
+    Organization organization
+    private Set<Policy> policies = null
 
     static mapping = {
         table name: 'ma_role'
@@ -17,18 +22,29 @@ class Role {
 
     static constraints = {
         users lazy: false
+        organization nullable: true
     }
+
+    static transients = ['policies', 'admin']
 
     @Override
     public String toString() {
-        return "Role{name='" + name + "'}";
+        return "Role{name='" + this.name + "'}";
     }
 
-    static Role admin() {
-        if (ADMIN_ROLE==null) {
-            ADMIN_ROLE = findByName(Role.ADMIN)
+    private Boolean admin = null
+    boolean isAdmin(Organization org) {
+        if (admin==null){
+            admin = isEntitled(Policy.Permission.ADMIN, org)
         }
-        ADMIN_ROLE
+        admin
+    }
+
+    Set<Policy> getPolicies() {
+        if (policies==null) {
+            policies = Policy.findAllByRole(this)
+        }
+        policies
     }
 
     boolean equals(o) {
@@ -42,5 +58,39 @@ class Role {
 
     int hashCode() {
         return (id != null ? id.hashCode() : 0)
+    }
+
+    void grandPermission(Policy.Permission permission, DomainClass domainObject) {
+        if (domainObject!=null && !domainObject instanceof DomainClass) {
+            throw new NoPermissionException("No Permission to change permission "+type+" on object "+domainObject+". No domain object")
+        }
+        Policy policy = new Policy(role:this,
+                                   permission: permission,
+                                   type: (permission==Policy.Permission.ADMIN)?Policy.Type.Admin:Policy.Type.Object,
+                                   name: makeUsefulName(domainObject),
+                objIdentity: domainObject.id).save(update:false, flush:true, failOnError:true)
+        if (policies!=null) {
+            policies << policy
+        }
+    }
+
+    public String makeUsefulName(DomainClass domainObject) {
+        String name = domainObject.class.name
+        name.substring(0,name.indexOf('$'))
+    }
+
+    boolean isEntitled(Policy.Permission permission, DomainClass domainObject) {
+        if (domainObject!=null && !domainObject instanceof DomainClass) {
+            throw new NoPermissionException("No Permission to change permission "+type+" on object "+domainObject+". No domain object")
+        }
+        //todo check if entiled to set permission
+        if (domainObject.hasProperty('organization') && (domainObject.organization != null)) {
+            getPolicies().each{Policy p ->
+                (p.permission==Policy.Permission.ADMIN && domainObject.organization==organization) ||
+                (p.name=='*' || p.name==makeUsefulName(domainObject))&&(p.objIdentity==null||p.objIdentity==domainObject.id)&&p.permission==permission
+            }
+        } else {
+            true
+        }
     }
 }

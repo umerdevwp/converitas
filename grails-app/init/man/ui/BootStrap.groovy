@@ -3,9 +3,11 @@ package man.ui
 import com.coveritas.heracles.ui.ApiService
 import com.coveritas.heracles.ui.Color
 import com.coveritas.heracles.ui.Organization
+import com.coveritas.heracles.ui.Policy
 import com.coveritas.heracles.ui.Project
 import com.coveritas.heracles.ui.Role
 import com.coveritas.heracles.ui.User
+import com.coveritas.heracles.ui.View
 import grails.util.Holders
 import org.hibernate.dialect.Dialect
 import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver
@@ -177,90 +179,61 @@ class BootStrap {
                 Role adminRole = new Role(name: Role.ADMIN).save(failOnError: true)
                 new Role(name: Role.USER).save(failOnError: true)
                 User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, Color.get(8))
-            } else {
-                ApplicationContext ctx = Holders.grailsApplication.mainContext
-//                DataSource  ds = ctx.getBean(DataSource)
-//                Connection c = null
-//                try {
-//                    c = ds.connection
-//                    ResultSet rs = c.createStatement().executeQuery("""select relname from pg_class where relkind='S'""")
-//                    boolean sequenceExists = false
-//                    while (rs.next()) {
-//                        String seq = rs.getString("relname");
-//                        if (seq=="seq_id_color_pk") {
+            }
+            Role.findAllByOrganizationIsNull().each{Role r ->
+                r.organization = r.users[0].organization
+                r.save(failOnError:true)
+            }
+            if (Policy.list().isEmpty()) {
+                Role.findAllByName(Role.ADMIN).each {Role r ->
+                    User u = r.users[0]
+                    r.grandPermission(Policy.Permission.ADMIN, u.organization)
+                }
+            }
+//            for (View v in View.list()) {
+//                if (v.users.isEmpty()) {
+//                    for (u in v.project.users) {
+//                        v.users.add(u)
+//                    }
+//                }
+//            }
+//            ApplicationContext ctx = Holders.grailsApplication.mainContext
+//            DataSource  ds = ctx.getBean(DataSource)
+//            Connection c = null
+//            try {
+//                c = ds.connection
+//                ResultSet rs = c.createStatement().executeQuery("""select relname from pg_class where relkind='S'""")
+//                boolean sequenceExists = false
+//                while (rs.next()) {
+//                    String seq = rs.getString("relname");
+//                    if (seq=="ma_view_users") {
 //                            sequenceExists = true
 //                            break
 //                        }
 //                    }
 //                    if (!sequenceExists) {
 //                        c.createStatement().executeUpdate("""
-// create sequence IF NOT EXISTS man-ui.public.seq_id_color_pk start 1000 increment 1;
-// create sequence IF NOT EXISTS man-ui.public.seq_id_company_attribute_pk start 1000 increment 1;
-// create sequence IF NOT EXISTS man-ui.public.seq_id_company_pk start 1000 increment 1;
-// create sequence IF NOT EXISTS man-ui.public.seq_id_organization_pk start 1000 increment 1;
-// create sequence IF NOT EXISTS man-ui.public.seq_id_project_pk start 1000 increment 1;
-// create sequence IF NOT EXISTS man-ui.public.seq_id_role_pk start 1000 increment 1;
-// create sequence IF NOT EXISTS man-ui.public.seq_id_user_event_pk start 1000 increment 1;
-// create sequence IF NOT EXISTS man-ui.public.seq_id_user_pk start 1000 increment 1;
-// create sequence IF NOT EXISTS man-ui.public.seq_id_view_object_pk start 1000 increment 1;
-// create sequence IF NOT EXISTS man-ui.public.seq_id_view_pk start 1000 increment 1;
+//create table ma_view_users
+//(
+//    user_id bigint not null constraint fk_ma_view_users__user_id references ma_user,
+//    view_id bigint not null constraint fk_ma_view_users__view_id references ma_view,
+//    primary key (view_id, user_id)
+//);
+//alter table ma_view_users owner to postgres;
 //""")
-//                    } else {
-//                        ResultSet rs1 = c.createStatement().executeQuery("""SELECT nextval('seq_id_color_pk') as TOTAL;""")
-//                        int total = 0
-//                        while (rs1.next()) {
-//                            total = rs1.getInt("TOTAL");
-//                        }
-//                        if (total<1000) {
-//                            c.createStatement().executeUpdate( """
-//SELECT setval('"seq_id_color_pk"', 1000, false);
-//SELECT setval('"seq_id_company_attribute_pk"', 1000, false);
-//SELECT setval('"seq_id_company_pk"', 1000, false);
-//SELECT setval('"seq_id_organization_pk"', 1000, false);
-//SELECT setval('"seq_id_project_pk"', 1000, false);
-//SELECT setval('"seq_id_role_pk"', 1000, false);
-//SELECT setval('"seq_id_user_event_pk"', 1000, false);
-//SELECT setval('"seq_id_user_pk"', 1000, false);
-//SELECT setval('"seq_id_view_object_pk"', 1000, false);
-//SELECT setval('"seq_id_view_pk"', 1000, false);
-//""")
-//                        }
 //                    }
-//                        c.createStatement().executeUpdate("drop table if exists ma_company_attribute cascade;" )
-//                        c.createStatement().executeUpdate("create table if not exists ma_company_attribute (\n" +
-//                                "    id                bigint       not null\n" +
-//                                "        primary key,\n" +
-//                                "    version           bigint       not null,\n" +
-//                                "    uuid              varchar(255) not null\n" +
-//                                "        constraint uk_hbpbruwq9my2dkfcf601y9bj8\n" +
-//                                "            unique,\n" +
-//                                "    i_value           integer,\n" +
-//                                "    source            varchar(255) not null,\n" +
-//                                "    f_value           real,\n" +
-//                                "    company_id        bigint       not null\n" +
-//                                "        constraint fk6en661kyibxym7bybobnpaklb\n" +
-//                                "            references ma_company,\n" +
-//                                "    s_value           varchar(255),\n" +
-//                                "    type              varchar(255) not null,\n" +
-//                                "    company_uuid      varchar(255) not null,\n" +
-//                                "    short_description varchar(255)\n" +
-//                                ");\n" +
-//                                "\n" +
-//                                "alter table ma_company_attribute\n" +
-//                                "    owner to postgres;\n" +
-//                                "\n;" )
 //                } finally {
 //                    if (c!=null) {
 //                        c.close()
 //                    }
 //                }
-                ApiService apiService = ctx.getBean(ApiService)
-                apiService.activateAllViews()
-                Project.all.each { Project project ->
-                    if (project.users.isEmpty()) {
-                        project.users = User.findAllByOrganization(project.organization)
-                    }
-                }
+//                ApiService apiService = ctx.getBean(ApiService)
+//                apiService.activateAllViews()
+//                Project.all.each { Project project ->
+//                    if (project.users.isEmpty()) {
+//                        project.users = User.findAllByOrganization(project.organization)
+//                    }
+//                }
 //                BigInteger h = 0x00E9263726E15A04F4E2E26E96BFBECFD21EEB343E12E7F4CA8E7E1DA87B7583EC8E464B888D2CA630E5B8451AC14BDB7423879135CFC51FE471FE43101FA60EC7
 //                User a = User.get(1)
 //                BigInteger h2 = new BigInteger(a.passwordHash)
@@ -282,7 +255,6 @@ class BootStrap {
 //                        }
 //                    }
 //                }
-            }
         }
     }
     def destroy = {

@@ -1,12 +1,14 @@
 package com.coveritas.heracles.ui
 
+import grails.artefact.DomainClass
+
 import java.security.MessageDigest
+import java.security.Permission
 import java.security.SecureRandom
 
 class User {
     public static final String SYS_ADMIN_UUID = "asdjA12364SDUHADIh"
-    static hasMany = [roles:Role,projects:Project]
-    static belongsTo = [Project]
+    static hasMany = [roles:Role]
     Long id
     String uuid
     String name
@@ -14,7 +16,6 @@ class User {
     Color color
     byte[] passwordHash
     byte[] salt
-//    Organization organization
     Date created
     Date lastUpdated
 
@@ -33,7 +34,7 @@ class User {
         }
     }
 
-    static transients = ['lastLogin']
+    static transients = ['lastLogin','admin']
 
     static mapping = {
         table name: 'ma_user'
@@ -101,15 +102,25 @@ class User {
     }
 
     boolean isSysAdmin() {
-        return uuid== SYS_ADMIN_UUID
+        return uuid==SYS_ADMIN_UUID
     }
 
+    private Long admin = null
     boolean isAdmin(Organization o) {
-        return isAdmin() && this.organization.id == o.id
+        if (organization.id == o.id) {
+            if (admin == null) {
+                if (roles.find { Role r -> r.isAdmin(o) } != null) {
+                    admin == o.id
+                }
+            } else {
+                admin = -1
+            }
+        }
+        admin == o.id
     }
 
     boolean isAdmin() {
-        return roles.contains(Role.admin())
+        isSysAdmin()||isAdmin(organization)
     }
 
     Long lastLogin = null
@@ -119,5 +130,9 @@ class User {
             lastLogin = (lastLogins.size() > 1) ? lastLogins.get(1).ts : 0L
         }
         lastLogin
+    }
+
+    boolean isEntitled(Policy.Permission permission, DomainClass object) {
+        return isAdmin(object.organization)||roles.any {Role r -> r.isEntitled(permission, object)}
     }
 }

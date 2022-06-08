@@ -421,9 +421,16 @@
                                 <label for="name">Name<span class="required-indicator">*</span></label>
                                 <input type="text" name="name" value="${view.name}" required="">
                             </div>
+%{--
                             <div class="fieldcontain required">
                                 <label for="description">Description<span class="required-indicator">*</span></label>
                                 <input type="text" name="description" value="${view.description}" required="">
+                            </div>
+--}%
+                            <div class="fieldcontain required">
+                                <label for="description">Description<span class="required-indicator">*</span>
+                                </label>
+                                <textarea name="description" value="" required="" cols="40" rows="5" id="description">${view.description}</textarea>
                             </div>
                         </fieldset>
                     </div>
@@ -460,9 +467,16 @@
                                 <input type="text" name="name" value="${project.name}" required="">
                             </div>
                             <div class="fieldcontain required">
+                                <label for="description">Description<span class="required-indicator">*</span>
+                                </label>
+                                <textarea name="description" value="" required="" cols="40" rows="5">${project.description}</textarea>
+                            </div>
+%{--
+                            <div class="fieldcontain required">
                                 <label for="description">Description<span class="required-indicator">*</span></label>
                                 <input type="text" name="description" value="${project.description}" required="">
                             </div>
+--}%
                             <div class="fieldcontain required">
                                 <label for="color.id">Color</label>
                                 <select name="color.id" id="color">

@@ -20,4 +20,13 @@ class ViewObject {
         projectUUID nullable: false
         view nullable: true  // only in case of annotations on project level (no view)
     }
+
+    static transients = ['organization']
+    private Organization organization = null
+    Organization getOrganization() {
+        if (organization==null) {
+            organization = organizationUUID!=null?Organization.findByUuid(organizationUUID):null
+        }
+        organization
+    }
 }

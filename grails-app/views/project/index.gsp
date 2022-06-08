@@ -135,7 +135,7 @@
 
         <div>
         <%-- <div class="btn btn-primary" style="margin-left: 20px;margin-top: 45px;">
-        
+
                 <g:link class="create" action="create">
                     <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
                     <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;"><g:message code="default.new.label" args="[entityName]" /></span>
@@ -146,7 +146,7 @@
                 <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
                 <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;"><g:message code="default.new.label" args="[entityName]" /></span>
             </g:link>
-        </div>         
+        </div>
         </div>
         <div id="list-project" class="content scaffold-list" role="main">
             <%-- <div class="col-8" style="display: block;float: left;"><h1><g:message code="default.list.label" args="[entityName]" /></h1></div>
@@ -322,8 +322,9 @@
                                     <input type="text" name="name" value="" required="">
                                 </div>
                                 <div class="fieldcontain required">
-                                    <label for="description">Description<span class="required-indicator">*</span></label>
-                                    <input type="text" name="description" value="" required="">
+                                    <label for="description">Description<span class="required-indicator">*</span>
+                                    </label>
+                                    <textarea name="description" value="" required="" cols="40" rows="5"></textarea>
                                 </div>
                             </fieldset>
                         </div>

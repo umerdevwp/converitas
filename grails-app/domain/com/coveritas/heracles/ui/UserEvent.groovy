@@ -22,4 +22,13 @@ class UserEvent {
         table name: 'ma_user_event'
         id generator : 'sequence', params:[sequence:'seq_id_user_event_pk']
     }
+
+    static transients = ['organization']
+    private Organization organization = null
+    Organization getOrganization() {
+        if (organization==null) {
+            organization = user.organization
+        }
+        organization
+    }
 }

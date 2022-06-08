@@ -20,6 +20,15 @@ class Annotation extends ViewObject {
         ts              nullable:true
     }
 
+    static transients = ['organization']
+    private Organization organization = null
+    Organization getOrganization() {
+        if (organization==null) {
+            organization = user.organization
+        }
+        organization
+    }
+
     @Override
     String toString() {
         return "$title" /*((annotatedVO==null)?"":" note for '${annotatedVO}'")*/

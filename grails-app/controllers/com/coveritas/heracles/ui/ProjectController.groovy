@@ -24,7 +24,16 @@ class ProjectController {
     }
 
     def show(Long id) {
-        respond projectService.get(id)
+        Project.withTransaction { status ->
+            Project project = projectService.get(id)
+            Map<Long, Set<User>> viewUsers = [:]
+            Set<View> views = []
+            project.views.each { View v ->
+                views << View.get(v.id)
+                viewUsers.put(v.id, v.users)
+            }
+            respond project, model: [articles:apiService.getLatestRelevantArticles(10)]
+        }
     }
 
     def create() {

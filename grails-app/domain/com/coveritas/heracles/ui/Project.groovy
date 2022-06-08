@@ -1,5 +1,7 @@
 package com.coveritas.heracles.ui
 
+import grails.artefact.DomainClass
+
 class Project {
     String uuid                 // View ID in backend
     String name
@@ -7,8 +9,9 @@ class Project {
     Organization organization
     Color color
 //    static belongsTo = [organization:Organization]
-    static hasMany = [views:View, users:User]
-    static fetchMode = [views: 'eager', user: 'eager']
+    static hasMany = [views:View]
+    static fetchMode = [views: 'eager']
+    private Set<User> users = null
 
     @Override
     String toString() { name }
@@ -21,9 +24,10 @@ class Project {
     static constraints = {
         uuid nullable: false, blank: false, unique: true
         name nullable: false, unique: ['organization']
-        users lazy: false
         color nullable: true
     }
+
+    static transients = ['users']
 
     boolean equals(o) {
         if (this.is(o)) return true
@@ -38,5 +42,31 @@ class Project {
 
     int hashCode() {
         return (uuid != null ? uuid.hashCode() : 0)
+    }
+
+    Set<User> getUsers() {
+        if (users==null) {
+            users = withTransaction { status ->
+                User.findAllByOrganization(organization).findAll { User u -> u.isEntitled(Policy.Permission.READ, this) }
+            }
+        }
+        users
+    }
+
+    Set<User> addUser(User u) {
+        getUsers()
+        if (!users.contains(u)) {
+            users = withTransaction { status ->
+                Role r = Role.findOrCreateWhere(name: name, organization: organization)
+                if (r.policies.isEmpty()) {
+                    r = r.save(update: false, flush: true, failOnError: true)
+                    r.grandPermission(Policy.Permission.READ, this)
+                    r.grandPermission(Policy.Permission.ANNOTATE, this)
+                }
+                users.add(u)
+//                u.addProject(this)
+            }
+        }
+        users
     }
 }

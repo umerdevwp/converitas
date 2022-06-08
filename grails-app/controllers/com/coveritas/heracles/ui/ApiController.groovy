@@ -50,7 +50,8 @@ class ApiController {
         call {
             User u = User.get(session['userID'] as long)
             View view = params.viewId?View.get(params.viewId as long):null
-            apiService.contentForProject(u, Project.get(id).uuid, view)
+            def x = apiService.contentForProject(u, Project.get(id).uuid, view)
+            x
         }
     }
 
@@ -95,7 +96,9 @@ class ApiController {
     def activecompanygraph( long viewId, @Nullable Long ts, @Nullable Long from, @Nullable Long to) {
         call {
             ///view/graph/org-uuid/user-uuid/project-uuid/view-uuid
-            apiService.newGraph(User.get(session['userID'] as long), View.get(viewId), from, to, null)
+            User user = User.get(session['userID'] as long)
+            View view = View.get(viewId)
+            apiService.newGraph(user, view, from, to, null)
         }
     }
 

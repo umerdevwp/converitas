@@ -16,6 +16,7 @@ class View {
     Set<Annotation> annotations = []
     Set<CompanyViewObject> companyViewObjects = []
     Set<ViewObject> viewObjects = []
+    private Set<User> users = null
 
     def onLoad(){
         viewObjects = ViewObject.findAllByView(this) as Set
@@ -73,7 +74,7 @@ class View {
         name nullable: false, unique: ['project']
     }
 
-    static transients = ['companies', 'viewObjects', 'companyViewObjects', 'annotations', 'projUUID']
+    static transients = ['companies', 'viewObjects', 'companyViewObjects', 'annotations', 'projUUID', 'users', 'organization']
 
     @Override
     String toString() { name }
@@ -120,5 +121,39 @@ class View {
         Map events = httpClientService.getParamsExpectMap("eve/count/view/${this.uuid}", null, true)
 
         events.count as long
+    }
+
+    private Organization organization = null
+    Organization getOrganization() {
+        if (organization==null) {
+            organization = project.organization
+        }
+        organization
+    }
+
+    Set<User> getUsers() {
+        if (users==null) {
+            users = withTransaction { status ->
+                User.findAllByOrganization(project.organization).findAll { User u -> u.isEntitled(Policy.Permission.READ, this) }
+            }
+        }
+        users
+    }
+
+    Set<User> addUser(User u) {
+        getUsers()
+        if (!users.contains(u)) {
+            withTransaction { status ->
+                Role r = Role.findOrCreateWhere(name: name, organization: project.organization)
+                if (r.policies.isEmpty()) {
+                    r = r.save(update: false, flush: true, failOnError: true)
+                    r.grandPermission(Policy.Permission.READ, this)
+                    r.grandPermission(Policy.Permission.ANNOTATE, this)
+                }
+                users.add(u)
+//                u.addView(this)
+            }
+        }
+        users
     }
 }
