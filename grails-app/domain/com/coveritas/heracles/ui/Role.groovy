@@ -68,7 +68,8 @@ class Role {
                                    permission: permission,
                                    type: (permission==Policy.Permission.ADMIN)?Policy.Type.Admin:Policy.Type.Object,
                                    name: makeUsefulName(domainObject),
-                objIdentity: domainObject.id).save(update:false, flush:true, failOnError:true)
+                                   objIdentity: domainObject.id
+        ).save(update:false, flush:true, failOnError:true)
         if (policies!=null) {
             policies << policy
         }
@@ -89,9 +90,9 @@ class Role {
         }
         //todo check if entiled to set permission
         if (domainObject.hasProperty('organization') && (domainObject.organization != null)) {
-            getPolicies().each{Policy p ->
+            getPolicies().any{Policy p ->
                 (p.permission==Policy.Permission.ADMIN && domainObject.organization==organization) ||
-                (p.name=='*' || p.name==makeUsefulName(domainObject))&&(p.objIdentity==null||p.objIdentity==domainObject.id)&&p.permission==permission
+                        ((p.name=='*' || p.name==makeUsefulName(domainObject))&&(p.objIdentity==null||p.objIdentity==domainObject.id)&&p.permission==permission)
             }
         } else {
             true

@@ -197,12 +197,18 @@ class BootStrap {
                 try {
                     c = ds.connection
                     ResultSet rs = c.createStatement().executeQuery("""select user_id, project_id from ma_project_users""")
+                    Map<Project,Set<User>> pu = [:]
                     while (rs.next()) {
                         Project p = Project.get(rs.getLong("project_id"))
-                        User u = User.get(rs.getLong("user_id"))
-                        p.addUser(u)
-                        for (View v in p.getViews()) {
-                            v.addUser(u)
+                        Set<User> users = pu.computeIfAbsent(p, {Project p1-> new LinkedHashSet<User>()})
+                        users.add(User.get(rs.getLong("user_id")))
+                    }
+                    for (Project p in pu.keySet()){
+                        for (User u in pu.get(p)) {
+                            p.addUser(u)
+                            for (View v in p.getViews()) {
+                                v.addUser(u)
+                            }
                         }
                     }
                 } finally {

@@ -63,12 +63,13 @@ class Project {
                     r
                 }
                 if (r.policies.isEmpty()) {
-//                    r =
                     r.grandPermission(Policy.Permission.READ, this)
                     r.grandPermission(Policy.Permission.ANNOTATE, this)
                 }
                 users.add(u)
 //                u.addProject(this)
+                u.roles.add(r)
+                u.save(update: false, flush: true, failOnError: true)
             }
         }
         users

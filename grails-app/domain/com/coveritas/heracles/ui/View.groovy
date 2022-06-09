@@ -145,18 +145,16 @@ class View {
         if (!users.contains(u)) {
             withTransaction { status ->
                 Role r = withTransaction { status1 ->
-                    Role r = Role.findOrSaveByNameAndOrganization("read & comment view ${name}", organization)
+                    Role r = Role.findOrSaveByNameAndOrganization("read & comment project ${project.name} > view ${name}", organization)
                     r.save(update: false, flush: true, failOnError: true)
                     r
                 }
                 if (r.policies.isEmpty()) {
-//                    r =
                     r.grandPermission(Policy.Permission.READ, this)
                     r.grandPermission(Policy.Permission.ANNOTATE, this)
                 }
-                u.roles << r
-                u.save()
-                users.add(u)
+                u.roles.add(r)
+                u.save(update: false, flush: true, failOnError: true)
 //                u.addProject(this)
             }
         }
