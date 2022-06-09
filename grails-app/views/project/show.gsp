@@ -62,9 +62,9 @@
             line-height: 1.2;
         }
         .leftElement { float: left;}
-        .table-scrollbar.insight-section {
+        /* .table-scrollbar.insight-section {
             height: 100%;
-        }
+        } */
         .material-icons.md-48 { font-size: 48px; }
         .section-title,
         .icon-section {
@@ -104,6 +104,16 @@
         #list-project {
             padding-top: 40px;
         }
+        #show-project .col-2.leftElement {
+            margin-top: 175px;
+        }
+        #show-project .col-4.leftElement form {
+            display: inline;
+            padding-left: 15px;
+        }
+        .material-icons {
+            cursor: pointer;
+        }
 
         </style>
     </head>
@@ -111,9 +121,19 @@
         <div id="show-project" class="content scaffold-list" role="main">
         <g:set var="u" value="${User.get(session["userID"])}"/>
         <g:if test="${u.organization==project.organization||u.isSysAdmin()}">
-            <div class="col-8 leftElement">
-                <div class="col-3 leftElement">
-                    <h1>${entityName} ${project.name}</h1>
+            <div class="col-9 leftElement">
+                <div class="col-4 leftElement">
+                    <h1>
+                        ${entityName} ${project.name}
+                        <g:form resource="${this.project}" method="DELETE">
+                             <i class="material-icons md-18 skyblue">
+                                <g:link class="edit" action="edit" resource="${this.project}">
+                                mode_edit_outline
+                                </g:link>
+                            </i>                                
+                            <span class="material-icons"><a class="delete">delete</a></span>
+                        </g:form>                    
+                    </h1>                 
                     <div class="btn btn-primary" style="margin-left: 5px;margin-top: 30px;margin-bottom: 30px;">
                         <g:link class="create" data-toggle="modal" data-target="#createModal">
                             <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
@@ -178,13 +198,6 @@
                     </g:each>
                     </tbody>
                 </table>
-
-            <g:form resource="${this.project}" method="DELETE">
-                <fieldset class="buttons">
-                    <g:link class="edit" action="edit" resource="${this.project}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
-                    <input class="delete" type="submit" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-                </fieldset>
-            </g:form>
             </div>
             <div class="col-2 leftElement">
                 <div class="table-wrapper-scroll-y table-scrollbar insight-section">
@@ -213,5 +226,13 @@
                 UNAUTHORIZED ACCESS
             </g:else>
         </div>
+
+        <script type="module">
+        $('.delete').on('click', function(){
+            if (confirm('Are you sure?')){
+                $(this).submit();     
+            };
+        });
+        </script>
     </body>
 </html>

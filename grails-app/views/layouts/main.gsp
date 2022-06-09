@@ -20,11 +20,13 @@
     <style>
     .client-logo {
         z-index: 999;
-        margin-left: 115px;
         padding-top: 10px;
     }
     .navbar-brand img {
         background: #FFF;
+    }
+    .nav.navbar-nav.ml-auto {
+        margin-right: 20px;
     }
 /* Dropdown Button */
 
@@ -66,6 +68,10 @@
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {display:block;}
+.projectTable .table-scrollbar.insight-section {
+    height: 350px;
+    overflow-y: scroll;
+}
     </style>
 </head>
 
@@ -139,17 +145,14 @@
                 <a href="#" onclick="window.search()">
                     <asset:image width="28px" height="28px" src="feather_search.svg" />
                 </a> --%>
-         &nbsp;&nbsp;&nbsp;
          <g:set var="u" value="${User.get(session["userID"])}"/>
          <g:if test="${u!=null}">
             <!-- <a href="/project/index">Projects</a> -->
-             &nbsp;&nbsp;&nbsp;
              <g:if test="${u.isAdmin()}">
               <!--   <a href="/user/index">Users</a> -->
-                &nbsp;&nbsp;&nbsp;
+
                 <g:if test="${u.isAdmin()}">
                <!--    <a href="/organization/index">Organizations</a> -->
-                  &nbsp;&nbsp;&nbsp;
                 </g:if>
             </g:if>
             <a href="/auth/logout">Logout ${u.name}</a>

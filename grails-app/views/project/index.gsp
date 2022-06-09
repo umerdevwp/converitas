@@ -91,7 +91,7 @@
         }
         .col-2.leftElement {
             margin-left: 75px;
-            height: 850px;
+            height: 650px;
             overflow-y: scroll;
         }
         .btn-primary {
