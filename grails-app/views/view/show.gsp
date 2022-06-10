@@ -717,7 +717,7 @@
                 const c = content[i];
                 html+= '  <tr  style="height: auto">\n'+
                     '    <td>'+ (i===0?"<h3>":"") + c+
-                    "<a data-toggle=\"modal\" data-target=\"#editProjectModal\"><i class=\"material-icons md-18 skyblue\">mode_edit_outline</i></a>" +
+                    "<a data-toggle=\"modal\" data-target=\"#editProjectModal\" style=\"cursor: pointer;\"><i class=\"material-icons md-18 skyblue\">mode_edit_outline</i></a>" +
                     (i===0?" Project</h3>":"") +'</td>\n'+
                     '  </tr>\n';
             }
@@ -728,7 +728,7 @@
                 const c = content[i];
                 html+= '  <tr  style="height: auto">\n'+
                     '    <td>'+ (i===2?"<h3>":"") + c +
-                    "<a data-toggle=\"modal\" data-target=\"#editLensModal\"><i class=\"material-icons md-18 skyblue\">mode_edit_outline</i></a>" +
+                    "<a data-toggle=\"modal\" data-target=\"#editLensModal\" style=\"cursor: pointer;\"><i class=\"material-icons md-18 skyblue\">mode_edit_outline</i></a>" +
                     (i===2?'Lens</h3>':'') +'</td>\n'+
                     // <div data-v-63f07fb9="" draggable="true" class="app-icon grid-icon__icon is-m_outlined"><img alt="Edit icon" srcset="https://img.icons8.com/material-outlined/2x/edit.png 2x" style="filter: invert(0%) sepia(0%) saturate(7470%) hue-rotate(193deg) brightness(95%) contrast(106%);"> <!----></div>
                     '  </tr>\n';

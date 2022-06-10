@@ -214,9 +214,11 @@
                     <div class="news-insight-item">
                         <ul class="">
                             <li>
+%{--
                                 <span class="material-icons md-48 icon-section">
                                     view_list
                                 </span>
+--}%
                                 <span class="section-title">NEW INSIGHTS</span>
                             </li>
                             %{-- todo fill in latest 10 insights --}%

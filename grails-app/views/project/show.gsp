@@ -123,15 +123,20 @@
         <g:if test="${u.organization==project.organization||u.isSysAdmin()}">
             <div class="col-9 leftElement">
                 <div class="col-4 leftElement">
+                    <span>
                     <h1>
-                        ${entityName} ${project.name}
-                             <i class="material-icons md-18 skyblue">
-                                <g:link class="edit" action="edit" resource="${this.project}">
-                                mode_edit_outline
-                                </g:link>
-                            </i>                                
-                            <span class="material-icons"><a class="delete">delete</a></span>
+                        Project ${project.name}
                     </h1>
+                    </span>
+                    <span style="cursor: pointer;float:top; z-index: 1000">
+                        <g:link class="edit" action="edit" resource="${this.project} ">
+                            <i class="material-icons md-18 skyblue">
+                                mode_edit_outline
+                            </i>
+                        </g:link>
+                        <a class="delete"><span class="material-icons">delete</span></a>
+                    </span>
+
                     <div class="btn btn-primary" style="margin-left: 5px;margin-top: 30px;margin-bottom: 30px;">
                         <g:link class="create" data-toggle="modal" data-target="#create-view">
                             <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
@@ -196,9 +201,11 @@
                     <div class="news-insight-item">
                         <ul class="">
                             <li>
+%{--
                                 <span class="material-icons md-48 icon-section">
                                     view_list
                                 </span>
+--}%
                                 <span class="section-title">NEW INSIGHTS</span>
                             </li>
                         %{-- todo fill in latest 10 insights --}%
