@@ -197,7 +197,7 @@ class View {
     void deleteCascaded(){
         withTransaction {
             Role.deleteAllForDomainClass(this)
-            ViewObject.findAllByView(this)*.delete()
+            ViewObject.findAllByView(this)*.deleteCascaded()
             delete()
         }
     }
