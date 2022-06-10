@@ -29,4 +29,11 @@ class ViewObject {
         }
         organization
     }
+
+    void deleteCascaded(){
+        withTransaction {
+            Annotation.findAllByAnnotatedVO(this)*.deleteCascaded()
+            delete()
+        }
+    }
 }

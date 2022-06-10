@@ -190,12 +190,12 @@ class BootStrap {
                     r.grandPermission(Policy.Permission.ADMIN, u.organization)
                 }
             }
-            if (Policy.all.size()==1) {
-                ApplicationContext ctx = Holders.grailsApplication.mainContext
-                DataSource  ds = ctx.getBean(DataSource)
-                Connection c = null
-                try {
-                    c = ds.connection
+            ApplicationContext ctx = Holders.grailsApplication.mainContext
+            DataSource  ds = ctx.getBean(DataSource)
+            Connection c = null
+            try {
+                c = ds.connection
+                if (Policy.all.size()==1) {
                     ResultSet rs = c.createStatement().executeQuery("""select user_id, project_id from ma_project_users""")
                     Map<Project,Set<User>> pu = [:]
                     while (rs.next()) {
@@ -211,12 +211,15 @@ class BootStrap {
                             }
                         }
                     }
-                } finally {
-                    if (c!=null) {
-                        c.close()
-                    }
+                } else {
+                    c.createStatement().executeUpdate("""drop table if exists ma_project_users cascade;""")
+                }
+            } finally {
+                if (c!=null) {
+                    c.close()
                 }
             }
+
 //                ApiService apiService = ctx.getBean(ApiService)
 //                apiService.activateAllViews()
 //                Project.all.each { Project project ->

@@ -111,7 +111,7 @@ class Project {
     void deleteCascaded(){
         withTransaction {
             Role.deleteAllForDomainClass(this)
-            ViewObject.findAllByProjectUUID(uuid)*.delete()
+            ViewObject.findAllByProjectUUID(uuid)*.deleteCascaded()
             View.findAllByProject(this)*.delete()
             delete()
         }

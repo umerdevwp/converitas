@@ -146,11 +146,10 @@
         <g:if test="${u.organization==project.organization||u.isSysAdmin()}">
             <div class="col-9 leftElement">
                 <div class="col-4 leftElement">
-                    <span>
+                    <div>
                     <h1 class="projectName">
                         Project ${project.name}
                     </h1>
-                    </span>
                     <span style="cursor: pointer;float:top; z-index: 1000">
                         <a class="edit" data-toggle="modal" data-target="#editProjectModal">
                             <i class="material-icons md-18 skyblue">
@@ -159,7 +158,7 @@
                         </a>
                         <a class="delete"><span class="material-icons skyblue">delete</span></a>
                     </span>
-
+                    </div>
                     <div class="btn btn-primary" style="margin-left: 5px;margin-top: 30px;margin-bottom: 30px;">
                         <g:link class="create" data-toggle="modal" data-target="#create-view">
                             <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
