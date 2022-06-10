@@ -687,11 +687,11 @@
                                 companyList += '<li><a class="loadcompany" id="load_' + company.uuid + '">' + company.name + '</a></li>';
                             }
                             companyList += '</ul>'
-                            html += ' <h3>'+head+' ('+len+')</h3>'
+                            html += ' <h3>'+head+' ('+len+')'
                             if ((i++)===0){
-                                html += '<a class=\'create\' data-toggle=\'modal\' data-target=\'#trackCompanyModal\'><span class=\'material-icons\'>add_circle</span></a>'
+                                html += '<a class=\'create\' style="padding-top: -10px;display: inline-block;" data-toggle=\'modal\' data-target=\'#trackCompanyModal\'><span class=\'material-icons\'>add_circle</span></a>'
                             }
-                            html += companyList
+                            html += '</h3>'+companyList
                         } else {
                             // len = companies.radar
                             // html += ' <h3>'+head+' ('+len+')</h3>'
