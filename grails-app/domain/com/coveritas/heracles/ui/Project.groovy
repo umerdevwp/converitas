@@ -12,6 +12,7 @@ class Project {
     static hasMany = [views:View]
     static fetchMode = [views: 'eager']
     private Set<User> users = null
+    boolean recalcUsers = false
 
     @Override
     String toString() { name }
@@ -27,7 +28,7 @@ class Project {
         color nullable: true
     }
 
-    static transients = ['users']
+    static transients = ['users','recalcUsers']
 
     boolean equals(o) {
         if (this.is(o)) return true
@@ -45,8 +46,9 @@ class Project {
     }
 
     Set<User> getUsers() {
-        if (users==null) {
+        if (users==null || recalcUsers) {
             users = withTransaction { status ->
+                recalcUsers = false
                 User.findAllByOrganization(organization).findAll { User u -> u.isEntitled(Policy.Permission.READ, this) }
             }
         }
@@ -73,6 +75,37 @@ class Project {
             }
         }
         users
+    }
+
+    Set<User> removeUser(User u) {
+        getUsers()
+        if (users.contains(u)) {
+            withTransaction { status ->
+                Role r = Role.findByNameAndOrganization("read & comment project ${name}", organization)
+                if (r) {
+//                u.addProject(this)
+                    u.roles.remove(r)
+                    u.save(update: false, flush: true, failOnError: true)
+                    recalcUsers = true
+                }
+            }
+        }
+        getUsers()
+    }
+
+    def setUsers(Set<User> userList) {
+        withTransaction { status ->
+            for (User u in userList) {
+                if (!getUsers().contains(u)) {
+                    addUser(u)
+                }
+            }
+            Set<User> toRemove = users.clone()
+            toRemove.removeAll(userList)
+            for (User u in toRemove) {
+                removeUser(u)
+            }
+        }
     }
 
     void deleteCascaded(){

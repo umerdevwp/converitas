@@ -218,6 +218,9 @@ class ViewController {
             Map<String, Object> result = httpClientService.postParamsExpectMap('view', [uuid:view.uuid, userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, name: view.name, description:view.description], false)
             try {
                 viewService.save(view)
+                Set<User> users = []
+                params.getList('users').each{ users.add(User.get(it as long))}
+                view.setUsers(users)
             } catch (ValidationException e) {
                 respond view.errors, view:'edit'
                 return

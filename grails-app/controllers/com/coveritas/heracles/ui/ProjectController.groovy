@@ -105,6 +105,9 @@ class ProjectController {
         if ( u.organization==project.organization||u.isSysAdmin()) {
             try {
                 projectService.save(project)
+                Set<User> users = []
+                params.getList('users').each{ users.add(User.get(it as long))}
+                project.setUsers(users)
             } catch (ValidationException e) {
                 respond project.errors, view:'edit'
                 return
@@ -133,10 +136,9 @@ class ProjectController {
         Long userID = session['userID'] as Long
         User u = User.get(userID)
         Project project = Project.get(id)
-        if ( u.isAdmin(project.organization)||u.isSysAdmin()) {
+        if (u.isAdmin(project.organization)||u.isSysAdmin()) {
             apiService.deleteProject(u, project)
             project.deleteCascaded()
-
             request.withFormat {
                 form multipartForm {
                     flash.message = message(code: 'default.deleted.message', args: [message(code: 'project.label', default: 'Project'), id])

@@ -11,6 +11,7 @@ class View {
     String description
     Project project
     String projUUID                 // project ID in backend
+    boolean recalcUsers = false
 
     Map<Company,String> companies = [:]
     Set<Annotation> annotations = []
@@ -74,7 +75,7 @@ class View {
         name nullable: false, unique: ['project']
     }
 
-    static transients = ['companies', 'viewObjects', 'companyViewObjects', 'annotations', 'projUUID', 'users', 'organization']
+    static transients = ['companies', 'viewObjects', 'companyViewObjects', 'annotations', 'projUUID', 'users', 'organization', 'recalcUsers']
 
     @Override
     String toString() { name }
@@ -132,8 +133,9 @@ class View {
     }
 
     Set<User> getUsers() {
-        if (users==null) {
+        if (users==null || recalcUsers) {
             users = withTransaction { status ->
+                recalcUsers = false
                 User.findAllByOrganization(project.organization).findAll { User u -> u.isEntitled(Policy.Permission.READ, this) }
             }
         }
@@ -159,6 +161,37 @@ class View {
             }
         }
         users
+    }
+
+    Set<User> removeUser(User u) {
+        getUsers()
+        if (users.contains(u)) {
+            withTransaction { status ->
+                Role r = Role.findByNameAndOrganization("read & comment project ${project.name} > view ${name}", organization)
+                if (r) {
+//                u.addProject(this)
+                    u.roles.remove(r)
+                    u.save(update: false, flush: true, failOnError: true)
+                    recalcUsers = true
+                }
+            }
+        }
+        getUsers()
+    }
+
+    def setUsers(Set<User> userList) {
+        withTransaction { status ->
+            for (User u in userList) {
+                if (!getUsers().contains(u)) {
+                    addUser(u)
+                }
+            }
+            Set<User> toRemove = users.clone()
+            toRemove.removeAll(userList)
+            for (User u in toRemove) {
+                removeUser(u)
+            }
+        }
     }
 
     void deleteCascaded(){
