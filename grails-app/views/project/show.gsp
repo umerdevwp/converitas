@@ -1,4 +1,4 @@
-<%@ page import="com.coveritas.heracles.ui.View; com.coveritas.heracles.ui.User" %>
+<%@ page import="com.coveritas.heracles.ui.Project; com.coveritas.heracles.ui.View; com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -123,7 +123,7 @@
         }
         .material-icons.skyblue:hover {
             color: #00BFFFFF;
-        }        
+        }
         .material-icons.grey {
             color: #999;
         }
@@ -152,11 +152,11 @@
                     </h1>
                     </span>
                     <span style="cursor: pointer;float:top; z-index: 1000">
-                        <g:link class="edit" action="edit" resource="${this.project} ">
+                        <a class="edit" data-toggle="modal" data-target="#editProjectModal">
                             <i class="material-icons md-18 skyblue">
                                 mode_edit_outline
                             </i>
-                        </g:link>
+                        </a>
                         <a class="delete"><span class="material-icons skyblue">delete</span></a>
                     </span>
 
@@ -279,6 +279,82 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <input type="submit" name="create" class="btn btn-primary" value="Create">
+                    </div>
+                </g:form>
+            </div>
+        </div>
+    </div>
+    %{-- Modal End --}%
+    %{-- Modal Start --}%
+    <div class="modal fade" id="editProjectModal" tabindex="-1" role="dialog" aria-labelledby="editProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProjectModalLabel">Edit Project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <g:form url="/project/update" method="PUT" >
+                    <g:hiddenField name="version" value="${project.version}" />
+                    <g:hiddenField name="id" value="${project.id}" />
+                    <g:hiddenField name="url" class="url" value="/project/show/${project.id}" />
+                    <g:hiddenField name="uuid" value="${project.uuid}" />
+                    <g:hiddenField name="organization" value="${project.organization.id}" />
+                    <div class="modal-body">
+                        <fieldset class="form">
+                            <div class="fieldcontain required">
+                                <label for="name">Name<span class="required-indicator">*</span></label>
+                                <input type="text" name="name" value="${project.name}" required="">
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="description">Description<span class="required-indicator">*</span>
+                                </label>
+                                <textarea name="description" value="" required="" cols="40" rows="5">${project.description}</textarea>
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="color.id">Color</label>
+                                <select name="color.id" id="color">
+                                    <option value="">-Choose your color-</option>
+                                    <g:each in="${com.coveritas.heracles.ui.Color.list()}" var="color">
+                                        <g:if test="${color.id==(project.color?.id?:-1)}">
+                                            <option selected="selected" value="${color.id}" style="background-color: ${color.code} !important" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>
+                                        </g:if>
+                                        <g:else>
+                                            <option value="${color.id}" style="background-color: ${color.code} !important" data-color="${color.code}">${color.name}</option>
+                                        </g:else>
+                                    </g:each>
+                                </select>
+                                <div id="colorSample"></div>
+                                <script type="module">
+                                    let $color = $("#color");
+                                    let $sample = $("#colorSample");
+                                    $color.on('change', function(){
+                                        const selected = $color.find(":selected");
+                                        $sample.html(selected.text());
+                                        $sample.css('background-color', selected.data('color'))
+                                    })
+                                </script>
+                            </div>
+                            <div class="fieldcontain">
+                                <label>Users</label>
+                                <select name="users" multiple="">
+                                    <g:set var="projectUserIds" value="${project.getUsers()*.id}"/>
+                                    <g:each in="${User.findAllByOrganization(project.organization)}" var="user">
+                                        <g:if test="${user.id in projectUserIds}">
+                                            <option selected="selected" value="${user.id}">${user.toString()}</option>
+                                        </g:if>
+                                        <g:else>
+                                            <option value="${user.id}">${user.toString()}</option>
+                                        </g:else>
+                                    </g:each>
+                                </select>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-primary" value="Update">
                     </div>
                 </g:form>
             </div>
