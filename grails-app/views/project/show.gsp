@@ -114,6 +114,29 @@
         .material-icons {
             cursor: pointer;
         }
+        h1.projectName {
+            width: fit-content;
+            display: inline-block;
+        }
+        .material-icons.skyblue {
+            color: #00BFFF3F;
+        }
+        .material-icons.skyblue:hover {
+            color: #00BFFFFF;
+        }        
+        .material-icons.grey {
+            color: #999;
+        }
+        .material-icons.grey:hover {
+            color: #676763;
+        }
+
+        #show-project h3 {
+            font-weight: 500;
+            font-size: 1.1em;
+            margin: 0.1em 0 0.1em 0;
+            line-height: 22px;
+        }
 
         </style>
     </head>
@@ -124,7 +147,7 @@
             <div class="col-9 leftElement">
                 <div class="col-4 leftElement">
                     <span>
-                    <h1>
+                    <h1 class="projectName">
                         Project ${project.name}
                     </h1>
                     </span>
@@ -134,7 +157,7 @@
                                 mode_edit_outline
                             </i>
                         </g:link>
-                        <a class="delete"><span class="material-icons">delete</span></a>
+                        <a class="delete"><span class="material-icons skyblue">delete</span></a>
                     </span>
 
                     <div class="btn btn-primary" style="margin-left: 5px;margin-top: 30px;margin-bottom: 30px;">
@@ -144,7 +167,7 @@
                         </g:link>
                     </div>
                 </div>
-                <div class="col-9" style="margin-top:63px;">
+                <div style="margin-top:63px;">
                     <h3>${project.description}</h3>
                 </div>
                 <g:if test="${flash.message}">
