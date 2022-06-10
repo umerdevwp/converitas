@@ -75,7 +75,20 @@ class Role {
         }
     }
 
-    public String makeUsefulName(DomainClass domainObject) {
+    static void deleteAllForDomainClass(DomainClass domainObject) {
+        if (domainObject!=null && domainObject instanceof DomainClass) {
+            Policy.findAllByTypeAndNameAndObjIdentity(Policy.Type.Object, makeUsefulName(domainObject), domainObject.id)*.delete()
+            Set<Role> usedRoles = Policy.all*.role as LinkedHashSet
+            Set<Role> unusedRoles = findAll() as LinkedHashSet
+            unusedRoles.removeAll(usedRoles)
+            for (Role r in unusedRoles){
+                r.users*.each {User u -> u.roles.remove(r)}
+                r.delete()
+            }
+        }
+    }
+
+    static String makeUsefulName(DomainClass domainObject) {
         String name = domainObject.class.name
         int cut = name.indexOf('$')
         if (cut>0){

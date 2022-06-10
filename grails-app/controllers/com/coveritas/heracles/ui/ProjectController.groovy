@@ -135,7 +135,7 @@ class ProjectController {
         Project project = Project.get(id)
         if ( u.isAdmin(project.organization)||u.isSysAdmin()) {
             apiService.deleteProject(u, project)
-            projectService.delete(id)
+            project.deleteCascaded()
 
             request.withFormat {
                 form multipartForm {

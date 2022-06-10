@@ -160,4 +160,12 @@ class View {
         }
         users
     }
+
+    void deleteCascaded(){
+        withTransaction {
+            Role.deleteAllForDomainClass(this)
+            ViewObject.findAllByView(this)*.delete()
+            delete()
+        }
+    }
 }

@@ -74,4 +74,13 @@ class Project {
         }
         users
     }
+
+    void deleteCascaded(){
+        withTransaction {
+            Role.deleteAllForDomainClass(this)
+            ViewObject.findAllByProjectUUID(uuid)*.delete()
+            View.findAllByProject(this)*.delete()
+            delete()
+        }
+    }
 }

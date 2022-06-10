@@ -249,12 +249,11 @@ class ViewController {
         Project project = view.project
         if ( u.organization==project.organization||u.isSysAdmin()) {
             apiService.deleteView(u, view)
-            viewService.delete(id)
-
+            view.deleteCascaded()
             request.withFormat {
                 form multipartForm {
                     flash.message = message(code: 'default.deleted.message', args: [message(code: 'view.label', default: 'View'), id])
-                    redirect action:"index", method:"GET"
+                    redirect controller:"project", action:"index", method:"GET"
                 }
                 '*'{ render status: NO_CONTENT }
             }

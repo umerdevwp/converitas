@@ -145,13 +145,6 @@
         text-decoration: none;
         display: block;
         }
-        #addCompanyToView form {
-            background: #f1f6fb;
-        }
-
-        #addCompanyToView label {
-            display: inline;
-        }
 
         .sub-company {
             width:400px;
@@ -332,44 +325,64 @@
                         <input class="delete" type="submit" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
                     </fieldset>
                 </g:form>
-                <div id="addCompanyToView" style="display: none">
-                    <g:form method="POST" url="/view/addCompany">
-                        <fieldset class="form">
-                            %{--<f:all bean="companyViewObject"/>--}%
-                            <g:hiddenField name="view.id" value="${this.view.id}"/>
-                            <g:hiddenField name="level" value="${CompanyViewObject.TRACKING}"/>
-                            <g:hiddenField name="url" value="" class="url"/>
-                            %{--<f:field bean="companyViewObject" property="company"/>--}%
-                            <div class="fieldcontain required">
-                                <label for="companyUUID">Company<span class="required-indicator">*</span></label>
-                                <input id="companyInput" placeholder="Add a Company" size="40">
-                                <div style="display:inline-block;width:150px;background-color: transparent">
-                                    <input type="hidden" id="companyUUID" name="companyUUID"/>
-                                </div>
-                                <div class="sub-company">
-                                    <select class="form-control list-group" id="companyOptions" style="display:none">
-                                    </select>
-                                </div>
-                                <div class="messageSection hide">Start tracking the selected company</div>
-                            </div>
-                            %{--
-                            <div class="fieldcontain required">
-                                <label for="level">Level<span class="required-indicator">*</span></label>
-                                <select name="level" id="level" class="form-control list-group">
-                                    <g:each in="${com.coveritas.heracles.ui.CompanyViewObject.LEVELS}" var="l">
-                                        <option value="${l}">${l}</option>
-                                    </g:each>
-                                </select>
-                           </div>
-                            --}%
-                        </fieldset>
-                        <fieldset class="showButtons">
-                            <button style="display: none" class="save" type="submit" id="addButton">Add Company</button>
-                        </fieldset>
-                    </g:form>
-                </div>
             </g:if>
         </div>
+
+        %{-- Modal Start --}%
+        <div class="modal fade" id="trackCompanyModal" tabindex="-1" role="dialog" aria-labelledby="trackCompanyModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="trackCompanyModalLabel">Add Tracked Company</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <g:form method="POST" url="/view/addCompany">
+                        <div class="modal-body">
+                            <fieldset class="form">
+                                %{--<f:all bean="companyViewObject"/>--}%
+                                <g:hiddenField name="view.id" value="${this.view.id}"/>
+                                <g:hiddenField name="level" value="${CompanyViewObject.TRACKING}"/>
+                                <g:hiddenField name="url" value="" class="url"/>
+                                %{--<f:field bean="companyViewObject" property="company"/>--}%
+                                <div class="fieldcontain required">
+                                    <label for="companyUUID">Company<span class="required-indicator">*</span></label>
+                                    <input id="companyInput" placeholder="Add a Company" size="40">
+                                    <div style="display:inline-block;width:150px;background-color: transparent">
+                                        <input type="hidden" id="companyUUID" name="companyUUID"/>
+                                    </div>
+                                    <div class="sub-company">
+                                        <select class="form-control list-group" id="companyOptions" style="display:none">
+                                        </select>
+                                    </div>
+                                    <div class="messageSection hide">Start tracking the selected company</div>
+                                </div>
+                                %{--
+                                <div class="fieldcontain required">
+                                    <label for="level">Level<span class="required-indicator">*</span></label>
+                                    <select name="level" id="level" class="form-control list-group">
+                                        <g:each in="${com.coveritas.heracles.ui.CompanyViewObject.LEVELS}" var="l">
+                                            <option value="${l}">${l}</option>
+                                        </g:each>
+                                    </select>
+                               </div>
+                                --}%
+                            </fieldset>
+                        </div>
+                        <div class="modal-footer">
+%{--                            <fieldset class="showButtons">--}%
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button style="display: none" class="save" type="submit" id="addButton">Add Company</button>
+%{--                            </fieldset>--}%
+    %{--                        <input type="submit" name="create" class="btn btn-primary" value="Done">--}%
+                        </div>
+                    </g:form>
+                </div>
+            </div>
+        </div>
+        %{-- Modal End --}%
+
         %{-- Modal Start --}%
         <div class="modal fade" id="articleModal" tabindex="-1" role="dialog" aria-labelledby="articleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
@@ -645,6 +658,7 @@
                 url: '/api/viewcompanystate/${view.id}',
                 success: function(data) {
                     let html = ''
+                    let i=0;
                     Object.keys(data.companies).map(function(head) {
                         const companies = data.companies[head];
                         let len = 0;
@@ -656,15 +670,10 @@
                             // for (const company of companies) {
                             for (let i = 0; i < len; i++) {
                                 const company = companies[i];
-                                // if (i >= 10) {
-                                //     companyList += '<a>(+)</a>';
-                                //     break;
-                                // }
-                                //<a onclick="loadProjectContent(\'' + node.id + '\')" style="text-decoration: none">
                                 companyList += '<li><a class="loadcompany" id="load_' + company.uuid + '">' + company.name + '</a></li>';
                             }
                             companyList += '</ul>'
-                            html += ' <h3>'+head+' ('+len+')</h3>'+companyList
+                            html += ' <h3>'+head+' ('+len+')'+((i++)===0?'<a class=\'create\' data-toggle=\'modal\' data-target=\'#trackCompanyModal\'><span class=\'material-icons\'>add_circle</span></a>':'')+'</h3>'+companyList
                         } else {
                             // len = companies.radar
                             // html += ' <h3>'+head+' ('+len+')</h3>'

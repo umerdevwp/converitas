@@ -122,53 +122,26 @@
     </head>
     <body>
         <a href="#list-project" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-        <%-- <div class="nav" role="navigation">
-            <ul>
-                <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-                <li>
-                    <g:link class="create" action="create"><span class="material-icons">add_circle</span><g:message code="default.new.label" args="[entityName]" /></g:link>
-                </li>
-<div class="btn btn-primary">
-<g:link class="create" action="create"><span class="material-icons">add_circle</span><g:message code="default.new.label" args="[entityName]" /></g:link>
-              </div>
-
-            </ul>
-        </div> --%>
-
         <div>
-        <%-- <div class="btn btn-primary" style="margin-left: 20px;margin-top: 45px;">
-
-                <g:link class="create" action="create">
-                    <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
-                    <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;"><g:message code="default.new.label" args="[entityName]" /></span>
-                </g:link>
-        </div> --%>
         <div class="btn btn-primary" style="margin-left: 20px;margin-top: 45px;">
             <g:link class="create" data-toggle="modal" data-target="#createModal">
                 <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
-                <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;"><g:message code="default.new.label" args="[entityName]" /></span>
+                <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;">New Project</span>
             </g:link>
         </div>
         </div>
         <div id="list-project" class="content scaffold-list" role="main">
-            <%-- <div class="col-8" style="display: block;float: left;"><h1><g:message code="default.list.label" args="[entityName]" /></h1></div>
-            <div class="col-3" style="display: block;float: left;margin-left: 100px;"><h1>Insights</h1></div> --%>
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
-%{--            <f:table collection="${projectList}" />--}%
             <table class="projectTable col-9 leftElement">
                 <thead>
                 <tr>
                     <g:sortableColumn property="name" title="Project Name" />
                     <g:set var="u" value="${User.get(session["userID"])}"/>
-%{--                    <g:if test="${u.isSysAdmin()}">--}%
-%{--                        <g:sortableColumn property="organization" title="Organization" />--}%
-%{--                    </g:if>--}%
-%{--                    <g:sortableColumn property="uuid" title="UUID" />--}%
                     <g:sortableColumn property="description" title="Project Description" />
                     <g:sortableColumn property="users" title="Team" width="100" />
-                    <g:sortableColumn property="users" title="." class="team-blank"/>
+%{--                    <g:sortableColumn property="users" title="." class="team-blank"/>--}%
                     <g:sortableColumn property="views" title="Lens" />
                     <g:sortableColumn property="views" title="." class="team-blank"/>
                     <g:sortableColumn property="insights" title="Insights" />
@@ -189,7 +162,7 @@
                                 </g:each>
                             </ul>
                         </td>
-                        <td rowspan="${rowspan}" class="pl-0"><span class="material-icons">add_circle</span></td>
+%{--                        <td rowspan="${rowspan}" class="pl-0"><span class="material-icons">add_circle</span></td>--}%
                         <g:if test="${rowspan==0}">
                             <td class="pr-0">
                             </td>
@@ -209,18 +182,22 @@
                                     <a href="/view/show/${pv.id}">${pv.name}</a>
                                 </td>
                                 <%-- <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td> --%>
-                                <td class="pl-0"><a data-toggle="modal" data-target="#create-view" data-projectid="${bean.id}" class="material-icons create-view-link">add_circle</a></td>
-                                <td>
-                                    <span class="material-icons">
-                                            view_list
-                                    </span>
-                                    <span class="number">${pv.annotations.size()}/${pv.annotations.size()}</span>
+                                <td class="pl-0">
+                                    <g:if test="${j==0}">
+                                        <a data-toggle="modal" data-target="#create-view" data-projectid="${bean.id}" class="create-view-link material-icons">add_circle</a>
+                                    </g:if>
                                 </td>
                                 <td>
-                                    <span class="material-icons">
-                                        chat_bubble
-                                    </span>
-                                    <span class="number">${pv.seenInsightsCount(u.lastLogin())}/${pv.insightsCount()}</span>
+%{--                                    <span class="material-icons">--}%
+%{--                                            view_list--}%
+%{--                                    </span>--}%
+                                    <span class="number">${pv.annotations.size()}%{--/${pv.annotations.size()}--}%</span>
+                                </td>
+                                <td>
+%{--                                    <span class="material-icons">--}%
+%{--                                        chat_bubble--}%
+%{--                                    </span>--}%
+                                    <span class="number">${pv.seenInsightsCount(u.lastLogin())}%{--/${pv.insightsCount()}--}%</span>
                                 </td>
                                 <g:if test="${j>0}">
                                     </tr>
@@ -267,7 +244,7 @@
                     </div>
                     <g:form url="/project/save" method="POST" >
                         <g:hiddenField name="organization.id" value="${u.organization.id}" />
-                        <g:hiddenField name="url" class="url" value="/project/index" />
+%{--                        <g:hiddenField name="url" class="url" value="/project/index" />--}%
                         <div class="modal-body">
                             <fieldset class="form">
                                 <div class="fieldcontain required">
@@ -305,11 +282,11 @@
 
     <!--Create Lens Modal-->
         %{-- Modal Start --}%
-        <div class="modal fade" id="create-view" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal fade" id="create-view" tabindex="-1" role="dialog" aria-labelledby="createLensModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createModalLabel">Create Lens</h5>
+                        <h5 class="modal-title" id="createLensModalLabel">Create Lens</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                         </button>
@@ -349,7 +326,7 @@
             $( document ).ready(() => {
                 pageURL = window.location.href;
                 $('#url').val(pageURL);
-                $('.create-view-link').on('click', function(event) {
+                $('*[data-projectid]').on('click', function(event) {
                     const projectId = $(this).data("projectid");
                     $('#createViewProjectId').val( projectId )
                 })

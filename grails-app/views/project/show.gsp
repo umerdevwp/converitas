@@ -1,4 +1,4 @@
-<%@ page import="com.coveritas.heracles.ui.User" %>
+<%@ page import="com.coveritas.heracles.ui.View; com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -125,19 +125,17 @@
                 <div class="col-4 leftElement">
                     <h1>
                         ${entityName} ${project.name}
-                        <g:form resource="${this.project}" method="DELETE">
                              <i class="material-icons md-18 skyblue">
                                 <g:link class="edit" action="edit" resource="${this.project}">
                                 mode_edit_outline
                                 </g:link>
                             </i>                                
                             <span class="material-icons"><a class="delete">delete</a></span>
-                        </g:form>                    
-                    </h1>                 
+                    </h1>
                     <div class="btn btn-primary" style="margin-left: 5px;margin-top: 30px;margin-bottom: 30px;">
-                        <g:link class="create" data-toggle="modal" data-target="#createModal">
+                        <g:link class="create" data-toggle="modal" data-target="#create-view">
                             <span class="material-icons" style="padding-top: -10px;display: inline-block;float: left;">add_circle</span>
-                            <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;"><g:message code="default.new.label" args="[entityName]" /></span>
+                            <span style="padding-top: -10px;display: inline-block;padding-top: -8px;padding-left: 5px;padding-top: 2px;">New Lens</span>
                         </g:link>
                     </div>
                 </div>
@@ -183,16 +181,10 @@
                             </td>
                             <td class="pl-0"><span class="material-icons">add_circle</span></td>
                             <td>
-                                <span class="material-icons">
-                                    view_list
-                                </span>
-                                <span class="number">${view.annotations.size()}/${view.annotations.size()}</span>
+                                <span class="number">${view.annotationsSince(u.lastLogin()).size()}</span>
                             </td>
                             <td>
-                                <span class="material-icons">
-                                    chat_bubble
-                                </span>
-                                <span class="number">${view.seenInsightsCount(u.lastLogin())}/${view.insightsCount()}</span>
+                                <span class="number">${view.insightsSince(u.lastLogin())}</span>
                             </td>
                         </tr>
                     </g:each>
@@ -227,11 +219,53 @@
             </g:else>
         </div>
 
-        <script type="module">
+    <!--Create Lens Modal-->
+    %{-- Modal Start --}%
+    <div class="modal fade" id="create-view" tabindex="-1" role="dialog" aria-labelledby="createLensModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createLensModalLabel">Create Lens</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <g:form url="/view/save" method="POST" >
+                    <g:hiddenField name="project.id" value="${project.id}" />
+%{--                    <g:hiddenField name="url" class="url" value="/project/index" />--}%
+                    <div class="modal-body">
+                        <fieldset class="form">
+                            <div class="fieldcontain required">
+                                <label for="name">Name<span class="required-indicator">*</span></label>
+                                <input type="text" name="name" value="" required="">
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="description">Description<span class="required-indicator">*</span>
+                                </label>
+                                <textarea name="description" value="" required="" cols="40" rows="5"></textarea>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input type="submit" name="create" class="btn btn-primary" value="Create">
+                    </div>
+                </g:form>
+            </div>
+        </div>
+    </div>
+    %{-- Modal End --}%
+    <script type="module">
         $('.delete').on('click', function(){
             if (confirm('Are you sure?')){
-                $(this).submit();     
-            };
+                $.ajax({
+                    url: '/project/delete/${project.id}',
+                    type: 'DELETE',
+                    success: function(result) {
+                        window.location = "/project/index";
+                    }
+                });
+            }
         });
         </script>
     </body>

@@ -1,4 +1,4 @@
-<%@ page import="com.coveritas.heracles.ui.User" %>
+<%@ page import="com.coveritas.heracles.ui.Project; com.coveritas.heracles.ui.User" %>
 <!doctype html>
 <html lang="en" class="no-js">
 <head>
@@ -121,9 +121,9 @@
                              <span class="material-icons" style="padding-top: 5px">keyboard_arrow_down</span>
                             </a>
                             <div id="myDropdown1" class="dropdown-content1">
-                                <a href="#">Link 1</a>
-                                <a href="#">Link 2</a>
-                                <a href="#">Link 3</a>
+                                <g:each in="${com.coveritas.heracles.ui.Project.all}" var="p">
+                                    <a href="#">${p.name}</a>
+                                </g:each>
                             </div>
                             </div>                        
                         </li>
