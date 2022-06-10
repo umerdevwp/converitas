@@ -96,21 +96,17 @@
     </button>
 
     <div class="collapse navbar-collapse" aria-expanded="false" style="height: 0.8px;" id="navbarContent">
-    
-
-        <%-- <div class="dropdown1">
+%{--
+        <div class="dropdown1">
         <button onclick="myFunction1()" class="dropbtn1">Dropdown</button>
         <div id="myDropdown1" class="dropdown-content1">
             <a href="#">Link 1</a>
             <a href="#">Link 2</a>
             <a href="#">Link 3</a>
         </div>
-        </div> --%>
-
+        </div>
+--}%
         <ul class="nav navbar-nav ml-auto" style="color: white">
-
-
-
                 <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
                 <g:set var="u" value="${User.get(session["userID"])}"/>
                     <g:if test="${u!=null}">
@@ -122,22 +118,19 @@
                             </a>
                             <div id="myDropdown1" class="dropdown-content1">
                                 <g:each in="${com.coveritas.heracles.ui.Project.all}" var="p">
-                                    <a href="#">${p.name}</a>
+                                    <a href="/project/show/${p.id}">${p.name}</a>
                                 </g:each>
                             </div>
                             </div>                        
                         </li>
-                        
                         <g:if test="${u.isAdmin()}">
                             <li><a href="/user/index">Users</a></li>
                             <g:if test="${u.isAdmin()}">
                             <%-- <li><a href="/organization/index">Organizations</a></li> --%>
                             </g:if>
                         </g:if>
-                    
                     </g:if>
                     <g:else>
-                        
                     </g:else>
 
             <g:pageProperty name="page.nav"/>

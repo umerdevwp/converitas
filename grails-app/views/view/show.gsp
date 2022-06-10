@@ -445,6 +445,20 @@
                                 </label>
                                 <textarea name="description" value="" required="" cols="40" rows="5" id="description">${view.description}</textarea>
                             </div>
+                            <div class="fieldcontain">
+                                <label>Users</label>
+                                <select name="users" multiple="">
+                                    <g:set var="viewUserIds" value="${view.users*.id}"/>
+                                    <g:each in="${User.findAllByOrganization(project.organization)}" var="user">
+                                        <g:if test="${user.id in viewUserIds}">
+                                            <option selected="selected" value="${user.id}">${user.toString()}</option>
+                                        </g:if>
+                                        <g:else>
+                                            <option value="${user.id}">${user.toString()}</option>
+                                        </g:else>
+                                    </g:each>
+                                </select>
+                            </div>
                         </fieldset>
                     </div>
                     <div class="modal-footer">
@@ -515,8 +529,8 @@
                                 </script>
                             </div>
                             <div class="fieldcontain">
-                                <label for="users">Users</label>
-                                <select name="users" id="users" multiple="">
+                                <label>Users</label>
+                                <select name="users" multiple="">
                                     <g:set var="projectUserIds" value="${project.users*.id}"/>
                                     <g:each in="${User.findAllByOrganization(project.organization)}" var="user">
                                         <g:if test="${user.id in projectUserIds}">
@@ -526,7 +540,7 @@
                                             <option value="${user.id}">${user.toString()}</option>
                                         </g:else>
                                     </g:each>
-                            </select>
+                                </select>
                             </div>
                         </fieldset>
                     </div>
