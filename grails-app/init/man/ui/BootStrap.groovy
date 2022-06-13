@@ -174,11 +174,13 @@ class BootStrap {
                 new Color([name:"Black", code: "#000000"]).save(update:false, failOnError:true)
             }
             if (User.list().isEmpty()) {
-                Date now = new Date()
-                Organization org = new Organization(uuid: Organization.COVERITAS_UUID, name: "CoVeritas", created: now, lastUpdated: now).save(failOnError: true)
-                Role adminRole = new Role(name: Role.ADMIN).save(failOnError: true)
-                new Role(name: Role.USER).save(failOnError: true)
-                User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, Color.get(8))
+                Organization.withNewTransaction { status1 ->
+                    Date now = new Date()
+                    Organization org = new Organization(uuid: Organization.COVERITAS_UUID, name: "CoVeritas", created: now, lastUpdated: now).save(failOnError: true)
+                    Role adminRole = new Role(name: Role.ADMIN, organization: org).save(failOnError: true)
+                    new Role(name: Role.USER, organization: org).save(failOnError: true)
+                    User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, Color.get(8))
+                }
             }
             Role.findAllByOrganizationIsNull().each{Role r ->
                 r.organization = r.users[0].organization
@@ -190,35 +192,35 @@ class BootStrap {
                     r.grandPermission(Policy.Permission.ADMIN, u.organization)
                 }
             }
-            ApplicationContext ctx = Holders.grailsApplication.mainContext
-            DataSource  ds = ctx.getBean(DataSource)
-            Connection c = null
-            try {
-                c = ds.connection
-                if (Policy.all.size()==1) {
-                    ResultSet rs = c.createStatement().executeQuery("""select user_id, project_id from ma_project_users""")
-                    Map<Project,Set<User>> pu = [:]
-                    while (rs.next()) {
-                        Project p = Project.get(rs.getLong("project_id"))
-                        Set<User> users = pu.computeIfAbsent(p, {Project p1-> new LinkedHashSet<User>()})
-                        users.add(User.get(rs.getLong("user_id")))
-                    }
-                    for (Project p in pu.keySet()){
-                        for (User u in pu.get(p)) {
-                            p.addUser(u)
-                            for (View v in p.getViews()) {
-                                v.addUser(u)
-                            }
-                        }
-                    }
-                } else {
-                    c.createStatement().executeUpdate("""drop table if exists ma_project_users cascade;""")
-                }
-            } finally {
-                if (c!=null) {
-                    c.close()
-                }
-            }
+//            ApplicationContext ctx = Holders.grailsApplication.mainContext
+//            DataSource  ds = ctx.getBean(DataSource)
+//            Connection c = null
+//            try {
+//                c = ds.connection
+//                if (Policy.all.size()==1) {
+//                    ResultSet rs = c.createStatement().executeQuery("""select user_id, project_id from ma_project_users""")
+//                    Map<Project,Set<User>> pu = [:]
+//                    while (rs.next()) {
+//                        Project p = Project.get(rs.getLong("project_id"))
+//                        Set<User> users = pu.computeIfAbsent(p, {Project p1-> new LinkedHashSet<User>()})
+//                        users.add(User.get(rs.getLong("user_id")))
+//                    }
+//                    for (Project p in pu.keySet()){
+//                        for (User u in pu.get(p)) {
+//                            p.addUser(u)
+//                            for (View v in p.getViews()) {
+//                                v.addUser(u)
+//                            }
+//                        }
+//                    }
+//                } else {
+//                    c.createStatement().executeUpdate("""drop table if exists ma_project_users cascade;""")
+//                }
+//            } finally {
+//                if (c!=null) {
+//                    c.close()
+//                }
+//            }
 
 //                ApiService apiService = ctx.getBean(ApiService)
 //                apiService.activateAllViews()

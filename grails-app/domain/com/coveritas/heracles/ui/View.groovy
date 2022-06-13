@@ -4,6 +4,10 @@ import com.coveritas.heracles.HttpClientService
 import com.coveritas.heracles.json.Company
 import grails.util.Holders
 import org.springframework.context.ApplicationContext
+import io.micronaut.caffeine.cache.Caffeine
+import io.micronaut.caffeine.cache.LoadingCache
+
+import java.util.concurrent.TimeUnit
 
 class View {
     String uuid                 // View ID in backend
@@ -92,35 +96,55 @@ class View {
         return (uuid != null ? uuid.hashCode() : 0)
     }
 
-    Set<Annotation> annotationsSince(long ts) {
-        return annotations.findAll({it.ts>ts })
+    class ViewTs {
+        View view
+        long timestamp
+
+        ViewTs(View v, long ts) {
+            view = v
+            timestamp = ts
+        }
+    }
+    static LoadingCache<ViewTs, Long> hmAnnotationsSince = Caffeine.newBuilder()
+            .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
+            .build({ViewTs vt -> vt.view.annotations.findAll({it.ts>vt.timestamp }).size() as Long})
+
+    long annotationsSince(long ts) {
+        hmAnnotationsSince.get(new ViewTs(this, ts))
     }
 
     Set<Annotation> seenAnnotations(long ts) {
         return annotations.findAll({it.ts<=ts })
     }
 
-    long insightsSince(long ts) {
-        ApplicationContext ctx = Holders.grailsApplication.mainContext
-        HttpClientService httpClientService = ctx.getBean(HttpClientService)
-        Map events = httpClientService.getParamsExpectMap("eve/count/view/${this.uuid}/${ts}/${System.currentTimeMillis()}", null, true)
+    static LoadingCache<ViewTs, Long> hmInsightsSince = Caffeine.newBuilder()
+            .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
+            .build({ViewTs vt ->
+                HttpClientService httpClientService = getHttpClientService()
+                Map events = httpClientService.getParamsExpectMap("eve/count/view/${vt.view.uuid}/${vt.timestamp}/${System.currentTimeMillis()}", null, true)
+                events.count as long
+            })
 
-        events.count as long
+    static HttpClientService httpClientService = null
+    static HttpClientService getHttpClientService() {
+        if (!httpClientService) {
+            ApplicationContext ctx = Holders.grailsApplication.mainContext
+            httpClientService = ctx.getBean(HttpClientService)
+        }
+        httpClientService
+    }
+
+    long insightsSince(long ts) {
+        hmInsightsSince.get(new ViewTs(this, ts))
     }
 
     long seenInsightsCount(long ts) {
-        ApplicationContext ctx = Holders.grailsApplication.mainContext
-        HttpClientService httpClientService = ctx.getBean(HttpClientService)
         Map events = httpClientService.getParamsExpectMap("eve/count/view/${this.uuid}/${0}/${ts}", null, true)
-
         events.count as long
     }
 
     long insightsCount() {
-        ApplicationContext ctx = Holders.grailsApplication.mainContext
-        HttpClientService httpClientService = ctx.getBean(HttpClientService)
         Map events = httpClientService.getParamsExpectMap("eve/count/view/${this.uuid}", null, true)
-
         events.count as long
     }
 

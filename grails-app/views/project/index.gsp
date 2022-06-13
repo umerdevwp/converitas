@@ -191,13 +191,13 @@
 %{--                                    <span class="material-icons">--}%
 %{--                                            view_list--}%
 %{--                                    </span>--}%
-                                    <span class="number">${pv.annotationsSince(u.lastLogin()).size()}%{--/${pv.annotations.size()}--}%</span>
+                                    <span class="number">${pv.annotationsSince(u?.lastLogin()?:0)}%{--/${pv.annotations.size()}--}%</span>
                                 </td>
                                 <td>
 %{--                                    <span class="material-icons">--}%
 %{--                                        chat_bubble--}%
 %{--                                    </span>--}%
-                                    <span class="number">${pv.insightsSince(u.lastLogin())}%{--/${pv.insightsCount()}--}%</span>
+                                    <span class="number">${pv.insightsSince(u?.lastLogin()?:0)}%{--/${pv.insightsCount()}--}%</span>
                                 </td>
                                 <g:if test="${j>0}">
                                     </tr>

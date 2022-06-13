@@ -9,7 +9,7 @@ class ProjectController {
     ProjectService      projectService
     ApiService          apiService
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE", addComment:"POST"]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -122,6 +122,46 @@ class ProjectController {
                     }
                 }
                 '*'{ respond project, [status: OK] }
+            }
+        } else {
+            notAllowed('default.not.updated.message')
+        }
+    }
+
+    def addComment() {
+        String url = params.url
+        Project project = Project.get(params.get("project").id as long)
+        Long userID = session['userID'] as Long
+        User u = User.get(userID)
+        String comment = params.comment
+        Annotation annotation = new Annotation(user: u, annotationType:'text', title: comment) //, project.uuid, view.uuid, company?.uuid, comment
+        if (project.organization==u.organization|| u.isSysAdmin()) {
+            if (comment) {
+                try {
+                    annotation = apiService.addComment(u, project.uuid, null, params.companyUUID as String, params.company2UUID as String, comment)
+                } catch (ValidationException e) {
+                    respond project.errors, project:'show'
+                    return
+                }
+
+                request.withFormat {
+                    form multipartForm {
+//                        flash.message = message(code: 'default.created.message', args: [message(code: 'companyProjectObject.label', default: 'CompanyProjectObject'), annotation])
+                        if (url!=null) {
+                            redirect url:url
+                        } else {
+                            redirect project
+                        }
+                    }
+//                    flash.message = message(code: 'default.updated.message', args: [message(code: 'project.label', default: 'CompanyProjectObject'), annotation])
+                    if (url!=null) {
+                        redirect url:url
+                    } else {
+                        redirect project
+                    }
+                }
+            } else {
+                notAllowed('default.not.updated.message')
             }
         } else {
             notAllowed('default.not.updated.message')

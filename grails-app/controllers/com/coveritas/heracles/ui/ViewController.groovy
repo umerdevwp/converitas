@@ -166,16 +166,18 @@ class ViewController {
 
     def addComment() {
         String url = params.url
-        View view = View.get(params.get("view").id as long)
+
+        Long viewId = params.get("view")?.id as Long
         Long userID = session['userID'] as Long
         User u = User.get(userID)
-        Project project = view.project
+        View view = viewId?View.get(viewId):null
+        Project project = view?.project?:Project.get(params.get("project")?.id as Long)
         String comment = params.comment
         Annotation annotation = new Annotation(user: u, annotationType:'text', title: comment) //, project.uuid, view.uuid, company?.uuid, comment
         if (project.organization==u.organization|| u.isSysAdmin()) {
             if (comment) {
                 try {
-                    annotation = apiService.addComment(u, project.uuid, view.uuid, params.companyUUID as String, params.company2UUID as String, comment)
+                    annotation = apiService.addComment(u, project.uuid, view?.uuid, params.companyUUID as String, params.company2UUID as String, comment)
                 } catch (ValidationException e) {
                     respond view.errors, view:'show'
                     return

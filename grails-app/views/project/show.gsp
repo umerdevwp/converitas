@@ -156,7 +156,10 @@
                                 mode_edit_outline
                             </i>
                         </a>
-                        <a class="delete"><span class="material-icons skyblue">delete</span></a>
+                        <a class="comment"data-toggle="modal" data-target="#commentProjectModal">
+                            <i class="material-icons skyblue">comment</i>
+                        </a>
+                        <a class="delete"><i class="material-icons skyblue">delete</i></a>
                     </span>
                     </div>
                     <div class="btn btn-primary" style="margin-left: 5px;margin-top: 30px;margin-bottom: 30px;">
@@ -208,7 +211,7 @@
                             </td>
                             <td class="pl-0"><span class="material-icons">add_circle</span></td>
                             <td>
-                                <span class="number">${view.annotationsSince(u.lastLogin()).size()}</span>
+                                <span class="number">${view.annotationsSince(u.lastLogin())}</span>
                             </td>
                             <td>
                                 <span class="number">${view.insightsSince(u.lastLogin())}</span>
@@ -356,6 +359,39 @@
                         <input type="submit" class="btn btn-primary" value="Update">
                     </div>
                 </g:form>
+            </div>
+        </div>
+    </div>
+    %{-- Modal End --}%
+    %{-- Modal Start --}%
+    <div class="modal fade" id="commentProjectModal" tabindex="-1" role="dialog" aria-labelledby="commentProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commentProjectModalLabel">Add Comment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form url="/project/addComment" method="POST" >
+                    <g:hiddenField name="project.id" value="${project.id}" />
+                    <g:hiddenField name="url" class="url" value="/project/show/${project.id}" />
+                    <g:hiddenField name="uuid" value="${project.uuid}" />
+                    <g:hiddenField name="organization" value="${project.organization.id}" />
+                    <div class="modal-body">
+                        <fieldset class="form">
+                            <div class="fieldcontain required">
+                                <label for="comment">Description<span class="required-indicator">*</span>
+                                </label>
+                                <textarea name="comment" value="" required="" cols="40" rows="5"></textarea>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-primary" value="Add Comment">
+                    </div>
+                </form>
             </div>
         </div>
     </div>
