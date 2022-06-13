@@ -211,10 +211,10 @@
                             </td>
                             <td class="pl-0"><span class="material-icons">add_circle</span></td>
                             <td>
-                                <span class="number">${view.annotationsSince(u.lastLogin())}</span>
+                                <span class="number">${view.insightsSince(u.lastLogin())}</span>
                             </td>
                             <td>
-                                <span class="number">${view.insightsSince(u.lastLogin())}</span>
+                                <span class="number">${view.annotationsSince(u.lastLogin())}</span>
                             </td>
                         </tr>
                     </g:each>
