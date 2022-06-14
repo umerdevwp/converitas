@@ -181,9 +181,8 @@
                         <g:sortableColumn property="name" title="Lens" />
                         <g:sortableColumn property="description" title="Description" />
                         <g:sortableColumn property="users" title="Team" width="100" />
-                        <th class="team-blank">.</th>
                         <th>Companies</th>
-                        <th>.</th>
+                        <th class="team-blank">.</th>
                         <g:sortableColumn property="insights" title="Insights" />
                         <g:sortableColumn property="comments" title="Comments" />
                     </thead>
@@ -199,7 +198,6 @@
                                     </g:each>
                                 </ul>
                             </td>
-                            <td class="pl-0"><span class="material-icons">add_circle</span></td>
                             <td class="pr-0">
                                 <ul>
                                     <g:each in="${view.companies.keySet()}" var="co">
