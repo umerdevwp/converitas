@@ -65,6 +65,9 @@
             float: left;
             font-size: 13px;         
         }
+        .material-icons.skyblue {
+            margin-left:5px;
+        }
         .btn-primary {
             float: left;
             background: #133c7c;
@@ -177,6 +180,11 @@
         #show-view input {
             cursor: pointer
         }
+
+        /* #companies li a,
+        #companies span.material-icons.skyblue {
+            float: left;
+        } */
 
         /* Change color of dropdown links on hover */
         .dropdown-content a:hover {background-color: #ddd}
@@ -599,6 +607,7 @@
         let pageURL = '';
 
         $( document ).ready(() => {
+
             $('.back-link').on('click', function(){
                 loadProjectContent();
             });
@@ -616,9 +625,12 @@
             });  
             $('#companies h3:eq( 2 )').on('click', function() {
                     loadGraphData(0);
-            });                       
-               
-            }, "2000");            
+            });                        
+            $('#companies ul:first').find('li').append('<span class="material-icons md-18 skyblue">remove_circle</span>');   
+            $('#companies ul:first').find('li').append('<span class="material-icons md-18 skyblue">hide_source</span>');
+            
+            $('#companies ul:eq(1)').find('li').append('<span class="material-icons md-18 skyblue">add_circle</span>');
+            }, "2000");           
 
         });
 
