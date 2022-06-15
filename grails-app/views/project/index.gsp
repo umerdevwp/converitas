@@ -149,31 +149,31 @@
                     <%-- <g:sortableColumn property="status" title="Status" /> --%>
                     <%-- <th>Action</th> --%>
                 </thead>
-                <g:each in="${projectList}" var="bean" status="i">
+                <g:each in="${projectList}" var="project" status="i">
                     <tbody>
                         <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-                        <td><g:link method="GET" resource="${bean}"><f:display bean="${bean}" property="name" displayStyle="table"/></g:link></td>
-                        <td><f:display bean="${bean}" property="description" displayStyle="${'table'}"/></td>
+                        <td><g:link method="GET" resource="${project}"><f:display bean="${project}" property="name" displayStyle="table"/></g:link></td>
+                        <td><f:display bean="${project}" property="description" displayStyle="${'table'}"/></td>
                         <td class="pr-0">
                             <ul>
-                                <g:each in="${bean.users}" var="pu">
+                                <g:each in="${project.users}" var="pu">
                                     <li style="background:${pu.color?.code?:'#0815'}"><a style="color: ghostwhite" href="/user/show/${pu.id}">${(pu.name as String).substring(0,2)}</a></li>
                                 </g:each>
                             </ul>
                         </td>
 %{--                      <td rowspan="${rowspan}" class="pl-0"><span class="material-icons">add_circle</span></td>--}%
-                          <%-- <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td> --%>
+                          <%-- <td class="pl-0"><a href="/view/create?project.id=${project.id}" class="material-icons">add_circle</a></td> --%>
                             <td>
 %{--                                <span class="material-icons">--}%
 %{--                                    chat_bubble--}%
 %{--                                </span>--}%
-                                <span class="number">${bean.insightsSince(u?.lastLogin())}%{--/${pv.insightsCount()}--}%</span>
+                                <span class="number">${project.insightsSince(u?.lastLogin())}%{--/${pv.insightsCount()}--}%</span>
                             </td>
                             <td>
 %{--                                <span class="material-icons">--}%
 %{--                                        view_list--}%
 %{--                                </span>--}%
-                                <span class="number">${bean.annotationsSince(u?.lastLogin()?:0)}%{--/${pv.annotations.size()}--}%</span>
+                                <span class="number">${project.annotationsSince(u?.lastLogin()?:0)}%{--/${pv.annotations.size()}--}%</span>
                             </td>
 
                     </tr>
