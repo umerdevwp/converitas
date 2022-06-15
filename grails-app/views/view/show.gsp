@@ -704,12 +704,12 @@
                                 const company = companies[j];
                                 compUuid2Name[company.uuid] = company.name;
                                 companyList += '<li><a class="loadcompany" id="load_' + company.uuid + '">' + company.name + '</a>';
-                                if (i===0) {
-                                    companyList += '<a class="companydlg" data-action="untrack" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">remove_circle</span>';
-                                    companyList += '<a class="companydlg" data-action="ignore" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">hide_source</span>';
-                                } else {
-                                    companyList += '<a class="companydlg" data-action="track" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">add_circle</span>';
-                                }
+                                // if (i===0) {
+                                //     companyList += '<a class="companydlg" data-action="untrack" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">remove_circle</span>';
+                                //     companyList += '<a class="companydlg" data-action="ignore" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">hide_source</span>';
+                                // } else {
+                                //     companyList += '<a class="companydlg" data-action="track" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">add_circle</span>';
+                                // }
                                 companyList += '</li>'
                             }
                             companyList += '</ul>'
