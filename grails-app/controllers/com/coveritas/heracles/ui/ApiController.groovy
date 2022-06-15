@@ -1,5 +1,8 @@
 package com.coveritas.heracles.ui
 
+import com.coveritas.heracles.utils.APIException
+import com.coveritas.heracles.utils.Helper
+import com.coveritas.heracles.utils.SessionTimedOutException
 import grails.converters.JSON
 import groovy.transform.CompileStatic
 import org.springframework.lang.Nullable
@@ -16,7 +19,18 @@ class ApiController {
      */
     private call(Closure cl) {
         try {
-            render cl() as JSON
+            User u = Helper.apiUserFromSession(session)
+            render cl(u) as JSON
+        }
+        catch (SessionTimedOutException ste) {
+            log.warn("Session was timed out")
+            response.sendError(ste.httpStatus, ste.message)
+            response
+        }
+        catch (APIException apiException) {
+            log.warn("API Exception while executing request", apiException)
+            response.sendError(apiException.httpStatus, apiException.message)
+            response
         }
         catch (Exception e) {
             log.warn("Exception while executing request", e)
@@ -26,7 +40,7 @@ class ApiController {
     }
 
     def suggestions() {
-        call {
+        call { User u ->
             List<Map> addCompanies = apiService.matchingCompanies((String) params.input, "US")
 //            addCompanies.removeAll(apiService.tracked())
             addCompanies
@@ -34,21 +48,40 @@ class ApiController {
     }
 
     def viewtimeline(long id, @Nullable Long from, @Nullable Long to) {
-        call {
+        call { User u ->
             apiService.itemsForTimeline(View.get(id).uuid, from, to)
         }
     }
 
     def viewcompanystate(long id) {
-        call {
-            User u = User.get(session['userID'] as long)
+        call { User u ->
             apiService.companyStateForView(u, View.get(id).uuid)
         }
     }
 
+    def track(String companyUUID, Long viewId) {
+        call { User u ->
+            apiService.addCompanyToView(u, companyUUID, viewId)
+            [success:true]
+        }
+    }
+
+    def untrack(String companyUUID, Long viewId) {
+        call { User u ->
+            apiService.removeCompanyFromView(u, companyUUID, viewId, false)
+            [success:true]
+        }
+    }
+
+    def ignore(String companyUUID, Long viewId) {
+        call { User u ->
+            apiService.removeCompanyFromView(u, companyUUID, viewId, true)
+            [success:true]
+        }
+    }
+
     def contentForProject(long id) {
-        call {
-            User u = User.get(session['userID'] as long)
+        call { User u ->
             View view = params.viewId?View.get(params.viewId as long):null
             def x = apiService.contentForProject(u, Project.get(id).uuid, view)
             x
@@ -56,54 +89,48 @@ class ApiController {
     }
 
     def contentForView(long id) {
-        call {
-            User u = User.get(session['userID'] as long)
+        call { User u ->
             apiService.contentForView(u, View.get(id).uuid)
         }
     }
 
     def contentForCompanyInView(String companyUUID, long viewId) {
-        call {
-            User u = User.get(session['userID'] as long)
+        call { User u ->
             View view = View.get(viewId)
             apiService.contentForCompanyInView(u, view.uuid, companyUUID)
         }
     }
 
     def contentForEdgeInView(String companyUUID, String company2UUID, long viewId) {
-        call {
-            User u = User.get(session['userID'] as long)
+        call { User u ->
             View view = View.get(viewId)
             apiService.contentForEdgeInView(u, view.uuid, companyUUID, company2UUID)
         }
     }
 
     def contentForCompanyInProject(String companyUUID, long viewId) {
-        call {
-            User u = User.get(session['userID'] as long)
+        call { User u ->
             String projectUUID = View.get(viewId).project.uuid
             apiService.contentForCompanyInProject(u, projectUUID, companyUUID)
         }
     }
 
     def addComment(String projectUUID, String viewUUID, String companyUUID, String company2UUID, String comment) {
-        call {
-            User u = User.get(session['userID'] as long)
+        call { User u ->
             apiService.addComment(u, projectUUID, viewUUID, companyUUID, company2UUID, comment)
         }
     }
 
     def activecompanygraph( long viewId, @Nullable Long ts, @Nullable Long from, @Nullable Long to) {
-        call {
+        call { User user ->
             ///view/graph/org-uuid/user-uuid/project-uuid/view-uuid
-            User user = User.get(session['userID'] as long)
             View view = View.get(viewId)
             apiService.newGraph(user, view, from, to, null)
         }
     }
 
     def article( String articleUUID ) {
-        call {
+        call { User u ->
             ///view/graph/org-uuid/user-uuid/project-uuid/view-uuid
             apiService.article(articleUUID)
         }

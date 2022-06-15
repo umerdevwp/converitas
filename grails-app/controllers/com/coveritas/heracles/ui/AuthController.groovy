@@ -32,12 +32,10 @@ class AuthController {
 
     def logout(){
         User.withTransaction { status ->
-            User user = null
             Long uid = session['userID'] as Long
             if (uid!=null) {
-                user = User.get(uid)
+                new UserEvent(user:User.get(uid), event: UserEvent.E_LOGOUT, ts: System.currentTimeMillis()).save(update:false, flush:true)
             }
-            new UserEvent(user:user, event: UserEvent.E_LOGOUT, ts: System.currentTimeMillis()).save(update:false, flush:true)
             session.invalidate()
             redirect controller: "auth", action: "login"
         }

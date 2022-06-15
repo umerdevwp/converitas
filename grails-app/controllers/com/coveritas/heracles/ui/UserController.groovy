@@ -1,8 +1,8 @@
 package com.coveritas.heracles.ui
 
 import com.coveritas.heracles.HttpClientService
+import com.coveritas.heracles.utils.Helper
 import grails.validation.ValidationException
-import org.springframework.validation.Errors
 
 import static org.springframework.http.HttpStatus.*
 
@@ -31,8 +31,7 @@ class UserController {
             return
         }
 
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if ((user.organization==null && u.isAdmin()) || u.isAdmin(user.organization) || u.isSysAdmin()) {
             try {
                 Map<String, Object> result = httpClientService.postParamsExpectMap('user', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, isAdmin: false], true)
@@ -81,8 +80,7 @@ class UserController {
             return
         }
 
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if ( u.isAdmin(user.organization)||u.isSysAdmin()||u.id==user.id) {
             try {
                 String password = params.password
@@ -124,8 +122,7 @@ class UserController {
             notFound()
             return
         }
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         User user = User.get(id)
         if ( u.isAdmin(user.organization)||u.isSysAdmin()||u.id==user.id) {
             userService.delete(id)

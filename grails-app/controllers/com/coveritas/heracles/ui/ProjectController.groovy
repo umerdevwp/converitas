@@ -1,6 +1,7 @@
 package com.coveritas.heracles.ui
 
 import com.coveritas.heracles.HttpClientService
+import com.coveritas.heracles.utils.Helper
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
@@ -13,8 +14,7 @@ class ProjectController {
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if (u) {
             apiService.remoteProjects(u)
             List<Project> projects = u.isSysAdmin() ? projectService.list(params) : Project.findAllByOrganization(u.organization, params)
@@ -48,8 +48,7 @@ class ProjectController {
         }
         String url = params.url
 
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         Organization organization = u.organization
         if (u.isAdmin(organization) || u.isSysAdmin()) {
             Map<String, Object> result = httpClientService.postParamsExpectMap('project', [userUUID: u.uuid,
@@ -100,8 +99,7 @@ class ProjectController {
             return
         }
         String url = params.url
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if ( u.organization==project.organization||u.isSysAdmin()) {
             try {
                 projectService.save(project)
@@ -131,8 +129,7 @@ class ProjectController {
     def addComment() {
         String url = params.url
         Project project = Project.get(params.get("project").id as long)
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         String comment = params.comment
         Annotation annotation = new Annotation(user: u, annotationType:'text', title: comment) //, project.uuid, view.uuid, company?.uuid, comment
         if (project.organization==u.organization|| u.isSysAdmin()) {
@@ -173,8 +170,7 @@ class ProjectController {
             notFound()
             return
         }
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         Project project = Project.get(id)
         if (u.isAdmin(project.organization)||u.isSysAdmin()) {
             apiService.deleteProject(u, project)

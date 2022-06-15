@@ -89,6 +89,9 @@
           loadChartData(from, to);
         },
         error: function(err, status) {
+          if (err.status===403) {
+            location.replace("/auth/login?url="+window.location.href);
+          }
           alert(err.responseJSON.message);
         }
       })
@@ -167,6 +170,9 @@
           chart2d.setOptions( {start: from, end: to} );
         },
         error: function(err, status) {
+          if (err.status===403) {
+            location.replace("/auth/login?url="+window.location.href);
+          }
           alert(err.responseJSON.message);
         }
       })
@@ -342,7 +348,10 @@
                   $('#graph').removeClass('hide');
                 },
                 error: function(err, status, error){
-                    alert(err.responseJSON.message);
+                  if (err.status===403) {
+                    location.replace("/auth/login?url="+window.location.href);
+                  }
+                  alert(err.responseJSON.message);
                 }
             })
         }

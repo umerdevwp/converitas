@@ -1,6 +1,7 @@
 package com.coveritas.heracles.ui
 
 import com.coveritas.heracles.HttpClientService
+import com.coveritas.heracles.utils.Helper
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
@@ -41,8 +42,7 @@ class CompanyViewObjectController {
             return
         }
 
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         View view = cvo.view
         Project project = view.project
         if (project.organization==u.organization|| u.isSysAdmin()) {
@@ -82,8 +82,7 @@ class CompanyViewObjectController {
         }
 
         try {
-            Long userID = session['userID'] as Long
-            User u = User.get(userID)
+            User u = Helper.userFromSession(session)
             httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, projectUUID:companyViewObject.projectUUID, viewUUID: companyViewObject.viewUUID, companyUUID: companyViewObject.company.uuid, level: companyViewObject.level], false)
             companyViewObjectService.save(companyViewObject)
             apiService.updateRvcCache(companyViewObject.view.id)

@@ -93,6 +93,9 @@ function requestUrl (url) {
             console.log('call '+url+' succeeded');
         },
         error: function(err, status) {
+            if (err.status===403) {
+                location.replace("/auth/login?url="+window.location.href);
+            }
             alert(err.responseJSON.message);
         }
     })

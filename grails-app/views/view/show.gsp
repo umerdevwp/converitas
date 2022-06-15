@@ -625,12 +625,14 @@
             });  
             $('#companies h3:eq( 2 )').on('click', function() {
                     loadGraphData(0);
-            });                        
-            $('#companies ul:first').find('li').append('<span class="material-icons md-18 skyblue">remove_circle</span>');   
+            });
+/*
+            $('#companies ul:first').find('li').append('<span class="material-icons md-18 skyblue">remove_circle</span>');
             $('#companies ul:first').find('li').append('<span class="material-icons md-18 skyblue">hide_source</span>');
             
             $('#companies ul:eq(1)').find('li').append('<span class="material-icons md-18 skyblue">add_circle</span>');
-            }, "2000");           
+*/
+            }, "2000");
 
         });
 
@@ -674,11 +676,15 @@
                     $('#now').html('[' + timeConverter(new Date(now).getTime(), 2) + ' <a href=\'/view/show/${view.id}\'> - <span style=\'color:pink\'>Now</span></a>' + ']');
                 },
                 error: function(err, status) {
+                    if (err.status===403) {
+                        location.replace("/auth/login?url="+window.location.href);
+                    }
                     alert(err.responseJSON.message);
                 }
             })
         }
 
+        const compUuid2Name = {}
         function loadCompanyStatus() {
             $.ajax({
                 url: '/api/viewcompanystate/${view.id}',
@@ -694,13 +700,21 @@
                             console.log(head, len);
                             let companyList = '<ul>'
                             // for (const company of companies) {
-                            for (let i = 0; i < len; i++) {
-                                const company = companies[i];
-                                companyList += '<li><a class="loadcompany" id="load_' + company.uuid + '">' + company.name + '</a></li>';
+                            for (let j = 0; j < len; j++) {
+                                const company = companies[j];
+                                compUuid2Name[company.uuid] = company.name;
+                                companyList += '<li><a class="loadcompany" id="load_' + company.uuid + '">' + company.name + '</a>';
+                                if (i===0) {
+                                    companyList += '<a class="companydlg" data-action="untrack" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">remove_circle</span>';
+                                    companyList += '<a class="companydlg" data-action="ignore" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">hide_source</span>';
+                                } else {
+                                    companyList += '<a class="companydlg" data-action="track" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">add_circle</span>';
+                                }
+                                companyList += '</li>'
                             }
                             companyList += '</ul>'
                             html += ' <h3>'+head+' ('+len+')'
-                            if ((i++)===0){
+                            if (i===0){
                                 html += '<a class=\'create\' style="padding-top: -10px;display: inline-block;" data-toggle=\'modal\' data-target=\'#trackCompanyModal\'><span class=\'material-icons\'>add_circle</span></a>'
                             }
                             html += '</h3>'+companyList
@@ -709,18 +723,43 @@
                             // html += ' <h3>'+head+' ('+len+')</h3>'
                             html += ' <h3>'+head+'</h3>'
                         }
+                        i++
                     });
                     $('#companies').html(html);
                     $('#companies ul:last-child').css('display', 'none');
                     $('.loadcompany').on('click', function() {
                         loadProjectContent(this.id.split('_')[1]);
                     });
+                    $('.companydlg').on('click', function() {
+                        let uuid = $(this).data('uuid');
+                        conmpanyDlg(uuid, compUuid2Name[uuid], $(this).data('action'));
+                    });
                 },
                 error: function(err, status) {
                     console.log(err);
+                    if (err.status===403) {
+                        location.replace("/auth/login?url="+window.location.href);
+                    }
                     alert(err.responseJSON.message);
                 }
             })
+        }
+
+        function conmpanyDlg(uuid, companyName, action) {
+            if (confirm( "You wnt to "+action + " "+companyName+"?" )) {
+                $.ajax({
+                    url: '/api/'+action+'?companyUUID='+uuid+'&viewId=${view.id}',
+                    success: function (data) {
+                        alert(action + ", " + uuid + ", " + companyName)
+                    },
+                    error: function(err, status, error){
+                        if (err.status===403) {
+                            location.replace("/auth/login?url="+window.location.href);
+                        }
+                        alert(err.responseJSON.message);
+                    }
+                })
+            }
         }
 
         function formatDescriptionContent(content)  {
@@ -907,6 +946,9 @@
                 },
                 error: function(err, status) {
                     console.log(err);
+                    if (err.status===403) {
+                        location.replace("/auth/login?url="+window.location.href);
+                    }
                     alert(err.responseJSON.message);
                 }
             })
@@ -930,6 +972,9 @@
                 },
                 error: function(err, status) {
                     console.log(err);
+                    if (err.status===403) {
+                        location.replace("/auth/login?url="+window.location.href);
+                    }
                     alert(err.responseJSON.message);
                 }
             })
@@ -1039,6 +1084,9 @@
                     $('#graph').removeClass('hide');
                 },
                 error: function(err, status, error){
+                    if (err.status===403) {
+                        location.replace("/auth/login?url="+window.location.href);
+                    }
                     alert(err.responseJSON.message);
                 }
             })

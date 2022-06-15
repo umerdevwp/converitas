@@ -1,6 +1,12 @@
 package com.coveritas.heracles.ui
 
-import grails.artefact.DomainClass
+import com.coveritas.heracles.HttpClientService
+import grails.util.Holders
+import io.micronaut.caffeine.cache.Caffeine
+import io.micronaut.caffeine.cache.LoadingCache
+import org.springframework.context.ApplicationContext
+
+import java.util.concurrent.TimeUnit
 
 class Project {
     String uuid                 // View ID in backend
@@ -116,4 +122,59 @@ class Project {
             delete()
         }
     }
+
+
+    class ProjectTs {
+        Project project
+        long timestamp
+
+        ProjectTs(Project p, long ts) {
+            project = p
+            timestamp = ts
+        }
+    }
+    static LoadingCache<ProjectTs, Long> hmAnnotationsSince = Caffeine.newBuilder()
+            .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
+            .build({ ProjectTs pt -> ViewObject.findAllByProjectUUID(pt.project.uuid)*.annotations*.findAll({it.ts>pt.timestamp }).size() as Long})
+
+    long annotationsSince(long ts) {
+        hmAnnotationsSince.get(new ProjectTs(this, ts))
+    }
+
+    Set<Annotation> seenAnnotations(long ts) {
+        Set<Annotation> annotations = ViewObject.findAllByProjectUUID(this.uuid)*.annotations
+        annotations*.findAll({it.ts<=ts }).size()
+    }
+
+    static LoadingCache<ProjectTs, Long> hmInsightsSince = Caffeine.newBuilder()
+            .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
+            .build({ ProjectTs vt ->
+                HttpClientService httpClientService = getHttpClientService()
+                Map events = httpClientService.getParamsExpectMap("eve/count/project/${vt.project.uuid}/${vt.timestamp}/${System.currentTimeMillis()}", null, true)
+                events.count as long
+            })
+
+    static HttpClientService httpClientService = null
+    static HttpClientService getHttpClientService() {
+        if (!httpClientService) {
+            ApplicationContext ctx = Holders.grailsApplication.mainContext
+            httpClientService = ctx.getBean(HttpClientService)
+        }
+        httpClientService
+    }
+
+    long insightsSince(long ts) {
+        hmInsightsSince.get(new ProjectTs(this, ts))
+    }
+
+    long seenInsightsCount(long ts) {
+        Map events = httpClientService.getParamsExpectMap("eve/count/project/${this.uuid}/${0}/${ts}", null, true)
+        events.count as long
+    }
+
+    long insightsCount() {
+        Map events = httpClientService.getParamsExpectMap("eve/count/project/${this.uuid}", null, true)
+        events.count as long
+    }
+
 }

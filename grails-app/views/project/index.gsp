@@ -142,68 +142,40 @@
                     <g:sortableColumn property="description" title="Project Description" />
                     <g:sortableColumn property="users" title="Team" width="100" />
 %{--                    <g:sortableColumn property="users" title="." class="team-blank"/>--}%
-                    <g:sortableColumn property="views" title="Lens" />
-                    <g:sortableColumn property="views" title="." class="team-blank"/>
+%{--                    <g:sortableColumn property="views" title="Lens" />--}%
+%{--                    <g:sortableColumn property="views" title="." class="team-blank"/>--}%
                     <g:sortableColumn property="insights" title="Insights" />
                     <g:sortableColumn property="comments" title="Comments" />
                     <%-- <g:sortableColumn property="status" title="Status" /> --%>
                     <%-- <th>Action</th> --%>
                 </thead>
                 <g:each in="${projectList}" var="bean" status="i">
-                    <g:set var="rowspan" value="${bean.views.size()}"/>
                     <tbody>
                         <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-                        <td rowspan="${rowspan}"><g:link method="GET" resource="${bean}"><f:display bean="${bean}" property="name" displayStyle="table"/></g:link></td>
-                        <td rowspan="${rowspan}"><f:display bean="${bean}" property="description" displayStyle="${'table'}"/></td>
-                        <td rowspan="${rowspan}" class="pr-0">
+                        <td><g:link method="GET" resource="${bean}"><f:display bean="${bean}" property="name" displayStyle="table"/></g:link></td>
+                        <td><f:display bean="${bean}" property="description" displayStyle="${'table'}"/></td>
+                        <td class="pr-0">
                             <ul>
                                 <g:each in="${bean.users}" var="pu">
                                     <li style="background:${pu.color?.code?:'#0815'}"><a style="color: ghostwhite" href="/user/show/${pu.id}">${(pu.name as String).substring(0,2)}</a></li>
                                 </g:each>
                             </ul>
                         </td>
-%{--                        <td rowspan="${rowspan}" class="pl-0"><span class="material-icons">add_circle</span></td>--}%
-                        <g:if test="${rowspan==0}">
-                            <td class="pr-0">
-                            </td>
-                            <%-- <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td> --%>
-                             <td class="pl-0"><a data-toggle="modal" data-target="#create-view" data-projectId="${bean.id}" class="material-icons">add_circle</a></td>
+%{--                      <td rowspan="${rowspan}" class="pl-0"><span class="material-icons">add_circle</span></td>--}%
+                          <%-- <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td> --%>
                             <td>
+%{--                                <span class="material-icons">--}%
+%{--                                    chat_bubble--}%
+%{--                                </span>--}%
+                                <span class="number">${bean.insightsSince(u?.lastLogin())}%{--/${pv.insightsCount()}--}%</span>
                             </td>
                             <td>
+%{--                                <span class="material-icons">--}%
+%{--                                        view_list--}%
+%{--                                </span>--}%
+                                <span class="number">${bean.annotationsSince(u?.lastLogin()?:0)}%{--/${pv.annotations.size()}--}%</span>
                             </td>
-                        </g:if>
-                        <g:else>
-                            <g:each in="${bean.views}" var="pv" status="j">
-                                <g:if test="${j>0}">
-                                    <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-                                </g:if>
-                                <td class="pr-0">
-                                    <a href="/view/show/${pv.id}">${pv.name}</a>
-                                </td>
-                                <%-- <td class="pl-0"><a href="/view/create?project.id=${bean.id}" class="material-icons">add_circle</a></td> --%>
-                                <td class="pl-0">
-                                    <g:if test="${j==0}">
-                                        <a data-toggle="modal" data-target="#create-view" data-projectid="${bean.id}" class="create-view-link material-icons">add_circle</a>
-                                    </g:if>
-                                </td>
-                                <td>
-%{--                                    <span class="material-icons">--}%
-%{--                                        chat_bubble--}%
-%{--                                    </span>--}%
-                                    <span class="number">${pv.insightsSince(u?.lastLogin()?:0)}%{--/${pv.insightsCount()}--}%</span>
-                                </td>
-                                <td>
-                                    %{--                                    <span class="material-icons">--}%
-                                    %{--                                            view_list--}%
-                                    %{--                                    </span>--}%
-                                    <span class="number">${pv.annotationsSince(u?.lastLogin()?:0)}%{--/${pv.annotations.size()}--}%</span>
-                                </td>
-                                <g:if test="${j>0}">
-                                    </tr>
-                                </g:if>
-                            </g:each>
-                        </g:else>
+
                     </tr>
                     </tbody>
                 </g:each>

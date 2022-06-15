@@ -181,8 +181,8 @@
                         <g:sortableColumn property="name" title="Lens" />
                         <g:sortableColumn property="description" title="Description" />
                         <g:sortableColumn property="users" title="Team" width="100" />
-                        <th>Companies</th>
-                        <th class="team-blank">.</th>
+%{--                        <th>Companies</th>--}%
+%{--                        <th class="team-blank">.</th>--}%
                         <g:sortableColumn property="insights" title="Insights" />
                         <g:sortableColumn property="comments" title="Comments" />
                     </thead>
@@ -190,7 +190,7 @@
                     <g:each in="${project.views}" var="view" status="i">
                         <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
                             <td><a href="/view/show/${view.id}">${view.name}</a></td>
-                            <td><${view.description}</td>
+                            <td>${view.description}</td>
                             <td %{--rowspan="${rowspan}"--}% class="pr-0">
                                 <ul>
                                     <g:each in="${view.users}" var="vu">
@@ -198,6 +198,7 @@
                                     </g:each>
                                 </ul>
                             </td>
+%{--
                             <td class="pr-0">
                                 <ul>
                                     <g:each in="${view.companies.keySet()}" var="co">
@@ -208,6 +209,7 @@
                                 </ul>
                             </td>
                             <td class="pl-0"><span class="material-icons">add_circle</span></td>
+--}%
                             <td>
                                 <span class="number">${view.insightsSince(u.lastLogin())}</span>
                             </td>
@@ -402,6 +404,12 @@
                     type: 'DELETE',
                     success: function(result) {
                         window.location = "/project/index";
+                    },
+                    error: function(err, status, error){
+                        if (err.status===403) {
+                            location.replace("/auth/login?url="+window.location.href);
+                        }
+                        alert(err.responseJSON.message);
                     }
                 });
             }

@@ -1,5 +1,6 @@
 package com.coveritas.heracles.ui
 
+import com.coveritas.heracles.utils.Helper
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
@@ -28,8 +29,7 @@ class RoleController {
             return
         }
 
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if (u.isSysAdmin()) {
             try {
                 roleService.save(role)
@@ -60,8 +60,7 @@ class RoleController {
             return
         }
 
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if (u.isSysAdmin()) {
             try {
                 roleService.save(role)
@@ -88,8 +87,7 @@ class RoleController {
             return
         }
 
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if (u.isSysAdmin()) {
             roleService.delete(id)
 

@@ -1,6 +1,7 @@
 package com.coveritas.heracles.ui
 
 import com.coveritas.heracles.HttpClientService
+import com.coveritas.heracles.utils.Helper
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
@@ -28,8 +29,7 @@ class OrganizationController {
             notFound()
             return
         }
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if (u.isSysAdmin()) {
             try {
                 Organization.withTransaction { status ->
@@ -71,8 +71,7 @@ class OrganizationController {
             notFound()
             return
         }
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if ( u.isAdmin(organization)||u.isSysAdmin()) {
             try {
                 organizationService.save(organization)
@@ -98,8 +97,7 @@ class OrganizationController {
             return
         }
         Organization o = Organization.get(id)
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if ( u.isAdmin(o)||u.isSysAdmin()) {
             organizationService.delete(id)
 

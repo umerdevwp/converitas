@@ -2,6 +2,7 @@ package com.coveritas.heracles.ui
 
 import com.coveritas.heracles.HttpClientService
 import com.coveritas.heracles.json.EntityViewEvent
+import com.coveritas.heracles.utils.Helper
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
@@ -16,8 +17,7 @@ class ViewController {
     def index(Integer max) {
         max = Math.min(max ?: 10, 100)
         params.max = max
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         if (u) {
 //            List<Project> prjLst = Project.findAllByOrganization(u.organization)
 //            List<View> views = u.isSysAdmin() ? viewService.list(params) : View.findAllByProjectInList(prjLst, params)
@@ -74,8 +74,7 @@ class ViewController {
             return
         }
 
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         Project project = view.project
         if (project.organization==u.organization|| u.isSysAdmin()) {
             Map<String, Object> result = httpClientService.postParamsExpectMap('view', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, name: view.name, description:view.description], false)
@@ -107,8 +106,7 @@ class ViewController {
     def edit(Long id) {
 //        Set<Company> companies = new LinkedHashSet<>(Company.list())
         View view = viewService.get(id)
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         Boolean[] isDirtyRef = [false]
         Set<CompanyViewObject> cvos = apiService.remoteViewCompanies(view, u, isDirtyRef)
         respond view, model:[companies: [], levels:CompanyViewObject.LEVELS]
@@ -120,8 +118,7 @@ class ViewController {
         View view = View.get(params.get("view").id as long)
         cvo.view = view
         String companyUUID = params.companyUUID as String
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         Project project = view.project
         if (project.organization==u.organization|| u.isSysAdmin()) {
             Map<String, Object> result = httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, viewUUID: view.uuid, companyUUID: companyUUID, level: cvo.level], false)
@@ -168,8 +165,7 @@ class ViewController {
         String url = params.url
 
         Long viewId = params.get("view")?.id as Long
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         View view = viewId?View.get(viewId):null
         Project project = view?.project?:Project.get(params.get("project")?.id as Long)
         String comment = params.comment
@@ -213,8 +209,7 @@ class ViewController {
             return
         }
         String url = params.url
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         Project project = view.project
         if ( u.organization==project.organization||u.isSysAdmin()) {
             Map<String, Object> result = httpClientService.postParamsExpectMap('view', [uuid:view.uuid, userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, name: view.name, description:view.description], false)
@@ -248,8 +243,7 @@ class ViewController {
             notFound()
             return
         }
-        Long userID = session['userID'] as Long
-        User u = User.get(userID)
+        User u = Helper.userFromSession(session)
         View view = View.get(id)
         Project project = view.project
         if ( u.organization==project.organization||u.isSysAdmin()) {

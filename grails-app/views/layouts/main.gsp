@@ -161,12 +161,10 @@
 </nav>
 
 <g:set var="u" value="${User.get(session["userID"])}"/>
-            <g:if test="${u!=null}">
-
-
- </g:if>
+%{--<g:if test="${u!=null}">
+</g:if>
 <g:else>
-</g:else>
+</g:else>--}%
 
 <div class="wrapper">
 

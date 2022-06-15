@@ -445,21 +445,47 @@ class ApiService {
         result.sort({ Map<String,String> a, Map<String,String> b -> (a.name.compareToIgnoreCase(b.name))})
     }
 
-    boolean addCompanyToVew(User user, String companyUUID, long viewId) {
+    boolean addCompanyToView(User user, String companyUUID, long viewId) {
         CompanyViewObject.withTransaction { status ->
             View view = View.get(viewId)
             Project project = view.project
             if (project.organization==user.organization|| user.isSysAdmin()) {
-                CompanyViewObject cvo = new CompanyViewObject()
-                Company company = getCompanyFromAPI(companyUUID)
-                cvo.companyUUID = companyUUID
-                cvo.company = company
-                cvo.view = view
-                httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid, level: cvo.level], false)
-                cvo.organizationUUID = project.organization.uuid
-                cvo.projectUUID = project.uuid
-                cvo.viewUUID = view.uuid
-                cvo.save(update:false, flush:true, failOnError:true)
+                boolean             isUpdate= true
+                CompanyViewObject   cvo     = CompanyViewObject.findByCompanyUUIDAndView(companyUUID, view)
+                if (cvo==null) {
+                    cvo                     = new CompanyViewObject()
+                    cvo.            uuid    = UUID.randomUUID()
+                    Company         company = getCompanyFromAPI(companyUUID)
+                    cvo.companyUUID         = companyUUID
+                    cvo.company             = company
+                    cvo.view                = view
+                    cvo.organizationUUID    = project.organization.uuid
+                    cvo.projectUUID         = project.uuid
+                    cvo.viewUUID            = view.uuid
+                    isUpdate                = false
+                }
+                cvo.level                   = CompanyViewObject.TRACKING
+                httpClientService.postParamsExpectMap('view/company', [userUUID: user.uuid, userOrgUUID: project.organization.uuid, projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid, level: cvo.level], false)
+                cvo.save(update:isUpdate, flush:true, failOnError:true)
+                view.addViewObject(cvo)
+                updateRvcCache(view.id)
+            }
+            true
+        }
+    }
+
+    boolean removeCompanyFromView(User user, String companyUUID, long viewId, boolean isPermanent) {
+        CompanyViewObject.withTransaction { status ->
+            View view = View.get(viewId)
+            Project project = view.project
+            if (project.organization==user.organization|| user.isSysAdmin()) {
+                CompanyViewObject   cvo     = CompanyViewObject.findByCompanyUUIDAndView(companyUUID, view)
+                httpClientService.postParamsExpectMap('view/company',
+                        [userUUID: user.uuid, userOrgUUID: project.organization.uuid,
+                         projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid,
+                         level: isPermanent?CompanyViewObject.IGNORING:CompanyViewObject.REMOVING], false)
+                cvo.deleteCascaded()
+                updateRvcCache(view.id)
             }
             true
         }
