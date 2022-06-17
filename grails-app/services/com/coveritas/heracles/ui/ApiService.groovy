@@ -181,7 +181,7 @@ class ApiService {
     void updateRvcCache(Long viewId) {
         for (ViewReq viewReq in rvcCache.asMap().keySet()) {
             if (viewReq.viewId==viewId) {
-                rvcCache.invalidate(viewReq)
+                rvcCache.refresh(viewReq)
             }
         }
     }
@@ -468,6 +468,7 @@ class ApiService {
                 httpClientService.postParamsExpectMap('view/company', [userUUID: user.uuid, userOrgUUID: project.organization.uuid, projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid, level: cvo.level], false)
                 cvo.save(update:isUpdate, flush:true, failOnError:true)
                 view.addViewObject(cvo)
+                view.save()
                 updateRvcCache(view.id)
             }
             true
@@ -485,6 +486,7 @@ class ApiService {
                          projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid,
                          level: isPermanent?CompanyViewObject.IGNORING:CompanyViewObject.REMOVING], false)
                 cvo.deleteCascaded()
+                view.save()
                 updateRvcCache(view.id)
             }
             true
@@ -529,7 +531,7 @@ class ApiService {
                     User.create(ro.adminUUID as String, "admin", lo, "@dm1n!", [Role.findByName(Role.ADMIN)] as Set<Role>)
                 }
                 Map resultU = httpClientService.getParamsExpectMap("user/${roUuid}/${User.SYS_ADMIN_UUID}", null, true)
-                resultU.users.keySet.each { String ruUuid ->
+                resultU?.users?.keySet?.each { String ruUuid ->
                     User lu = lo.users.find { it.uuid == ruUuid }
                     if (lu==null){
                         User.create(ru.uuid as String, ruUuid as String, lo, "test", [Role.findByName(Role.USER)] as Set<Role>)
@@ -632,7 +634,6 @@ class ApiService {
     Map contentForCompanyInView(User user, String viewUUID, String companyUUID) {
         View view = View.findByUuid( viewUUID )
 
-        String projectUUID = view.project.uuid
         List insights = formatInsights(allEventsForCompanyInView(user, viewUUID, companyUUID))
         Set<Annotation> annotations = commentsForViewAndCompany(viewUUID, companyUUID)
         Set<Map> comments = []
@@ -640,11 +641,19 @@ class ApiService {
         //todo 'det' in view with content formatter
         //todo conversion rc map -> list of Maps with name, value
         List profile = companyProfile(companyUUID)
+        Map actions = [name: searchFor(profile, 'Name'),
+                       uuid:companyUUID,
+                       level:view.companies[companyUUID]]
         [
          "Company Details":profile,
          Insights:insights,
-         Comments:comments
+         Comments:comments,
+         Actions:actions
         ]
+    }
+
+    public String searchFor(ArrayList<Map<String,String>> profile, String key) {
+        profile.find { it.k == key }.v
     }
 
     List<EntityViewEvent> allEventsForEdgeInView(User user, String vUUID, String cUUID, String c2UUID) {

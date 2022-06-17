@@ -50,20 +50,6 @@ class ViewController {
         respond view, model:[ts: ts, events: events, eventCount: events.size()]
     }
 
-    def s(Long id) {
-        Long ts = params.ts ?  Long.parseLong(params.ts as String) : System.currentTimeMillis()
-        Long from = ts-12*3600*1000, to = ts+12*3600*1000
-        View view = viewService.get(id)
-        List<Map> eves = apiService.itemsForTimeline(view.uuid, from, to).tldata
-        List<EntityViewEvent> events = []
-        eves.each { Map eve ->
-            EntityViewEvent event = new EntityViewEvent()
-        }
-
-//        respond viewService.get(id)
-        respond view, model:[ts: ts, events: events, eventCount: events.size()]
-    }
-
     def create() {
         respond new View(params)
     }

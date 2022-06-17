@@ -193,7 +193,7 @@
                             <td>${view.description}</td>
                             <td %{--rowspan="${rowspan}"--}% class="pr-0">
                                 <ul>
-                                    <g:each in="${view.users}" var="vu">
+                                    <g:each in="${view.users.sort({ a, b -> a.name.compareToIgnoreCase( b.name) })}" var="vu">
                                         <li style="background:${vu.color?.code?:'#0815'}"><a style="color: ghostwhite" href="/user/show/${vu.id}">${(vu.name as String).substring(0,2)}</a></li>
                                     </g:each>
                                 </ul>

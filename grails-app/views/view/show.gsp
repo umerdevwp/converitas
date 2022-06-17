@@ -1,4 +1,4 @@
-<%@ page import="com.coveritas.heracles.ui.CompanyViewObject; com.coveritas.heracles.json.EntityViewEvent; com.coveritas.heracles.ui.User" %>
+<%@ page import="com.coveritas.heracles.ui.View; com.coveritas.heracles.ui.CompanyViewObject; com.coveritas.heracles.json.EntityViewEvent; com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -236,9 +236,9 @@
             </div>
             <div class="col-sm-4">
 %{--                <h2>${project.name} > <a class="back-link" style="cursor: pointer;color: #336699"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>--}%
-                <h2>${project.name} <a href="#" class="dropbtn" >&gt;</a> <a class="back-link" href="#"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>
+                <h2><a href="/project/show/${project.id}">${project.name}</a> <a href="#" class="dropbtn" >&gt;</a> <a class="back-link" href="#"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>
                 <div class="dropdown">
-                    <g:set var="views" value="${project.views}"/>
+                    <g:set var="views" value="${View.findAllByProject(project)}"/>
                     <g:if test="${views.size()>1}">
                         <div id="lensDropdown" class="dropdown-content">
                             <g:each in="${views}" var="v">
@@ -684,13 +684,14 @@
             })
         }
 
-        const compUuid2Name = {}
+        const compUuid2Company = {}
         function loadCompanyStatus() {
             $.ajax({
                 url: '/api/viewcompanystate/${view.id}',
                 success: function(data) {
-                    let html = ''
+                    let html = '';
                     let i=0;
+                    let level = 'tracking';
                     Object.keys(data.companies).map(function(head) {
                         const companies = data.companies[head];
                         let len = 0;
@@ -698,19 +699,13 @@
                         if (companies.radar===undefined) {
                             len = companies.length;
                             console.log(head, len);
-                            let companyList = '<ul>'
+                            companyList = '<ul>'
                             // for (const company of companies) {
                             for (let j = 0; j < len; j++) {
                                 const company = companies[j];
-                                compUuid2Name[company.uuid] = company.name;
-                                companyList += '<li><a class="loadcompany" id="load_' + company.uuid + '">' + company.name + '</a>';
-                                // if (i===0) {
-                                //     companyList += '<a class="companydlg" data-action="untrack" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">remove_circle</span>';
-                                //     companyList += '<a class="companydlg" data-action="ignore" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">hide_source</span>';
-                                // } else {
-                                //     companyList += '<a class="companydlg" data-action="track" data-uuid="' + company.uuid + '"><span class="material-icons md-18 skyblue">add_circle</span>';
-                                // }
-                                companyList += '</li>'
+                                company['level'] = level;
+                                compUuid2Company[company.uuid] = company;
+                                companyList += '<li><a class="loadcompany" data-uuid="' + company.uuid + '">' + company.name + '</a></li>'
                             }
                             companyList += '</ul>'
                             html += ' <h3>'+head+' ('+len+')'
@@ -723,17 +718,20 @@
                             // html += ' <h3>'+head+' ('+len+')</h3>'
                             html += ' <h3>'+head+'</h3>'
                         }
-                        i++
+                        i++;
+                        level = 'surfacing'
                     });
                     $('#companies').html(html);
                     $('#companies ul:last-child').css('display', 'none');
                     $('.loadcompany').on('click', function() {
-                        loadProjectContent(this.id.split('_')[1]);
+                        loadProjectContent($(this).data('uuid'));
                     });
+/*
                     $('.companydlg').on('click', function() {
                         let uuid = $(this).data('uuid');
                         conmpanyDlg(uuid, compUuid2Name[uuid], $(this).data('action'));
                     });
+*/
                 },
                 error: function(err, status) {
                     console.log(err);
@@ -746,11 +744,11 @@
         }
 
         function conmpanyDlg(uuid, companyName, action) {
-            if (confirm( "You wnt to "+action + " "+companyName+"?" )) {
+            if (confirm( "Do you want to "+action + " "+companyName+"?" )) {
                 $.ajax({
                     url: '/api/'+action+'?companyUUID='+uuid+'&viewId=${view.id}',
                     success: function (data) {
-                        alert(action + ", " + uuid + ", " + companyName)
+                        loadCompanyStatus()
                     },
                     error: function(err, status, error){
                         if (err.status===403) {
@@ -873,6 +871,27 @@
             return html;
         }
 
+        function formatActionsContent(content)  {
+            // todo untrack/track/ignore/
+            let html= '';
+            html+='<div>';
+            let company = compUuid2Company[content.uuid]
+            if (company.level==='tracking') {
+                html += '<button class="btn btn-primary companydlg" data-action="untrack" data-uuid="' + company.uuid + '"><span class="material-icons md-18">remove_circle</span>Untrack</button>';
+            } else {
+                html += '<button class="btn btn-primary companydlg" data-action="track" data-uuid="' + company.uuid + '"><span class="material-icons md-18">add_circle</span>Track</button>';
+            }
+            html+='</div>';
+            html+='<div>';
+            html += '<button class="btn btn-primary companydlg" data-action="ignore" data-uuid="' + company.uuid + '"><span class="material-icons md-18">hide_source</span>Ignore</button>';
+            html+='</div>';
+            html+='<div>';
+
+            html+='</div>';
+
+            return html;
+        }
+
         function loadProjectContent(companyUUID, company2UUID) {
             $.ajax({
                 url: companyUUID ? (company2UUID ?'/api/contentForEdgeInView?companyUUID='+companyUUID+'&company2UUID='+company2UUID+'&viewId=${view.id}'
@@ -881,12 +900,11 @@
                 success: function(data) {
                     let profiles = 0
                     let i=0
-                    $("#btn4item").hide()
+                    // $("#btn4item").hide()
+                    let actions=false
                     Object.keys(data).map(function(head) {
                         i++;
-                        console.log( "showButtons:"+head)
                         const content = data[head];
-                        console.log(content)
                         let $button = $('#button'+i);
                         let buttonText =  head;
                         let html = ''
@@ -902,13 +920,13 @@
                                 break;
                             case 'comp':
                                 count = content.pop()["count"]
-                                buttonText = 'Details '+content[0].v
+                                buttonText = ''+content[0].v
                                 count = -1
                                 html = formatProfileContent(content);
                                 $icon.html('business')
-                                if (profiles++ === 1) {
-                                    $("#btn4item").show();
-                                }
+                                // if (profiles++ === 1) {
+                                //     $("#btn4item").show();
+                                // }
                                 break;
                             case 'insi':
                                 html = formatInsightsContent(content);
@@ -922,9 +940,17 @@
                                 html = formatParametersContent(content);
                                 count = content.Themes.length+content.Constraints.length
                                 count = -1
-                                $("#btn4item").show();
+                                // $("#btn4item").show();
                                 // $icon.html('settings')
                                 $icon.html('dehaze')
+                                break;
+                            case 'acti':
+                                html = formatActionsContent(content);
+                                // count = content.Themes.length+content.Constraints.length
+                                buttonText = 'Actions'
+                                count = -1
+                                $icon.html('business')
+                                actions = true;
                                 break;
                         }
                         $button.html(buttonText)
@@ -938,9 +964,14 @@
                             $count.show()
                         }
                     });
+                    if (actions) {
+                        $('.companydlg').on('click', function () {
+                            let uuid = $(this).data('uuid');
+                            conmpanyDlg(uuid, compUuid2Company[uuid].name, $(this).data('action'));
+                        })
+                    }
                     $('.article').on('click', function(event) {
-                        const articleUUID = $(this).data("uuid");
-                        showArticle(articleUUID)
+                        showArticle($(this).data("uuid"))
                     })
                     // $('#companies').html(html);
                 },
@@ -1048,6 +1079,7 @@
                         map[node.id] = node;
                         return map;
                     }, {});
+                    data.edges.map(edge => edge.width=1)
                     let arrSize = filteredNodes.length
                     const size = arrSize>90?42:arrSize>50?32:15;
                     // alert("arrSize="+arrSize+" -> font: "+size);

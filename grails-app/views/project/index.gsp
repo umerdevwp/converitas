@@ -156,7 +156,7 @@
                         <td><f:display bean="${project}" property="description" displayStyle="${'table'}"/></td>
                         <td class="pr-0">
                             <ul>
-                                <g:each in="${project.users}" var="pu">
+                                <g:each in="${project.users.sort({ a, b -> a.name.compareToIgnoreCase(b.name) })}" var="pu">
                                     <li style="background:${pu.color?.code?:'#0815'}"><a style="color: ghostwhite" href="/user/show/${pu.id}">${(pu.name as String).substring(0,2)}</a></li>
                                 </g:each>
                             </ul>
