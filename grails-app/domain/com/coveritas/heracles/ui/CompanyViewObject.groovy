@@ -27,6 +27,10 @@ class CompanyViewObject extends ViewObject {
         company
     }
 
+//    void setCompany(Company c){
+//        company c
+//    }
+//
     static transients = ['company']
 
     static mapping = {
@@ -36,19 +40,6 @@ class CompanyViewObject extends ViewObject {
     static constraints = {
         companyUUID nullable: false, unique: ['view']
         level nullable: false, inList: LEVELS
-    }
-
-    def afterInsert() {
-        if (view) {
-            view.addViewObject(this)
-        }
-    }
-
-    def afterUpdate() {
-        if (view) {
-            view.addViewObject(this)
-        }
-        return true
     }
 
     static createDontSave(String companyUUID, View lv, String level) {

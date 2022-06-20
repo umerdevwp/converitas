@@ -454,7 +454,7 @@ class ApiService {
                 CompanyViewObject   cvo     = CompanyViewObject.findByCompanyUUIDAndView(companyUUID, view)
                 if (cvo==null) {
                     cvo                     = new CompanyViewObject()
-                    cvo.            uuid    = UUID.randomUUID()
+                    cvo.uuid                = UUID.randomUUID()
                     Company         company = getCompanyFromAPI(companyUUID)
                     cvo.companyUUID         = companyUUID
                     cvo.company             = company
@@ -467,8 +467,6 @@ class ApiService {
                 cvo.level                   = CompanyViewObject.TRACKING
                 httpClientService.postParamsExpectMap('view/company', [userUUID: user.uuid, userOrgUUID: project.organization.uuid, projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid, level: cvo.level], false)
                 cvo.save(update:isUpdate, flush:true, failOnError:true)
-                view.addViewObject(cvo)
-                view.save()
                 updateRvcCache(view.id)
             }
             true

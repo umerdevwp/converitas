@@ -47,7 +47,7 @@ class ViewController {
         }
 
 //        respond viewService.get(id)
-        respond view, model:[ts: ts, events: events, eventCount: events.size()]
+        respond view, model:[ts: ts, events: events, eventCount: events.size(), colors:Color.list()]
     }
 
     def create() {

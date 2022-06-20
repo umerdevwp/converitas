@@ -30,10 +30,29 @@ class ViewObject {
         organization
     }
 
-    void deleteCascaded(){
-        withTransaction {
-            Annotation.findAllByAnnotatedVO(this)*.deleteCascaded()
+    def afterInsert() {
+        if (view) {
+            view.addViewObject(this)
+        }
+    }
+
+    def afterUpdate() {
+        if (view) {
+            view.addViewObject(this)
+        }
+        return true
+    }
+
+    def beforeDelete() {
+        Annotation.findAllByAnnotatedVO(this)*.deleteCascaded()
+        if (view) {
             view.removeViewObject(this)
+        }
+        return true
+    }
+
+    void deleteCascaded() {
+        withTransaction {
             delete()
         }
     }
