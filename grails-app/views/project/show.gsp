@@ -42,7 +42,7 @@
             color: #FFF;
         }
         .news-insight-item ul li{
-            margin-bottom: 23px;
+            margin-bottom: 15px;
             color: #171822;
             font-size: 16px;
             line-height: 1.8;
@@ -133,9 +133,13 @@
 
         #show-project h3 {
             font-weight: 500;
-            font-size: 1.1em;
+            font-size: 14px;
             margin: 0.1em 0 0.1em 0;
-            line-height: 22px;
+            line-height: 18px;
+        }
+
+        .news-insight-item .time {
+            font-size: 14px;
         }
 
         </style>
@@ -219,10 +223,10 @@
                             <td class="pl-0"><span class="material-icons">add_circle</span></td>
 --}%
                             <td>
-                                <span class="number">${view.insightsSince(u.lastLogin())}</span>
+                                <span class="number"><a href="#" class="insightLink">${view.insightsSince(u.lastLogin())}</a></span>
                             </td>
                             <td>
-                                <span class="number">${view.annotationsSince(u.lastLogin())}</span>
+                                <span class="number"><a href="#" class="commentLink">${view.annotationsSince(u.lastLogin())}</a></span>
                             </td>
                         </tr>
                     </g:each>
@@ -244,13 +248,16 @@
                         %{-- todo fill in latest 10 insights --}%
                             <g:each in="${articles}" var="a">
                                 <li>
-                                    <span>${a.time}</span>
+                                    <span class="time">${a.time}</span>
                                     <h3>${a.title}</h3>
                                     <p><a href="${a.source}" target="_blank" rel="noopener noreferrer">${a.content.substring(0,200)}...</a></p>
                                 </li>
                             </g:each>
                         </ul>
                     </div>
+                    <div class="news-comment-item">
+                        Comments
+                    </div>                
                 </div>
             </div>
             </g:if>
@@ -422,6 +429,18 @@
                 });
             }
         });
+
+        $('.news-comment-item').hide();
+
+        $('.insightLink').on('click', function(){
+            $('.news-insight-item').show();
+            $('.news-comment-item').hide();
+        });
+
+        $('.commentLink').on('click', function(){
+            $('.news-insight-item').hide();
+            $('.news-comment-item').show();
+        });        
         </script>
     </body>
 </html>
