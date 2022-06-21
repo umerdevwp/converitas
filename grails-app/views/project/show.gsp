@@ -178,17 +178,25 @@
                 <table class="projectTable">
                     <thead>
                     <tr>
-                        <g:sortableColumn property="name" title="Lens" />
+                        <g:sortableColumn property="name" title="Project" />
+                        <g:sortableColumn property="name" title="Lens" width="100"/>
                         <g:sortableColumn property="description" title="Description" />
-                        <g:sortableColumn property="users" title="Team" width="100" />
+                        <g:sortableColumn property="users" title="Team" width="150" />
 %{--                        <th>Companies</th>--}%
 %{--                        <th class="team-blank">.</th>--}%
-                        <g:sortableColumn property="insights" title="Insights" />
-                        <g:sortableColumn property="comments" title="Comments" />
+                        <g:sortableColumn property="insights" title="Insights" width="80"/>
+                        <g:sortableColumn property="comments" title="Comments" width="80"/>
                     </thead>
                     <tbody>
+                    <tr>
+                        <td>${project.name}</td>
+                        <td></td>
+                        <td>${project.description}</td>                    
+                    </tr>
+
                     <g:each in="${project.views}" var="view" status="i">
                         <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                            <td></td>
                             <td><a href="/view/show/${view.id}">${view.name}</a></td>
                             <td>${view.description}</td>
                             <td %{--rowspan="${rowspan}"--}% class="pr-0">
