@@ -68,23 +68,20 @@ class ApiService {
                     }
                     // get all views for project (only uuid and status)
                     Map remoteVwMap = httpClientService.getParamsExpectObject("view/${orgUuid}/${user.uuid}/${rpUuid}",null, LinkedHashMap.class, true)
-                    List<Map> views = remoteVwMap.views
+                    Map views = remoteVwMap.views
                     if (views!=null && !views.isEmpty()) {
                         Set<View> localViews = []
-                        for (Map view in views) {
-                            Boolean[] isDirtyRef = {lpIsDirty}
-                            for (String rvUUID in view.keySet()) {
-                                View lv = createOrUpdateViewFromApi(rvUUID, rpUuid, orgUuid, user, isDirtyRef)
-                                localViews.add(lv)
-                            }
+                        Boolean[] isDirtyRef = {lpIsDirty}
+                        for (String rvUUID in views.keySet()) {
+                            View lv = createOrUpdateViewFromApi(rvUUID, rpUuid, orgUuid, user, isDirtyRef)
+                            localViews.add(lv)
                         }
                         if (lpIsDirty) {
                             lp.views = localViews
                             lp.save()
                             localProjects << lp
                         }
-                    }
-                }
+                    }                }
                 allLocalProjects.addAll(localProjects)
             }
         }

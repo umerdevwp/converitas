@@ -70,6 +70,65 @@ class UserController {
         }
     }
 
+    def createcoveritas() {
+            User u = Helper.userFromSession(session)
+            User user = null
+            if (u.isSysAdmin()) {
+                try {
+                    Map name2usr = [:]
+                    User.withTransaction { status ->
+                        [[name:'Paul Josefak',     colorId:94],
+                         [name:'Peter Reuschel',   colorId:90],
+                         [name:'Martina Jecker',   colorId:61],
+                         [name:'Gunther Tolkmit',  colorId:73],
+                         [name:'Ralf Meyer',       colorId: 4],
+                         [name:'Lisa Reeves',      colorId:43]].each{ Map usr ->
+                            Map<String, Object> result = httpClientService.postParamsExpectMap('user', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, isAdmin: false], true)
+                            String uuid = result.uuid
+                            if (uuid) {
+                                user = new User(usr)
+                                Date now = new Date()
+                                user.uuid = uuid
+                                user.color = Color.get(usr.colorId as long)
+                                user.organization = u.organization
+                                user.created = now
+                                user.lastUpdated = now
+                                String password = 'ch@ng3M3!'
+                                if (password != null && password.size() > 0) {
+                                    user.changePassword(password)
+                                }
+                                user.roles = [Role.findByName('User')]
+                                name2usr[usr.name.substring(0,2).toUpperCase()]=userService.save(user)
+                            }
+                        }
+                    }
+                    Project.withTransaction { status ->
+                        [[project:'Nightingale', users:[name2usr['MA'],name2usr['PE']]],
+                         [project:'Blackbird',   users:[name2usr['GU'],name2usr['PA'],name2usr['RA']]],
+                         [project:'Samba',       users:[name2usr['MA'],name2usr['PE']]],
+                         [project:'Asimov',      users:[name2usr['GU'],name2usr['RA']]]].each{ Map prj ->
+                            Project p = Project.findByName(prj.project as String)
+                            p.users = prj.users
+                            p.save()
+                            p.views.each { View v ->
+                                v.users = prj.users
+                            }
+                        }
+                    }
+                } catch (ValidationException e) {
+                    respond user?.errors, view: 'create'
+                    return
+                }
+
+                request.withFormat {
+                    render "Coveritas users are created"
+                }
+
+            } else {
+                notAllowed('default.not.created.message')
+            }
+
+    }
     def edit(Long id) {
         respond userService.get(id)
     }

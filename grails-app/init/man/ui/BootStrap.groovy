@@ -27,6 +27,7 @@ import java.sql.Statement
 class BootStrap {
 
     def init = { ServletContext servletContext ->
+        Color adminColor
         Color.withTransaction { TransactionStatus status ->
             if (Color.list().isEmpty()) {
                 new Color([name:"IndianRed", code: "#CD5C5C"]).save(update:false, failOnError:true)
@@ -36,7 +37,7 @@ class BootStrap {
                 new Color([name:"LightSalmon", code: "#FFA07A"]).save(update:false, failOnError:true)
                 new Color([name:"Crimson", code: "#DC143C"]).save(update:false, failOnError:true)
                 new Color([name:"Red", code: "#FF0000"]).save(update:false, failOnError:true)
-                new Color([name:"FireBrick", code: "#B22222"]).save(update:false, failOnError:true)
+                adminColor = new Color([name:"FireBrick", code: "#B22222"]).save(update:false, failOnError:true)
                 new Color([name:"DarkRed", code: "#8B0000"]).save(update:false, failOnError:true)
                 new Color([name:"Pink", code: "#FFC0CB"]).save(update:false, failOnError:true)
                 new Color([name:"LightPink", code: "#FFB6C1"]).save(update:false, failOnError:true)
@@ -173,13 +174,15 @@ class BootStrap {
                 new Color([name:"DarkSlateGray", code: "#2F4F4F"]).save(update:false, failOnError:true)
                 new Color([name:"Black", code: "#000000"]).save(update:false, failOnError:true)
             }
+        }
+        User.withTransaction { TransactionStatus status ->
             if (User.list().isEmpty()) {
                 Organization.withNewTransaction { status1 ->
                     Date now = new Date()
                     Organization org = new Organization(uuid: Organization.COVERITAS_UUID, name: "CoVeritas", created: now, lastUpdated: now).save(failOnError: true)
                     Role adminRole = new Role(name: Role.ADMIN, organization: org).save(failOnError: true)
                     new Role(name: Role.USER, organization: org).save(failOnError: true)
-                    User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, Color.get(8))
+                    User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, adminColor)
                 }
             }
             Role.findAllByOrganizationIsNull().each{Role r ->

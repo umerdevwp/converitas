@@ -514,7 +514,7 @@
 --}%
                             <div class="fieldcontain required">
                                 <label for="color.id">Color</label>
-                                <select name="color.id" id="color">
+                                <select name="color.id" id="color"≥>
                                     <option value="">-Choose your color-</option>
                                     <g:each in="${colors}" var="color">
                                         <g:if test="${color.id==(project.color?.id?:-1)}">
