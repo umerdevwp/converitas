@@ -107,7 +107,7 @@ class ViewController {
         User u = Helper.userFromSession(session)
         Project project = view.project
         if (project.organization==u.organization|| u.isSysAdmin()) {
-            Map<String, Object> result = httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID:project.uuid, viewUUID: view.uuid, companyUUID: companyUUID, level: cvo.level], false)
+            Map result = apiService.addCompanyToView(u, project, view, companyUUID, cvo)
 //            String uuid = result.uuid
             if (result) {
                 try {

@@ -1,4 +1,4 @@
-<%@ page import="com.coveritas.heracles.ui.User" %>
+<%@ page import="com.coveritas.heracles.ui.Project; com.coveritas.heracles.ui.User" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -77,14 +77,18 @@
             height: 100%;
         }
         .material-icons.md-48 { font-size: 48px; }
+        /*
         .section-title,
         .icon-section {
             float: left;
         }
+        */
         .section-title {
             padding-top: 10px;
             padding-left: 10px;
+            margin-left: 8px;
             font-weight: bold;
+            font-size: 16px;
         }
         .news-insight-item li:first-child {
             border-left: none;
@@ -178,13 +182,13 @@
 %{--                                <span class="material-icons">--}%
 %{--                                    chat_bubble--}%
 %{--                                </span>--}%
-                                <span class="number"><a href="#" class="insightLink">${project.insightsSince(u?.lastLogin())}</a>%{--/${pv.insightsCount()}--}%</span>
+                                <span class="number"><a href="#" class="insightLink" data-url="/api/newInsightsForProject/${project.id}">${(project as Project).insightsSince(u?.lastLogin()?:0)}</a>%{--/${pv.annotations.size()}--}%</span>
                             </td>
                             <td>
 %{--                                <span class="material-icons">--}%
 %{--                                        view_list--}%
 %{--                                </span>--}%
-                                <span class="number"><a href="#" class="commentLink">${project.annotationsSince(u?.lastLogin()?:0)}</a>%{--/${pv.annotations.size()}--}%</span>
+                                <span class="number"><a href="#" class="commentLink" data-url="/api/newCommentsForProject/${project.id}">${(project as Project).annotationsSince(u?.lastLogin()?:0)}</a>%{--/${pv.annotations.size()}--}%</span>
                             </td>
 
                     </tr>
@@ -193,30 +197,31 @@
             </table>
 
             <div class="col-2 leftElement">
-                <div class="table-wrapper-scroll-y table-scrollbar insight-section">
-                    <div class="news-insight-item">
-                        <ul class="">
-                            <li>
-%{--
-                                <span class="material-icons md-48 icon-section">
-                                    view_list
-                                </span>
---}%
-                                <span class="section-title">NEW INSIGHTS</span>
-                            </li>
-                            %{-- todo fill in latest 10 insights --}%
-                            <g:each in="${articles}" var="a">
-                                <li>
-                                    <span>${a.time}</span>
-                                    <h3>${a.title}</h3>
-                                    <p><a href="${a.source}" target="_blank" rel="noopener noreferrer">${a.content.substring(0,200)}...</a></p>
-                                </li>
-                            </g:each>
-                        </ul>
+                <div class="news-insight-item">
+                    <div class="section-title">
+                        %{--
+                                                        <span class="material-icons md-48 icon-section">
+                                                            view_list
+                                                        </span>
+                        --}%
+                        NEW INSIGHTS
                     </div>
-                    <div class="news-comment-item">
-                        Comments
-                    </div>                    
+                    <div class="table-wrapper-scroll-y table-scrollbar insight-section" id="insights">
+
+                            <ul class="">
+                                %{-- todo fill in latest 10 insights --}%
+                                <g:each in="${articles}" var="a">
+                                    <li>
+                                        <span>${a.time}</span>
+                                        <h3>${a.title}</h3>
+                                        <p><a href="${a.source}" target="_blank" rel="noopener noreferrer">${a.content.substring(0,200)}...</a></p>
+                                    </li>
+                                </g:each>
+                            </ul>
+                    </div>
+                </div>
+                <div class="news-comment-item">
+                    Comments
                 </div>
             </div>
         </div>
@@ -303,7 +308,35 @@
                 </div>
             </div>
         </div>
-        %{-- Modal End --}%        
+        %{-- Modal End --}%
+        %{-- Modal Start --}%
+        <div class="modal fade" id="articleModal" tabindex="-1" role="dialog" aria-labelledby="articleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="articleModalLabel">Article</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body fixedHeight">
+                        <h3 id="articleTitle">Apple Inc. article</h3>
+                        <br/>
+                        <span id="articleAuthorSp">by <span id="articleAuthor"></span>,</span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="articleTime" style="float: right">03:05:01 05/17/2022</span>
+                        <br/>
+                        <br/>
+                        <p id="articleContent">Meta halts plans to build a large data center in the Netherlands, amid rising opposition from the government over environmental concerns (April Roach/Bloomberg)</p>
+                        <br/>
+                        <span id="articleSource"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        %{--                        <input type="submit" name="create" class="btn btn-primary" value="Done">--}%
+                    </div>
+                </div>
+            </div>
+        </div>
+        %{-- Modal End --}%
 
         <script type="module">
             // import "/assets/vis-timeline-graph2d.min.js";
@@ -322,15 +355,79 @@
 
             $('.news-comment-item').hide();
 
+            let articles = {}
+
             $('.insightLink').on('click', function(){
-                $('.news-insight-item').show();
-                $('.news-comment-item').hide();
+                $.ajax({
+                    url: $(this).data('url'),
+                    success: function (data) {
+                        $('.section-title').html("NEW INSIGHTS");
+                        articles = {};
+                        let insights = '<ul class="">\n';
+                        const content = data['insights'];
+                        for (let i=0; i<content.length; i++) {
+                            const c = content[i];
+                            articles[c['uuid']] = c;
+                            insights += '  <li>\n    <span class="time">' + c['time'] + '</span>\n';
+                            insights += '    <h3><a data-uuid="' + c['uuid'] + '" data-toggle="modal" data-target="#articleModal" class="article" href="#">' + c['title'] + '</a></h3>\n'
+                            insights += '  </li>\n'
+                        }
+                        insights += '</ul>';
+                        $('#insights').html(insights);
+                        $('.article').on('click', function(event) {
+                            showArticle($(this).data("uuid"))
+                        })
+                    },
+                    error: function(err, status, error){
+                        if (err.status===403) {
+                            location.replace("/auth/login?url="+window.location.href);
+                        }
+                        alert(err.responseJSON.message);
+                    }
+                });
             });
 
+            function showArticle(articleUUID) {
+                const article = articles[articleUUID]
+                console.log(article)
+                $('#articleTitle'   ).html(article.title);
+                if (article.author===undefined || article.author.length==0) {
+                    $('#articleAuthorSp').hide()
+                } else {
+                    $('#articleAuthorSp').show()
+                    $('#articleAuthor').html(article.author);
+                }
+                $('#articleTime'    ).html(article.time);
+                $('#articleContent' ).html(article.content);
+                $('#articleSource'  ).html('<a href='+article.source+' target="_blank" rel="noopener noreferrer">'+article.source+'</a>');
+            }
+
             $('.commentLink').on('click', function(){
-                $('.news-insight-item').hide();
-                $('.news-comment-item').show();
-            });            
-        </script>
+                $.ajax({
+                    url: $(this).data('url'),
+                    success: function (data) {
+                        $('.section-title').html("NEW COMMENTS");
+                        let insights = '<ul class="">\n';
+                        const content = data['comments'];
+                        for (let i=0; i<content.length; i++) {
+                            const c = content[i];
+                            insights+= '  <li>\n    <span class="time">' + c['time'] + '</span>\n';
+                            insights+= '    <h3>' + c['title'] + '</h3>\n'
+                            insights += '  </li>\n'
+                        }
+                        insights += '</ul>\n';
+                        //todo add new cpmment
+
+                        $('#insights').html(insights);
+                    },
+                    error: function(err, status, error){
+                        if (err.status===403) {
+                            location.replace("/auth/login?url="+window.location.href);
+                        }
+                        alert(err.responseJSON.message);
+                    }
+                });
+            });
+    </script>
     </body>
 </html>

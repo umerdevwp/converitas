@@ -7,6 +7,7 @@ import io.micronaut.caffeine.cache.LoadingCache
 import org.springframework.context.ApplicationContext
 
 import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
 
 class Project {
     String uuid                 // View ID in backend
@@ -42,13 +43,13 @@ class Project {
 
         Project project = (Project) o
 
-        if (uuid != project.uuid) return false
+        if (this.uuid != project.uuid) return false
 
         return true
     }
 
     int hashCode() {
-        return (uuid != null ? uuid.hashCode() : 0)
+        return (this.uuid != null ? this.uuid.hashCode() : 0)
     }
 
     Set<User> getUsers() {
@@ -117,7 +118,7 @@ class Project {
     void deleteCascaded(){
         withTransaction {
             Role.deleteAllForDomainClass(this)
-            ViewObject.findAllByProjectUUID(uuid)*.deleteCascaded()
+            ViewObject.findAllByProjectUUID(this.uuid)*.deleteCascaded()
             View.findAllByProject(this)*.delete()
             delete()
         }
@@ -135,7 +136,12 @@ class Project {
     }
     static LoadingCache<ProjectTs, Long> hmAnnotationsSince = Caffeine.newBuilder()
             .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
-            .build({ ProjectTs pt -> ViewObject.findAllByProjectUUID(pt.project.uuid)*.annotations*.findAll({it.ts>pt.timestamp }).size() as Long})
+            .build({ ProjectTs pt ->
+                ArrayList<Set<Annotation>> annotations = ViewObject.findAllByProjectUUID(pt.project.uuid)*.annotations
+                HashSet<Set<Annotation>> all = annotations*.findAll { Annotation a -> a.ts > pt.timestamp }
+                IntSummaryStatistics count = all.stream().collect(Collectors.summarizingInt{ Set s -> s?.size()?:0})
+                count.sum
+            })
 
     long annotationsSince(long ts) {
         hmAnnotationsSince.get(new ProjectTs(this, ts))
@@ -148,11 +154,16 @@ class Project {
 
     static LoadingCache<ProjectTs, Long> hmInsightsSince = Caffeine.newBuilder()
             .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
-            .build({ ProjectTs vt ->
-                HttpClientService httpClientService = getHttpClientService()
-                Map events = httpClientService.getParamsExpectMap("eve/count/project/${vt.project.uuid}/${vt.timestamp}/${System.currentTimeMillis()}", null, true)
-                events.count as long
-            })
+            .build{ ProjectTs vt -> getApiService().countNewEventsForProject(vt.project.uuid, vt.timestamp)}
+
+    static ApiService apiService = null
+    static ApiService getApiService() {
+        if (!apiService) {
+            ApplicationContext ctx = Holders.grailsApplication.mainContext
+            apiService = ctx.getBean(ApiService)
+        }
+        apiService
+    }
 
     static HttpClientService httpClientService = null
     static HttpClientService getHttpClientService() {

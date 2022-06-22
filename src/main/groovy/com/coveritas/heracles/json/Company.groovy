@@ -12,6 +12,7 @@ class Company {
   final static Integer TEMP_WARM = 1 // ... or try Wikidata or Crunchbase (or ...) to get base info
   final static Integer TEMP_HOT = 2
 
+  Long id
   String uuid                 // Company ID in backend
 
   /**
@@ -42,6 +43,7 @@ class Company {
   Integer warmth = TEMP_COLD // How deep have we delved to discover base info ??
 
   Company(Map rc) {
+    id = rc['id']
     uuid =  rc["uuid"]
     canonicalName =  rc["canonicalName"]
     normalizedName =  rc["normalizedName"]

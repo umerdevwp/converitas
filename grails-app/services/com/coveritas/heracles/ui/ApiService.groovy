@@ -29,9 +29,23 @@ class ApiService {
 
     List<Map> matchingCompanies(String name, String country) {
         Map<String,String> params = [:]
-        params.name = name
-        params.country = country
-        httpClientService.getParamsExpectResult("company/byname", params, false) as List<Map>
+        params.prefix = name
+        List<Map> response = httpClientService.getParamsExpectResult("company/match", params, false).company as List<Map>
+        response.each { Map c ->
+            companyCache.put( c.uuid as String, new Company(c))
+        }
+        response
+    }
+
+    Map addCompanyToView(User u, Project project, View view, String companyUUID, CompanyViewObject cvo) {
+        Company c = companyCache.get(companyUUID)
+        if (c.id == null) {
+            Map<String, Object> result = httpClientService.getParamsExpectMap('company/resolve', [name:c.canonicalName], false)
+            companyCache.put(result.uuid as String, new Company(result))
+            log.info("company "+result)
+        }
+        Map<String, Object> result = httpClientService.postParamsExpectMap('view/company', [userUUID: u.uuid, userOrgUUID: project.organization.uuid, projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: companyUUID, level: cvo.level], false)
+        result
     }
 
     /**
@@ -729,6 +743,24 @@ class ApiService {
         eveIt(events)
     }
 
+    List<Map> newInsightsForProject(User user, String pUUID) {
+        List<Map> articles = httpClientService.getParamsExpectResult("article/project/${pUUID}/${user.lastLogin()}/${System.currentTimeMillis()}", null, true) as List<Map>
+        articles.each{Map a -> a.time=format.format(new Date(a.contentTs as long))}
+    }
+
+    List<Map> newInsightsForView(User user, String vUUID) {
+        List<Map> articles = httpClientService.getParamsExpectMap("article/view/${vUUID}/${user.lastLogin()}/${System.currentTimeMillis()}", null, true) as List<Map>
+        articles.each{Map a -> a.time=format.format(new Date(a.contentTs as long))}
+    }
+
+    long countNewEventsForProject(String pUUID, long lastLogin) {
+        httpClientService.getParamsExpectResult("article/count/project/${pUUID}/${lastLogin}/${System.currentTimeMillis()}", null, true) as Long
+    }
+
+    long countNewEventsForView(String vUUID, long lastLogin) {
+        httpClientService.getParamsExpectResult("article/count/view/${vUUID}/${lastLogin}/${System.currentTimeMillis()}", null, true) as Long
+    }
+
     List<EntityViewEvent> allEventsForCompanyInView(User user, String vUUID, String cUUID) {
         Map events = httpClientService.getParamsExpectMap("eve/view/entity/${vUUID}/${cUUID}", null, true)
         eveIt(events)
@@ -746,6 +778,7 @@ class ApiService {
             // todo change the content based on event type and state
             EntityViewEvent event = Meta.fromMap(EntityViewEvent.class, e) as EntityViewEvent
             event.id = i
+//            event.time = format.format(new Date(event.ts as long))
             entityViewEvents.add(event)
         }
 

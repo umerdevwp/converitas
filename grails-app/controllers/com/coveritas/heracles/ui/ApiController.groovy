@@ -88,6 +88,18 @@ class ApiController {
         }
     }
 
+    def newInsightsForProject(long id) {
+        call { User u ->
+            [insights: apiService.newInsightsForProject(u, Project.get(id).uuid)]
+        }
+    }
+
+    def newInsightsForView(long id) {
+        call { User u ->
+            [insights: apiService.newInsightsForView(u, View.get(id).uuid)]
+        }
+    }
+
     def contentForView(long id) {
         call { User u ->
             apiService.contentForView(u, View.get(id).uuid)

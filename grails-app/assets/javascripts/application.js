@@ -33,7 +33,7 @@ $(
                 $.getJSON("/api/suggestions?input=" + input, function (data) {
                     let hasEntry = false
                     $.each(data, function () {
-                        $companyOptions.append($("<option />").val(this.uuid).text(this.name));
+                        $companyOptions.append($("<option />").val(this.uuid).text(this.canonicalName));
                         hasEntry = true
                     });
                     if (hasEntry) {

@@ -8,6 +8,7 @@ import io.micronaut.caffeine.cache.Caffeine
 import io.micronaut.caffeine.cache.LoadingCache
 
 import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
 
 class View {
     String uuid                 // View ID in backend
@@ -107,7 +108,12 @@ class View {
     }
     static LoadingCache<ViewTs, Long> hmAnnotationsSince = Caffeine.newBuilder()
             .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
-            .build({ViewTs vt -> vt.view.annotations.findAll({it.ts>vt.timestamp }).size() as Long})
+            .build({ ViewTs vt ->
+                ArrayList<Set<Annotation>> annotations = ViewObject.findAllByViewUUID(vt.view.uuid)*.annotations
+                HashSet<Set<Annotation>> all = annotations*.findAll { Annotation a -> a.ts > vt.timestamp }
+                IntSummaryStatistics count = all.stream().collect(Collectors.summarizingInt{ Set s -> s?.size()?:0})
+                count.sum
+            })
 
     long annotationsSince(long ts) {
         hmAnnotationsSince.get(new ViewTs(this, ts))
@@ -119,11 +125,16 @@ class View {
 
     static LoadingCache<ViewTs, Long> hmInsightsSince = Caffeine.newBuilder()
             .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
-            .build({ViewTs vt ->
-                HttpClientService httpClientService = getHttpClientService()
-                Map events = httpClientService.getParamsExpectMap("eve/count/view/${vt.view.uuid}/${vt.timestamp}/${System.currentTimeMillis()}", null, true)
-                events.count as long
-            })
+            .build{ViewTs vt -> getApiService().countNewEventsForView(vt.view.uuid, vt.timestamp)}
+
+    static ApiService apiService = null
+    static ApiService getApiService() {
+        if (!apiService) {
+            ApplicationContext ctx = Holders.grailsApplication.mainContext
+            apiService = ctx.getBean(ApiService)
+        }
+        apiService
+    }
 
     static HttpClientService httpClientService = null
     static HttpClientService getHttpClientService() {
