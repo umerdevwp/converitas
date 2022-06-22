@@ -91,7 +91,7 @@
         }
         .col-2.leftElement {
             margin-left: 75px;
-            height: 650px;
+            height: 475px;
             overflow-y: scroll;
         }
         .btn-primary {
@@ -116,6 +116,17 @@
         }
         #list-project {
             padding-top: 40px;
+        }
+
+        h3 {
+            font-weight: 500;
+            font-size: 14px;
+            margin: 0.1em 0 0.1em 0;
+            line-height: 18px;
+        }
+
+        .news-insight-item .time {
+            font-size: 14px;
         }
  
         </style>
@@ -167,13 +178,13 @@
 %{--                                <span class="material-icons">--}%
 %{--                                    chat_bubble--}%
 %{--                                </span>--}%
-                                <span class="number">${project.insightsSince(u?.lastLogin())}%{--/${pv.insightsCount()}--}%</span>
+                                <span class="number"><a href="#" class="insightLink">${project.insightsSince(u?.lastLogin())}</a>%{--/${pv.insightsCount()}--}%</span>
                             </td>
                             <td>
 %{--                                <span class="material-icons">--}%
 %{--                                        view_list--}%
 %{--                                </span>--}%
-                                <span class="number">${project.annotationsSince(u?.lastLogin()?:0)}%{--/${pv.annotations.size()}--}%</span>
+                                <span class="number"><a href="#" class="commentLink">${project.annotationsSince(u?.lastLogin()?:0)}</a>%{--/${pv.annotations.size()}--}%</span>
                             </td>
 
                     </tr>
@@ -203,6 +214,9 @@
                             </g:each>
                         </ul>
                     </div>
+                    <div class="news-comment-item">
+                        Comments
+                    </div>                    
                 </div>
             </div>
         </div>
@@ -304,7 +318,19 @@
                     const projectId = $(this).data("projectid");
                     $('#createViewProjectId').val( projectId )
                 })
-            })
+            });
+
+            $('.news-comment-item').hide();
+
+            $('.insightLink').on('click', function(){
+                $('.news-insight-item').show();
+                $('.news-comment-item').hide();
+            });
+
+            $('.commentLink').on('click', function(){
+                $('.news-insight-item').hide();
+                $('.news-comment-item').show();
+            });            
         </script>
     </body>
 </html>
