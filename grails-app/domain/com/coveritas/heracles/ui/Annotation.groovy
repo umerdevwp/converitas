@@ -8,6 +8,15 @@ class Annotation extends ViewObject {
     long ts
     User user
     static hasOne = [annotatedVO:ViewObject]
+    String time = null
+
+
+    String getTime() {
+        if (time==null){
+            time = ApiService.format.format(new Date(ts as long))
+        }
+        time
+    }
 
     static mapping = {
         table name: 'ma_annotation'
@@ -20,7 +29,7 @@ class Annotation extends ViewObject {
         ts              nullable:true
     }
 
-    static transients = ['organization']
+    static transients = ['organization', 'time']
     private Organization organization = null
     Organization getOrganization() {
         if (organization==null) {

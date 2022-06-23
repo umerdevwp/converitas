@@ -100,6 +100,18 @@ class ApiController {
         }
     }
 
+    def newCommentsForProject(long id) {
+        call { User u ->
+            [comments: apiService.newCommentsForProject(u, Project.get(id).uuid)]
+        }
+    }
+
+    def newCommentsForView(long id) {
+        call { User u ->
+            [comments: apiService.newCommentsForView(u, View.get(id).uuid)]
+        }
+    }
+
     def contentForView(long id) {
         call { User u ->
             apiService.contentForView(u, View.get(id).uuid)

@@ -12,6 +12,7 @@ class AuthController {
             Organization org = Organization.findByUuid(orgId)
             User user = User.findByNameAndOrganization(name, org)
             if (user!=null ) {
+                user.lastLogin = null
                 if (user.authenticate(password)) {
                     session['userID'] = user.id
                     new UserEvent(user:user, event: UserEvent.E_LOGIN, ts: System.currentTimeMillis()).save(update:false, flush:true)

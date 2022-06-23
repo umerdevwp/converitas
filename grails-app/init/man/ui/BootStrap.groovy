@@ -185,21 +185,18 @@ class BootStrap {
                     User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, adminColor)
                 }
             }
-            Role.findAllByOrganizationIsNull().each{Role r ->
-                r.organization = r.users[0].organization
-                r.save(failOnError:true)
-            }
             if (Policy.list().isEmpty()) {
                 Role.findAllByName(Role.ADMIN).each {Role r ->
                     User u = r.users[0]
                     r.grandPermission(Policy.Permission.ADMIN, u.organization)
                 }
             }
-//            ApplicationContext ctx = Holders.grailsApplication.mainContext
-//            DataSource  ds = ctx.getBean(DataSource)
-//            Connection c = null
-//            try {
-//                c = ds.connection
+            ApplicationContext ctx = Holders.grailsApplication.mainContext
+            DataSource  ds = ctx.getBean(DataSource)
+            Connection c = null
+            try {
+                c = ds.connection
+                c.createStatement().executeUpdate("""alter table ma_view_object alter column viewuuid drop not null;""")
 //                if (Policy.all.size()==1) {
 //                    ResultSet rs = c.createStatement().executeQuery("""select user_id, project_id from ma_project_users""")
 //                    Map<Project,Set<User>> pu = [:]
@@ -219,11 +216,11 @@ class BootStrap {
 //                } else {
 //                    c.createStatement().executeUpdate("""drop table if exists ma_project_users cascade;""")
 //                }
-//            } finally {
-//                if (c!=null) {
-//                    c.close()
-//                }
-//            }
+            } finally {
+                if (c!=null) {
+                    c.close()
+                }
+            }
 
 //                ApiService apiService = ctx.getBean(ApiService)
 //                apiService.activateAllViews()

@@ -753,6 +753,14 @@ class ApiService {
         articles.each{Map a -> a.time=format.format(new Date(a.contentTs as long))}
     }
 
+    List<Annotation> newCommentsForProject(User user, String pUUID) {
+        commentsForProject(pUUID, user.lastLogin(), System.currentTimeMillis())
+    }
+
+    List<Annotation> newCommentsForView(User user, String vUUID) {
+        commentsForProject(vUUID, user.lastLogin(), System.currentTimeMillis())
+    }
+
     long countNewEventsForProject(String pUUID, long lastLogin) {
         httpClientService.getParamsExpectResult("article/count/project/${pUUID}/${lastLogin}/${System.currentTimeMillis()}", null, true) as Long
     }
@@ -880,35 +888,40 @@ class ApiService {
         }
     }
 
-    List<Annotation> commentsForProject(String projectUUID) {
-        List<ViewObject> vos = ViewObject.findAllByProjectUUID(projectUUID)
-        extractAllAnnotations(vos)
-    }
-
-    List<Annotation> extractAllAnnotations(List<ViewObject> vos) {
+    List<Annotation> extractAllAnnotations(List<ViewObject> vos, Long ts1=null, Long ts2=null) {
         List<Annotation> result = []
-        vos.each { result.addAll(it.annotations) }
+        vos.each { ViewObject vo -> result.addAll(vo.annotations) }
+        if (ts1!=null || ts2!=null) {
+            if (ts1==null) ts1=0
+            if (ts2==null) ts1=Long.MAX_VALUE;
+            result = result.findAll({ Annotation a -> (a.ts >= ts1)&&(a.ts <= ts2) })
+        }
         result
     }
 
-    List<Annotation> commentsForView(String viewUUID) {
+    List<Annotation> commentsForProject(String projectUUID, Long ts1=null, Long ts2=null) {
+        List<ViewObject> vos = ViewObject.findAllByProjectUUID(projectUUID)
+        extractAllAnnotations(vos, ts1, ts2)
+    }
+
+    List<Annotation> commentsForView(String viewUUID, Long ts1=null, Long ts2=null) {
         List<ViewObject> vos = ViewObject.findAllByViewUUID(viewUUID)
-        extractAllAnnotations(vos)
+        extractAllAnnotations(vos, ts1, ts2)
     }
 
-    List<Annotation> commentsForProjectAndCompany(String projectUUID, String companyUUID) {
+    List<Annotation> commentsForProjectAndCompany(String projectUUID, String companyUUID, Long ts1=null, Long ts2=null) {
         List<ViewObject> vos = CompanyViewObject.findAllByProjectUUIDAndCompanyUUID(projectUUID, companyUUID)
-        extractAllAnnotations(vos)
+        extractAllAnnotations(vos, ts1, ts2)
     }
 
-    List<Annotation> commentsForViewAndCompany(String viewUUID, String companyUUID) {
+    List<Annotation> commentsForViewAndCompany(String viewUUID, String companyUUID, Long ts1=null, Long ts2=null) {
         List<ViewObject> vos = CompanyViewObject.findAllByViewUUIDAndCompanyUUID(viewUUID, companyUUID)
-        extractAllAnnotations(vos)
+        extractAllAnnotations(vos, ts1, ts2)
     }
 
-    List<Annotation> commentsForViewAndEdge(String viewUUID, String companyUUID, String company2UUID) {
+    List<Annotation> commentsForViewAndEdge(String viewUUID, String companyUUID, String company2UUID, Long ts1=null, Long ts2=null) {
         List<ViewObject> vos = EdgeViewObject.findAllByViewUUIDAndCompanyUUIDAndCompany2UUID(viewUUID, companyUUID, company2UUID)
-        extractAllAnnotations(vos)
+        extractAllAnnotations(vos, ts1, ts2)
     }
 
     static String temperatureColor(Float temp) {

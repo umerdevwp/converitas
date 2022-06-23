@@ -400,7 +400,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form url="/project/addComment" method="POST" >
+                <g:form url="/project/addComment" method="POST" >
                     <g:hiddenField name="project.id" value="${project.id}" />
                     <g:hiddenField name="url" class="url" value="/project/show/${project.id}" />
                     <g:hiddenField name="uuid" value="${project.uuid}" />
@@ -408,7 +408,7 @@
                     <div class="modal-body">
                         <fieldset class="form">
                             <div class="fieldcontain required">
-                                <label for="comment">Description<span class="required-indicator">*</span>
+                                <label for="comment">Comment<span class="required-indicator">*</span>
                                 </label>
                                 <textarea name="comment" value="" required="" cols="40" rows="5"></textarea>
                             </div>
@@ -418,7 +418,7 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <input type="submit" class="btn btn-primary" value="Add Comment">
                     </div>
-                </form>
+                </g:form>
             </div>
         </div>
     </div>
@@ -451,6 +451,8 @@
         </div>
     </div>
     %{-- Modal End --}%
+    <script src="/assets/timeConverter.js"></script>
+
     <script type="module">
         $('.delete').on('click', function(){
             if (confirm('Are you sure?')){
@@ -525,10 +527,10 @@
                 success: function (data) {
                     $('.section-title').html("NEW COMMENTS");
                     let insights = '<ul class="">\n';
-                    const content = data['comments'];
-                    for (let i=0; i<content.length; i++) {
-                        const c = content[i];
-                        insights+= '  <li>\n    <span class="time">' + c['time'] + '</span>\n';
+                    const annotations = data['comments'];
+                    for (let i=0; i<annotations.length; i++) {
+                        const c = annotations[i];
+                        insights+= '  <li>\n    <span class="time">' + timeConverter(c['ts'],1) + '</span>\n';
                         insights+= '    <h3>' + c['title'] + '</h3>\n'
                         insights += '  </li>\n'
                     }

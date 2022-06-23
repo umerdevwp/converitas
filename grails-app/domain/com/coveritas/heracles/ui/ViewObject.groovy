@@ -16,9 +16,10 @@ class ViewObject {
     }
 
     static constraints = {
-        uuid nullable: false, blank: false, unique: true
+        uuid        nullable: false, blank: false, unique: true
         projectUUID nullable: false
-        view nullable: true  // only in case of annotations on project level (no view)
+        viewUUID    nullable: true  // only in case of annotations on project level (no view)
+        view        nullable: true  // only in case of annotations on project level (no view)
     }
 
     static transients = ['organization']

@@ -229,209 +229,212 @@
                 </div>
             </div>
         </div>
-        %{-- Modal Start --}%
-        <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createModalLabel">New Project</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <g:form url="/project/save" method="POST" >
-                        <g:hiddenField name="organization.id" value="${u.organization.id}" />
-%{--                        <g:hiddenField name="url" class="url" value="/project/index" />--}%
-                        <div class="modal-body">
-                            <fieldset class="form">
-                                <div class="fieldcontain required">
-                                    <label for="name">Name<span class="required-indicator">*</span></label>
-                                    <input type="text" name="name" value="" required="" id="name">
-                                </div>
-                                <div class="fieldcontain required">
-                                    <label for="description">Description<span class="required-indicator">*</span>
-                                    </label>
-                                    <textarea name="description" value="" required="" cols="40" rows="5" id="description"></textarea>
-                                </div>
-                                <div class="fieldcontain required">
-                                    <label for="color.id">Color</label>
-                                    %{-- <select name="color.id" id="color.id" class="selectpicker">
-                                        <option data-icon="glyphicon glyphicon-eye-open" data-subtext="petrification">Eye of Medusa</option>--}%
-                                    <select name="color.id" id="color.id">
-                                        <option value="">-Choose your color-</option>
-                                        <g:each in="${com.coveritas.heracles.ui.Color.list()}" var="color">
-                                            <option value="${color.id}" style="background-color: ${color.code} !important" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>
-%{--                                            <option value="${color.id}" data-color="${color.code}" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>--}%
-                                        </g:each>
-                                    </select>
-                                </div>
-                            </fieldset>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <input type="submit" name="create" class="btn btn-primary" value="Create">
-                        </div>
-                    </g:form>
-                </div>
-            </div>
-        </div>
-        %{-- Modal End --}%
 
-    <!--Create Lens Modal-->
-        %{-- Modal Start --}%
-        <div class="modal fade" id="create-view" tabindex="-1" role="dialog" aria-labelledby="createLensModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createLensModalLabel">Create Lens</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <g:form url="/view/save" method="POST" >
-                        <g:hiddenField name="project.id" id="createViewProjectId"  value="" />
-                        <g:hiddenField name="url" class="url" value="/project/index" />
-                        <div class="modal-body">
-                            <fieldset class="form">
-                                <div class="fieldcontain required">
-                                    <label for="name">Name<span class="required-indicator">*</span></label>
-                                    <input type="text" name="name" value="" required="">
-                                </div>
-                                <div class="fieldcontain required">
-                                    <label for="description">Description<span class="required-indicator">*</span>
-                                    </label>
-                                    <textarea name="description" value="" required="" cols="40" rows="5"></textarea>
-                                </div>
-                            </fieldset>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <input type="submit" name="create" class="btn btn-primary" value="Create">
-                        </div>
-                    </g:form>
+    %{-- Modal Start --}%
+    <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">New Project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-            </div>
-        </div>
-        %{-- Modal End --}%
-        %{-- Modal Start --}%
-        <div class="modal fade" id="articleModal" tabindex="-1" role="dialog" aria-labelledby="articleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="articleModalLabel">Article</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body fixedHeight">
-                        <h3 id="articleTitle">Apple Inc. article</h3>
-                        <br/>
-                        <span id="articleAuthorSp">by <span id="articleAuthor"></span>,</span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="articleTime" style="float: right">03:05:01 05/17/2022</span>
-                        <br/>
-                        <br/>
-                        <p id="articleContent">Meta halts plans to build a large data center in the Netherlands, amid rising opposition from the government over environmental concerns (April Roach/Bloomberg)</p>
-                        <br/>
-                        <span id="articleSource"></span>
+                <g:form url="/project/save" method="POST" >
+                    <g:hiddenField name="organization.id" value="${u.organization.id}" />
+%{--                        <g:hiddenField name="url" class="url" value="/project/index" />--}%
+                    <div class="modal-body">
+                        <fieldset class="form">
+                            <div class="fieldcontain required">
+                                <label for="name">Name<span class="required-indicator">*</span></label>
+                                <input type="text" name="name" value="" required="" id="name">
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="description">Description<span class="required-indicator">*</span>
+                                </label>
+                                <textarea name="description" value="" required="" cols="40" rows="5" id="description"></textarea>
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="color.id">Color</label>
+                                %{-- <select name="color.id" id="color.id" class="selectpicker">
+                                    <option data-icon="glyphicon glyphicon-eye-open" data-subtext="petrification">Eye of Medusa</option>--}%
+                                <select name="color.id" id="color.id">
+                                    <option value="">-Choose your color-</option>
+                                    <g:each in="${com.coveritas.heracles.ui.Color.list()}" var="color">
+                                        <option value="${color.id}" style="background-color: ${color.code} !important" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>
+%{--                                            <option value="${color.id}" data-color="${color.code}" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>--}%
+                                    </g:each>
+                                </select>
+                            </div>
+                        </fieldset>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        %{--                        <input type="submit" name="create" class="btn btn-primary" value="Done">--}%
+                        <input type="submit" name="create" class="btn btn-primary" value="Create">
                     </div>
+                </g:form>
+            </div>
+        </div>
+    </div>
+    %{-- Modal End --}%
+
+    <!--Create Lens Modal-->
+    %{-- Modal Start --}%
+    <div class="modal fade" id="create-view" tabindex="-1" role="dialog" aria-labelledby="createLensModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createLensModalLabel">Create Lens</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <g:form url="/view/save" method="POST" >
+                    <g:hiddenField name="project.id" id="createViewProjectId"  value="" />
+                    <g:hiddenField name="url" class="url" value="/project/index" />
+                    <div class="modal-body">
+                        <fieldset class="form">
+                            <div class="fieldcontain required">
+                                <label for="name">Name<span class="required-indicator">*</span></label>
+                                <input type="text" name="name" value="" required="">
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="description">Description<span class="required-indicator">*</span>
+                                </label>
+                                <textarea name="description" value="" required="" cols="40" rows="5"></textarea>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input type="submit" name="create" class="btn btn-primary" value="Create">
+                    </div>
+                </g:form>
+            </div>
+        </div>
+    </div>
+    %{-- Modal End --}%
+    %{-- Modal Start --}%
+    <div class="modal fade" id="articleModal" tabindex="-1" role="dialog" aria-labelledby="articleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="articleModalLabel">Article</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body fixedHeight">
+                    <h3 id="articleTitle">Apple Inc. article</h3>
+                    <br/>
+                    <span id="articleAuthorSp">by <span id="articleAuthor"></span>,</span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="articleTime" style="float: right">03:05:01 05/17/2022</span>
+                    <br/>
+                    <br/>
+                    <p id="articleContent">Meta halts plans to build a large data center in the Netherlands, amid rising opposition from the government over environmental concerns (April Roach/Bloomberg)</p>
+                    <br/>
+                    <span id="articleSource"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    %{--                        <input type="submit" name="create" class="btn btn-primary" value="Done">--}%
                 </div>
             </div>
         </div>
-        %{-- Modal End --}%
+    </div>
+    %{-- Modal End --}%
 
-        <script type="module">
-            // import "/assets/vis-timeline-graph2d.min.js";
-            // import "/assets/vis-network.min.js";
+    <script src="/assets/timeConverter.js"></script>
 
-            let pageURL = '';
+    <script type="module">
+        // import "/assets/vis-timeline-graph2d.min.js";
+        // import "/assets/vis-network.min.js";
 
-            $( document ).ready(() => {
-                pageURL = window.location.href;
-                $('#url').val(pageURL);
-                $('*[data-projectid]').on('click', function(event) {
-                    const projectId = $(this).data("projectid");
-                    $('#createViewProjectId').val( projectId )
-                })
-            });
+        let pageURL = '';
 
-            $('.news-comment-item').hide();
+        $( document ).ready(() => {
+            pageURL = window.location.href;
+            $('#url').val(pageURL);
+            $('*[data-projectid]').on('click', function(event) {
+                const projectId = $(this).data("projectid");
+                $('#createViewProjectId').val( projectId )
+            })
+        });
 
-            let articles = {}
+        $('.news-comment-item').hide();
 
-            $('.insightLink').on('click', function(){
-                $.ajax({
-                    url: $(this).data('url'),
-                    success: function (data) {
-                        $('.section-title').html("NEW INSIGHTS");
-                        articles = {};
-                        let insights = '<ul class="">\n';
-                        const content = data['insights'];
-                        for (let i=0; i<content.length; i++) {
-                            const c = content[i];
-                            articles[c['uuid']] = c;
-                            insights += '  <li>\n    <span class="time">' + c['time'] + '</span>\n';
-                            insights += '    <h3><a data-uuid="' + c['uuid'] + '" data-toggle="modal" data-target="#articleModal" class="article" href="#">' + c['title'] + '</a></h3>\n'
-                            insights += '  </li>\n'
-                        }
-                        insights += '</ul>';
-                        $('#insights').html(insights);
-                        $('.article').on('click', function(event) {
-                            showArticle($(this).data("uuid"))
-                        })
-                    },
-                    error: function(err, status, error){
-                        if (err.status===403) {
-                            location.replace("/auth/login?url="+window.location.href);
-                        }
-                        alert(err.responseJSON.message);
+        let articles = {}
+
+        $('.insightLink').on('click', function(){
+            $.ajax({
+                url: $(this).data('url'),
+                success: function (data) {
+                    $('.section-title').html("NEW INSIGHTS");
+                    articles = {};
+                    let insights = '<ul class="">\n';
+                    const content = data['insights'];
+                    for (let i=0; i<content.length; i++) {
+                        const c = content[i];
+                        articles[c['uuid']] = c;
+                        insights += '  <li>\n    <span class="time">' + c['time'] + '</span>\n';
+                        insights += '    <h3><a data-uuid="' + c['uuid'] + '" data-toggle="modal" data-target="#articleModal" class="article" href="#">' + c['title'] + '</a></h3>\n'
+                        insights += '  </li>\n'
                     }
-                });
-            });
-
-            function showArticle(articleUUID) {
-                const article = articles[articleUUID]
-                console.log(article)
-                $('#articleTitle'   ).html(article.title);
-                if (article.author===undefined || article.author.length==0) {
-                    $('#articleAuthorSp').hide()
-                } else {
-                    $('#articleAuthorSp').show()
-                    $('#articleAuthor').html(article.author);
+                    insights += '</ul>';
+                    $('#insights').html(insights);
+                    $('.article').on('click', function(event) {
+                        showArticle($(this).data("uuid"))
+                    })
+                },
+                error: function(err, status, error){
+                    if (err.status===403) {
+                        location.replace("/auth/login?url="+window.location.href);
+                    }
+                    alert(err.responseJSON.message);
                 }
-                $('#articleTime'    ).html(article.time);
-                $('#articleContent' ).html(article.content);
-                $('#articleSource'  ).html('<a href='+article.source+' target="_blank" rel="noopener noreferrer">'+article.source+'</a>');
-            }
-
-            $('.commentLink').on('click', function(){
-                $.ajax({
-                    url: $(this).data('url'),
-                    success: function (data) {
-                        $('.section-title').html("NEW COMMENTS");
-                        let insights = '<ul class="">\n';
-                        const content = data['comments'];
-                        for (let i=0; i<content.length; i++) {
-                            const c = content[i];
-                            insights+= '  <li>\n    <span class="time">' + c['time'] + '</span>\n';
-                            insights+= '    <h3>' + c['title'] + '</h3>\n'
-                            insights += '  </li>\n'
-                        }
-                        insights += '</ul>\n';
-                        //todo add new cpmment
-
-                        $('#insights').html(insights);
-                    },
-                    error: function(err, status, error){
-                        if (err.status===403) {
-                            location.replace("/auth/login?url="+window.location.href);
-                        }
-                        alert(err.responseJSON.message);
-                    }
-                });
             });
+        });
+
+        function showArticle(articleUUID) {
+            const article = articles[articleUUID]
+            console.log(article)
+            $('#articleTitle'   ).html(article.title);
+            if (article.author===undefined || article.author.length==0) {
+                $('#articleAuthorSp').hide()
+            } else {
+                $('#articleAuthorSp').show()
+                $('#articleAuthor').html(article.author);
+            }
+            $('#articleTime'    ).html(article.time);
+            $('#articleContent' ).html(article.content);
+            $('#articleSource'  ).html('<a href='+article.source+' target="_blank" rel="noopener noreferrer">'+article.source+'</a>');
+        }
+
+        $('.commentLink').on('click', function(){
+            $.ajax({
+                url: $(this).data('url'),
+                success: function (data) {
+                    $('.section-title').html("NEW COMMENTS");
+                    let insights = '<ul class="">\n';
+                    const annotations = data['comments'];
+                    for (let i=0; i<annotations.length; i++) {
+                        const c = annotations[i];
+                        insights+= '  <li>\n    <span class="time">' + timeConverter(c['ts'],1) + '</span>\n';
+                        insights+= '    <h3>' + c['title'] + '</h3>\n'
+                        insights += '  </li>\n'
+                    }
+                    insights += '</ul>\n';
+                    //todo add new cpmment
+
+                    $('#insights').html(insights);
+                },
+                error: function(err, status, error){
+                    if (err.status===403) {
+                        location.replace("/auth/login?url="+window.location.href);
+                    }
+                    alert(err.responseJSON.message);
+                }
+            });
+        });
     </script>
     </body>
 </html>

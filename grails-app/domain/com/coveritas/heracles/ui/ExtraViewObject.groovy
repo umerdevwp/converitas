@@ -20,18 +20,18 @@ class ExtraViewObject extends ViewObject {
 
     def afterInsert() {
         log.debug "${id} inserted"
-        view.addViewObject(this)
+        view?.addViewObject(this)
     }
 
     def afterUpdate() {
         log.debug "Updating ${id}"
-        view.addViewObject(this)
+        view?.addViewObject(this)
         return true
     }
 
     def beforeDelete() {
         log.debug "Updating ${id}"
-        view.removeViewObject(this)
+        view?.removeViewObject(this)
     }
 
     @Override
