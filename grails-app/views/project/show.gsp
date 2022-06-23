@@ -79,9 +79,9 @@
             font-weight: bold;
             font-size: 16px;
         }
-        .news-insight-item li:first-child {
+        /* .news-insight-item li:first-child {
             border-left: none;
-        }
+        } */
         .col-2.leftElement {
             margin-left: 75px;
         }

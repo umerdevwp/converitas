@@ -90,14 +90,23 @@
             font-weight: bold;
             font-size: 16px;
         }
-        .news-insight-item li:first-child {
+        /* .news-insight-item li:first-child {
             border-left: none;
-        }
+        } */
         .col-2.leftElement {
             margin-left: 75px;
+        }
+
+        .col-2.leftElement .table-wrapper-scroll-y {
             height: 475px;
             overflow-y: scroll;
         }
+
+        #articleContent {
+            height: 450px;
+            overflow-y: scroll;
+        }
+        
         .btn-primary {
             color: #fff;
             background-color: #f59424;
@@ -199,11 +208,6 @@
             <div class="col-2 leftElement">
                 <div class="news-insight-item">
                     <div class="section-title">
-                        %{--
-                                                        <span class="material-icons md-48 icon-section">
-                                                            view_list
-                                                        </span>
-                        --}%
                         NEW INSIGHTS
                     </div>
                     <div class="table-wrapper-scroll-y table-scrollbar insight-section" id="insights">

@@ -86,9 +86,9 @@
             padding-left: 10px;
             font-weight: bold;
         }
-        .news-insight-item li:first-child {
+        /* .news-insight-item li:first-child {
             border-left: none;
-        }
+        } */
         .col-2.leftElement {
             margin-left: 75px;
         }
