@@ -482,7 +482,7 @@
                 success: function (data) {
                     $('.section-title').html("NEW INSIGHTS");
                     articles = {};
-                    let insights = '<ul class="">\n';
+                    let insights = '<div>'+data['breadcrumb']+'</div><ul class="">\n';
                     const content = data['insights'];
                     for (let i=0; i<content.length; i++) {
                         const c = content[i];
