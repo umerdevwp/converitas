@@ -14,6 +14,7 @@ import org.springframework.transaction.TransactionStatus
 
 import java.text.SimpleDateFormat
 import java.time.Duration
+import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.TimeUnit
 
 @Transactional
@@ -40,7 +41,10 @@ class ApiService {
     Map addCompanyToView(User u, Project project, View view, String companyUUID, CompanyViewObject cvo) {
         Company c = companyCache.get(companyUUID)
         if (c.id == null) {
-            Map<String, Object> result = httpClientService.getParamsExpectMap('company/resolve', [name:c.canonicalName], false)
+            Map mc = c.getClass().declaredFields.findAll { !it.synthetic }.collectEntries { field ->
+                        [field.name, c."$field.name"]
+                    }
+            Map<String, Object> result = httpClientService.postParamsExpectMap('company', mc, false)
             companyCache.put(result.uuid as String, new Company(result))
             log.info("company "+result)
         }
@@ -193,6 +197,17 @@ class ApiService {
         for (ViewReq viewReq in rvcCache.asMap().keySet()) {
             if (viewReq.viewId==viewId) {
                 rvcCache.refresh(viewReq)
+            }
+        }
+    }
+
+    void removeRvcCache(View view, String companyUUID ) {
+        ConcurrentMap<ViewReq, ViewResp> rvcs = rvcCache.asMap()
+        for (ViewReq viewReq in rvcs.keySet()) {
+            if (viewReq.viewId==view.id) {
+                ViewResp vr = rvcs.get(viewReq)
+                vr.resp = vr.resp.findAll({it.companyUUID!=companyUUID})
+                rvcCache.put(viewReq, vr)
             }
         }
     }
@@ -490,13 +505,16 @@ class ApiService {
             Project project = view.project
             if (project.organization==user.organization|| user.isSysAdmin()) {
                 CompanyViewObject   cvo     = CompanyViewObject.findByCompanyUUIDAndView(companyUUID, view)
-                httpClientService.postParamsExpectMap('view/company',
-                        [userUUID: user.uuid, userOrgUUID: project.organization.uuid,
-                         projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: cvo.company.uuid,
-                         level: isPermanent?CompanyViewObject.IGNORING:CompanyViewObject.REMOVING], false)
-                cvo.deleteCascaded()
-                view.save()
-                updateRvcCache(view.id)
+                if (cvo!=null) {
+                    Company company = cvo.company
+                    httpClientService.postParamsExpectMap('view/company',
+                            [userUUID   : user.uuid, userOrgUUID: project.organization.uuid,
+                             projectUUID: project.uuid, viewUUID: view.uuid, companyUUID: company.uuid,
+                             level      : isPermanent ? CompanyViewObject.IGNORING : CompanyViewObject.REMOVING], false)
+                    cvo.deleteCascaded()
+                    view.save()
+                    removeRvcCache(view, company.uuid)
+                }
             }
             true
         }

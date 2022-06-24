@@ -54,6 +54,10 @@ class ViewObject {
 
     void deleteCascaded() {
         withTransaction {
+            Annotation.findAllByAnnotatedVO(this)*.deleteCascaded()
+            if (view) {
+                view.removeViewObject(this)
+            }
             delete()
         }
     }
