@@ -90,25 +90,29 @@ class ApiController {
 
     def newInsightsForProject(long id) {
         call { User u ->
-            [insights: apiService.newInsightsForProject(u, Project.get(id).uuid)]
+            Project p = Project.get(id)
+            [breadcrumb: p.name, projectId:p.id, insights: apiService.newInsightsForProject(u, p.uuid)]
         }
     }
 
     def newInsightsForView(long id) {
         call { User u ->
-            [insights: apiService.newInsightsForView(u, View.get(id).uuid)]
+            View v = View.get(id)
+            [breadcrumb: "${v.project.name} > ${v.name}", viewId:v.id, projectId:v.project.id, insights: apiService.newInsightsForView(u, v.uuid)]
         }
     }
 
     def newCommentsForProject(long id) {
         call { User u ->
-            [comments: apiService.newCommentsForProject(u, Project.get(id).uuid)]
+            Project p = Project.get(id)
+            [breadcrumb: p.name, projectId:p.id, comments: apiService.newCommentsForProject(u, p.uuid)]
         }
     }
 
     def newCommentsForView(long id) {
         call { User u ->
-            [comments: apiService.newCommentsForView(u, View.get(id).uuid)]
+            View v = View.get(id)
+            [breadcrumb: "${v.project.name} > ${v.name}", viewId:v.id, projectId:v.project.id, comments: apiService.newCommentsForView(u, v.uuid)]
         }
     }
 

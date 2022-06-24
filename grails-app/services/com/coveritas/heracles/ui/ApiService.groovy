@@ -776,7 +776,7 @@ class ApiService {
     }
 
     List<Annotation> newCommentsForView(User user, String vUUID) {
-        commentsForProject(vUUID, user.lastLogin(), System.currentTimeMillis())
+        commentsForView(vUUID, user.lastLogin(), System.currentTimeMillis())
     }
 
     long countNewEventsForProject(String pUUID, long lastLogin) {
@@ -832,7 +832,7 @@ class ApiService {
 
     ViewObject findOrCreateViewObject(Organization org, String projectUUID, String viewUUID, String companyUUID, String company2UUID) {
         ViewObject.withTransaction { status ->
-            View view = View.findByUuid(viewUUID)
+            View view = viewUUID==null?null:View.findByUuid(viewUUID)
             ViewObject vo
             if (companyUUID) {
                 if (!company2UUID) {

@@ -109,10 +109,8 @@ class View {
     static LoadingCache<ViewTs, Long> hmAnnotationsSince = Caffeine.newBuilder()
             .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
             .build({ ViewTs vt ->
-                ArrayList<Set<Annotation>> annotations = ViewObject.findAllByViewUUID(vt.view.uuid)*.annotations
-                HashSet<Set<Annotation>> all = annotations*.findAll { Annotation a -> a.ts > vt.timestamp }
-                IntSummaryStatistics count = all.stream().collect(Collectors.summarizingInt{ Set s -> s?.size()?:0})
-                count.sum
+                ArrayList<Set<Annotation>> annotations = Annotation.findAllByViewUUID(vt.view.uuid)*.annotations
+                annotations*.findAll({ Annotation a -> a.ts > vt.timestamp }).size()
             })
 
     long annotationsSince(long ts) {

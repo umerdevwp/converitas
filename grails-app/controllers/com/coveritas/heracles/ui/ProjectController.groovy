@@ -135,7 +135,9 @@ class ProjectController {
         if (project.organization==u.organization|| u.isSysAdmin()) {
             if (comment) {
                 try {
-                    annotation = apiService.addComment(u, project.uuid, null, params.companyUUID as String, params.company2UUID as String, comment)
+                    Long viewId = params.get("view")?.id as Long
+                    View view = (viewId!=null)?View.get(viewId):null
+                    annotation = apiService.addComment(u, project.uuid, view?.uuid, params.companyUUID as String, params.company2UUID as String, comment)
                 } catch (ValidationException e) {
                     respond project.errors, project:'show'
                     return

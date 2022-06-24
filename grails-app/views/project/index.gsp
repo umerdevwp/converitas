@@ -414,18 +414,28 @@
                 url: $(this).data('url'),
                 success: function (data) {
                     $('.section-title').html("NEW COMMENTS");
-                    let insights = '<ul class="">\n';
+                    let comments = '<div>'+data['breadcrumb']+'</div>' +
+                                   '<form method=\'post\' action=\'/project/addComment\'>'+
+                                   '<input type=\'hidden\' name="url" class="url" value=\'/project/index\' />'+
+                                   '<input type=\'hidden\'  name=\'project.id\' value=\''+data['projectId']+'\'/>';
+                    const viewId = data['viewId'];
+                    if (viewId!==undefined) {
+                        comments+= '<input type=\'hidden\'  name=\'view.id\' value=\''+ viewId+'\'/>';
+                    }
+                    comments    += '<input id=\'comment\' name=\'comment\' placeholder=\'Enter a Comment\' class=\'form-control\'>' +
+                                   '<input id=\'addComment\' value=\'Add Comment\' type=\'submit\' class=\'btn btn-primary\'>'+
+                                   '</form>';
                     const annotations = data['comments'];
                     for (let i=0; i<annotations.length; i++) {
                         const c = annotations[i];
-                        insights+= '  <li>\n    <span class="time">' + timeConverter(c['ts'],1) + '</span>\n';
-                        insights+= '    <h3>' + c['title'] + '</h3>\n'
-                        insights += '  </li>\n'
+                        comments+= '  <li>\n    <span class="time">' + timeConverter(c['ts'],1) + '</span>\n';
+                        comments+= '    <h3>' + c['title'] + '</h3>\n'
+                        comments += '  </li>\n'
                     }
-                    insights += '</ul>\n';
+                    comments += '</ul>\n';
                     //todo add new cpmment
 
-                    $('#insights').html(insights);
+                    $('#insights').html(comments);
                 },
                 error: function(err, status, error){
                     if (err.status===403) {
