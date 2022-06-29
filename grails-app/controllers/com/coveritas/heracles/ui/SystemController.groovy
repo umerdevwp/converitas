@@ -4,7 +4,7 @@ import com.coveritas.heracles.HttpClientService
 import com.coveritas.heracles.json.SystemState
 import groovy.transform.CompileStatic
 
-import javax.annotation.Nullable
+import org.springframework.lang.Nullable
 
 @CompileStatic
 class SystemController {
