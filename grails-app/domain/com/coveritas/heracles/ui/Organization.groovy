@@ -44,13 +44,4 @@ class Organization {
     public String toString() {
         return "$name" + ((country == null) ? "" : " ($country)");
     }
-
-    static transients = ['organization']
-    private Organization organization = null
-    Organization getOrganization() {
-        if (organization==null) {
-            organization = this
-        }
-        organization
-    }
 }
