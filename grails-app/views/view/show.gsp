@@ -168,7 +168,7 @@
             font-size: 16px;
             margin: 4px 2px;
             cursor: pointer;
-            margin-left: 88px;            
+            /* margin-left: 88px;             */
         }
 
         a.edit {
@@ -179,6 +179,22 @@
         }
         #show-view input {
             cursor: pointer
+        }
+
+        #companyOptions.form-control {
+            width: 65%;
+            float: left;
+            font-size: 13px;
+            height: auto;
+            list-style: none;
+            padding: 7px;
+            max-height: 300px;
+            overflow: auto;
+        }
+
+        .sub-company {
+            margin-top: 0;
+            margin-left: 180px;
         }
 
         /* #companies li a,
@@ -361,8 +377,8 @@
                                         <input type="hidden" id="companyUUID" name="companyUUID"/>
                                     </div>
                                     <div class="sub-company">
-                                        <select class="form-control list-group" id="companyOptions" style="display:none">
-                                        </select>
+                                        <ul class="form-control list-group" id="companyOptions" style="display:none">
+                                        </ul>
                                     </div>
                                     <div class="messageSection hide">Start tracking the selected company</div>
                                 </div>

@@ -33,7 +33,7 @@ $(
                 $.getJSON("/api/suggestions?input=" + input, function (data) {
                     let hasEntry = false
                     $.each(data, function () {
-                        $companyOptions.append($("<option />").val(this.uuid).text(this.canonicalName));
+                        $companyOptions.append($("<li />").attr('value', this.uuid).text(this.canonicalName));
                         hasEntry = true
                     });
                     if (hasEntry) {
@@ -44,25 +44,36 @@ $(
             }
         });
 
-        function onSelChange() {
-            return function () {
-                $selectedCompany = $( "#companyOptions option:selected");
-                let text = $selectedCompany.text();
-                if (text!=='') {
-                    $company.val(text);
-                    var uuid = $('#companyUUID').val($selectedCompany.val());
-                    var uuid = $("#companyOptions").find(":selected").attr('value');
-                    console.log('seelected uuid', uuid);
-                    $('#addButton').show();
-                } else {
-                    $('#addButton').hide()
-                    $companyOptions.hide()
-                }
-            };
-        }
 
-        $companyOptions.on('change', onSelChange());
-        $companyOptions.on('click', onSelChange());
+        $('#companyInput').val();
+        $(document.body).on('click change', '#companyOptions li' ,function(){
+            $('#companyInput').val($(this).html());
+            $('#companyOptions').hide();
+            var uuid = $(this).attr('value');
+            console.log('uuid', uuid);
+            $('#addButton').show();
+         });
+
+        // function onSelChange() {
+        //     return function () {
+        //         //$selectedCompany = $( "#companyOptions option:selected");
+        //         //let text = $selectedCompany.text();
+        //         if (text!=='') {
+        //             $company.val(text);
+        //             var uuid = $('#companyUUID').val($selectedCompany.val());
+        //             var uuid = $("#companyOptions").find(":selected").attr('value');
+        //             console.log('seelected uuid', uuid);
+        //             $('#addButton').show();
+        //         } else {
+        //             $('#addButton').hide()
+        //             $companyOptions.hide()
+        //         }
+        //     };
+        // }
+
+        // $companyOptions.on('change', onSelChange());
+        // $companyOptions.on('click', onSelChange());
+
     }
 );
 
