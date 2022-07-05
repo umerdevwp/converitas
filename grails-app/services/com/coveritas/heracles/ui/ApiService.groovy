@@ -942,56 +942,6 @@ class ApiService {
         extractAllAnnotations(vos, ts1, ts2)
     }
 
-    static String temperatureColor(Float temp) {
-
-        if (null == temp) return ''
-
-        int t = Math.round(temp*31)
-        switch (t) {
-            case 31: return "#790402"
-            case 30: return "#940d00"
-            case 29: return "#c12201"
-            case 28: return "#d23105"
-            case 27: return "#e14008"
-            case 26: return "#eb520e"
-            case 25: return "#f56818"
-            case 24: return "#fb8021"
-            case 23: return "#fe972b"
-            case 22: return "#fcac34"
-            case 21: return "#f7c039"
-            case 20: return "#ecd03a"
-            case 19: return "#DEDF36"
-            case 17: return "#cbec33"
-            case 16: return "#b7f734"
-            case 15: return "#A2FD3C"
-            case 14: return "#8aff4b"
-            case 13: return "#6afe64"
-            case 12: return "#4CF77D"
-            case 11: return "#31f099"
-            case 10: return "#1de9af"
-            case  9: return "#18DBC3"
-            case  8: return "#1CCCD9"
-            case  7: return "#28BBEC"
-            case  6: return "#37a7f9"
-            case  5: return "#4194ff"
-            case  4: return "#437bef"
-            case  3: return "#456be3"
-            case  2: return "#4356c6"
-            case  1: return "#382a72"
-            default: return "#2b0536"
-        }
-    }
-
-    private class NodeAndEdges {
-        Map node
-        List<Map> edges
-
-        NodeAndEdges(Map node) {
-            this.node = node
-            edges = []
-        }
-    }
-
     /**
      * Produce [nodes: edges] data for graph widget. If uuid is null then complete graph,
      * else if uuid and mexdepth are not null just the subgraph of all edges connected

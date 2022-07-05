@@ -8,7 +8,6 @@ import io.micronaut.caffeine.cache.Caffeine
 import io.micronaut.caffeine.cache.LoadingCache
 
 import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
 
 class View {
     String uuid                 // View ID in backend

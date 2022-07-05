@@ -39,10 +39,10 @@ class ApiController {
         }
     }
 
-    def suggestions() {
+    def suggestions(String input) {
         call { User u ->
-            List<Map> addCompanies = apiService.matchingCompanies((String) params.input, "US")
-//            addCompanies.removeAll(apiService.tracked())
+//            List<Map> addCompanies = apiService.matchingCompanies((params as GrailsParameterMap).input as String, "US")
+            List<Map> addCompanies = apiService.matchingCompanies(input, "US")
             addCompanies
         }
     }
@@ -80,9 +80,10 @@ class ApiController {
         }
     }
 
-    def contentForProject(long id) {
+    def contentForProject(long id, String viewId) {
         call { User u ->
-            View view = params.viewId?View.get(params.viewId as long):null
+//            def viewId = (params as GrailsParameterMap).viewId
+            View view = viewId?View.get(viewId as long):null
             def x = apiService.contentForProject(u, Project.get(id).uuid, view)
             x
         }

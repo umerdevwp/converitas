@@ -47,11 +47,18 @@ $(
 
         $('#companyInput').val();
         $(document.body).on('click change', '#companyOptions li' ,function(){
-            $('#companyInput').val($(this).html());
-            $('#companyOptions').hide();
-            var uuid = $(this).attr('value');
-            console.log('uuid', uuid);
-            $('#addButton').show();
+            let text = $(this).html();
+            if (text!=='') {
+                $('#companyInput').val(text);
+                $('#companyOptions').hide();
+                var uuid = $(this).attr('value');
+                $('#companyUUID').val(uuid);
+                console.log('uuid', uuid);
+                $('#addButton').show();
+            } else {
+                $('#addButton').hide()
+                $companyOptions.hide()
+            }
          });
 
         // function onSelChange() {

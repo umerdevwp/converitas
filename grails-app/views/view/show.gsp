@@ -902,7 +902,8 @@
             html += '<button class="btn btn-primary companydlg" data-action="ignore" data-uuid="' + company.uuid + '"><span class="material-icons md-18">hide_source</span>Ignore</button>';
             html+='</div>';
             html+='<div>';
-
+            //todo list with possible relationships and tracked companies
+            //todo form to persist relationship as event (should stay timeless/always be present in graph)
             html+='</div>';
 
             return html;
