@@ -76,8 +76,10 @@ class ApiService {
 
             Project.withTransaction { status ->
                 Set<Project> localProjects = Project.findAllByOrganization(organization)
+                Set<String> retainProjectUUIDs = []
                 for (Map rp:remoteProjects) {
                     String rpUuid = rp.uuid
+                    retainProjectUUIDs << rpUuid
                     Project lp = localProjects.find({it.uuid==rpUuid})
                     boolean lpIsDirty = lp==null  // this should never happen because all views are created in UI (>=admin level)
                     if (lpIsDirty) {
@@ -86,20 +88,31 @@ class ApiService {
                     }
                     // get all views for project (only uuid and status)
                     Map remoteVwMap = httpClientService.getParamsExpectObject("view/${orgUuid}/${user.uuid}/${rpUuid}",null, LinkedHashMap.class, true)
-                    Map views = remoteVwMap.views
-                    if (views!=null && !views.isEmpty()) {
-                        Set<View> localViews = []
-                        Boolean[] isDirtyRef = {lpIsDirty}
-                        for (String rvUUID in views.keySet()) {
-                            View lv = createOrUpdateViewFromApi(rvUUID, rpUuid, orgUuid, user, isDirtyRef)
-                            localViews.add(lv)
+                    Map views = remoteVwMap.views?:[:]
+                    Set<View> localViews = []
+                    Boolean[] isDirtyRef = {lpIsDirty}
+                    for (String rvUUID in views.keySet()) {
+                        View lv = createOrUpdateViewFromApi(rvUUID, rpUuid, orgUuid, user, isDirtyRef)
+                        localViews.add(lv)
+                    }
+                    Set<View> deleteViews = View.findAllByProject(lp)
+                    Set<String> retainViewUUIDs = localViews*.uuid
+                    for (View dv in deleteViews) {
+                        if (!retainViewUUIDs.contains(dv.uuid)) {
+                            dv.deleteCascaded()
                         }
-                        if (lpIsDirty) {
-                            lp.views = localViews
-                            lp.save()
-                            localProjects << lp
-                        }
-                    }                }
+                    }
+                    if (lpIsDirty) {
+                        lp.views = localViews
+                        lp.save()
+                        localProjects << lp
+                    }
+                }
+                for (Project dp in localProjects) {
+                    if (!retainProjectUUIDs.contains(dp.uuid)) {
+                        dp.deleteCascaded()
+                    }
+                }
                 allLocalProjects.addAll(localProjects)
             }
         }
@@ -171,11 +184,6 @@ class ApiService {
     Set<CompanyViewObject> remoteViewCompanies(View lv, User user, Boolean[] isDirtyRef) {
         ViewReq viewReq = new ViewReq(lv, user)
         return rvcCache.get(viewReq).resp
-    }
-
-    Set<CompanyViewObject> remoteViewCompanies(long lvId, long userId) {
-        ViewReq viewReq = new ViewReq(View.get(lvId), User.get(userId))
-        rvcCache.get(viewReq).resp
     }
 
     ViewResp remoteViewCompaniesWithRadar(long lvId, long userId) {
@@ -284,8 +292,7 @@ class ApiService {
             .build({ eid -> createOrUpdateCompanyFromApi(eid as String) }) as LoadingCache<String, Company>
 
     Company createOrUpdateCompanyFromApi(String uuid) {
-        Map rc = httpClientService.getParamsExpectResult("company/byuuid", [uuid: uuid, plain:true], true)
-        new Company(rc)
+        new Company(httpClientService.getParamsExpectResult("company/byuuid", [uuid: uuid, plain:true], true) as Map)
     }
 
     View createOrUpdateViewFromApi(String vUuid, String pUuid, String userOrgUUID, User user, Boolean[] isDirtyRef, View lv=null) {
@@ -294,7 +301,7 @@ class ApiService {
         }
         //todo find out how to get the right data for the View from API
         Map rvMap = httpClientService.getParamsExpectResult("view/byuuid", [viewUUID:"${vUuid}"], true) as Map
-        View rv = (rvMap.size()==0)?null:Meta.fromMap(View.class, rvMap.get("view")) as View
+        View rv = (rvMap.size()==0)?null:Meta.fromMap(View.class, rvMap.get("view") as Map<String, Object>) as View
         if (lv==null) {
             if (!rv) {
                 return null

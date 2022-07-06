@@ -41,7 +41,6 @@ class ApiController {
 
     def suggestions(String input) {
         call { User u ->
-//            List<Map> addCompanies = apiService.matchingCompanies((params as GrailsParameterMap).input as String, "US")
             List<Map> addCompanies = apiService.matchingCompanies(input, "US")
             addCompanies
         }
@@ -164,45 +163,4 @@ class ApiController {
             apiService.article(articleUUID)
         }
     }
-
-/**
-     * Returns times series of *tracked* organization state one per bucket in time range
-     *
-     * @param from - timeMS of start of range
-     * @param to - timeMS of end of range
-     * @param buckets - number of windows to divide range into
-     * @return map companyuuid -> List of organization state maps
-     *//*
-
-    def trackedCompanyWindowedState(Long from, Long to, Integer buckets) {
-        call {
-            List<String> tracked =
-                (httpClientService.getParamsExpectList("organization/active", [mode: 2], LinkedHashMap) as List<LinkedHashMap>)
-                    .collect { ((Map)it.company).uuid as String }
-
-            httpClientService.postParamsExpectMap("entity/windowedstate", [uuids: tracked, from: from, to: to, buckets: buckets])
-        }
-    }
-
-    def companyEntityState(String uuid) {
-        call {
-            organizationService.get(uuid)
-        }
-    }
-
-
-    def startTracking(String uuid) {
-        call {
-            organizationService.track(uuid)
-            [:]
-        }
-    }
-
-    def stopTracking(String uuid) {
-        call {
-            organizationService.untrack(uuid)
-            [:]
-        }
-    }
-*/
 }

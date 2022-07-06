@@ -27,7 +27,7 @@ import java.sql.Statement
 class BootStrap {
 
     def init = { ServletContext servletContext ->
-        Color adminColor
+        Color adminColor = null
         Color.withTransaction { TransactionStatus status ->
             if (Color.list().isEmpty()) {
                 new Color([name:"IndianRed", code: "#CD5C5C"]).save(update:false, failOnError:true)
@@ -182,7 +182,7 @@ class BootStrap {
                     Organization org = new Organization(uuid: Organization.COVERITAS_UUID, name: "CoVeritas", created: now, lastUpdated: now).save(failOnError: true)
                     Role adminRole = new Role(name: Role.ADMIN, organization: org).save(failOnError: true)
                     new Role(name: Role.USER, organization: org).save(failOnError: true)
-                    User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, adminColor)
+                    User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, adminColor?:Color.findByName("FireBrick"))
                 }
             }
             if (Policy.list().isEmpty()) {

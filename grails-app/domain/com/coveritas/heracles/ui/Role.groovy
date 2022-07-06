@@ -49,7 +49,7 @@ class Role {
 
     boolean equals(o) {
         if (this.is(o)) return true
-        if (getClass() != o.class) return false
+        if ((o==null) || (getClass() != o.class)) return false
 
         Role role = (Role) o
 
