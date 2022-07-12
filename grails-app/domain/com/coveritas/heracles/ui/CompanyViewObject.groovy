@@ -11,7 +11,8 @@ class CompanyViewObject extends ViewObject {
     final static String SURFACING = 'surfacing'
     final static String IGNORING = 'ignoring'
     final static String REMOVING = 'removing'
-    final static List<String> LEVELS = [UNKNOWN, TRACKING, WATCHING, SURFACING, IGNORING, REMOVING]
+    final static String DISCOVERED = 'discovered'
+    final static List<String> LEVELS = [UNKNOWN, TRACKING, WATCHING, SURFACING, IGNORING, REMOVING, DISCOVERED]
 
     String companyUUID
     String  level

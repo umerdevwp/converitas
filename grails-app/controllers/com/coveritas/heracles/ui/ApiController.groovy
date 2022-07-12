@@ -46,9 +46,9 @@ class ApiController {
         }
     }
 
-    def viewtimeline(long id, @Nullable Long from, @Nullable Long to) {
+    def viewtimeline(long id, @Nullable Long from, @Nullable Long to, @Nullable String co1, @Nullable String co2) {
         call { User u ->
-            apiService.itemsForTimeline(View.get(id).uuid, from, to)
+            apiService.itemsForTimeline(View.get(id).uuid, from, to, co1, co2)
         }
     }
 

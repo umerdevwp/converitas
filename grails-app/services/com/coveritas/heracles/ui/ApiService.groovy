@@ -343,11 +343,15 @@ class ApiService {
         String vUuid
         Long from
         Long to
+        String co1
+        String co2
 
-        TimelineReq(String vUuid, Long from, Long to) {
+        TimelineReq(String vUuid, Long from, Long to, String co1, String co2) {
             this.vUuid = vUuid
             this.from = from
             this.to = to
+            this.co1 = co1
+            this.co2 = co2
         }
 
         boolean equals(o) {
@@ -368,12 +372,14 @@ class ApiService {
             result = (vUuid != null ? vUuid.hashCode() : 0)
             result = 31 * result + (from != null ? from.hashCode() : 0)
             result = 31 * result + (to != null ? to.hashCode() : 0)
+            result = 31 * result + (co1 != null ? co1.hashCode() : 0)
+            result = 31 * result + (co2!= null ? co2.hashCode() : 0)
             return result
         }
     }
 
-    Map itemsForTimeline(String vUuid, Long from = null, Long to = null) {
-        TimelineReq tlReq = new TimelineReq(vUuid, from, to)
+    Map itemsForTimeline(String vUuid, Long from = null, Long to = null, String co1 = null, String co2 = null) {
+        TimelineReq tlReq = new TimelineReq(vUuid, from, to, co1, co2)
         return timelineCache.get(tlReq)
     }
 
@@ -385,12 +391,19 @@ class ApiService {
         String vUuid = tlReq.vUuid
         Long from    = tlReq.from
         Long to      = tlReq.to
+        String co1 = tlReq.co1
+        String co2 = tlReq.co2
 
         to = to ?: System.currentTimeMillis()
         from = from ?: to - Duration.ofHours(24).toMillis()
 
         List tldata = []
-        Map events = httpClientService.getParamsExpectMap("eve/view/${vUuid}/${from}/${to}", null, true)
+        String args = ''
+
+        if (co1) args = "?co1=$co1"
+        if (co2) args = args + "&co2=$co2"
+
+        Map events = httpClientService.getParamsExpectMap("eve/view/${vUuid}/${from}/${to}" + args, null, true)
         List<Map<String, Object>> remoteViews = events.entityViewEvents
         remoteViews.eachWithIndex {Map e, int i ->
             // todo change the content based on event type and state
@@ -463,6 +476,7 @@ class ApiService {
         ["companies" : [
               "Tracked" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
               "Surfaced" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING),
+              "Emerging" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.DISCOVERED),
               "Linked" : [radar:response.radar]
             ]
         ]
@@ -636,9 +650,10 @@ class ApiService {
         List insights = []
         eves.each { EntityViewEvent e ->
             // todo change the content based on event type and state
+            Long ts = e.ts ?: System.currentTimeMillis()
             insights.add([
                     title     : e.title,
-                    time      : format.format(new Date(e.ts as long)),
+                    time      : format.format(new Date(ts)),
                     type      : e.type,
                     state     : e.state,
                     entityUUID: e.entityUUID

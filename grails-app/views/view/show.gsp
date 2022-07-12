@@ -90,7 +90,10 @@
              color: #f2a83b;
         }
         #companies h3:nth-child(3) {
-             color: #9fc2f7;
+             color: #457b07;
+        }
+        #companies h3:nth-child(4) {
+            color: #9fc2f7;
         }
         .companies-wrapper {
             background-color: #FFF;
@@ -632,15 +635,20 @@
             setTimeout(() => {    
             $('#companies h3:eq(0)').css('color', '#ea3223');                 
              $('#companies h3:eq( 1 )').css('color', '#f2a83b'); 
-             $('#companies h3:eq( 2 )').css('color', '#9fc2f7');                        
+             $('#companies h3:eq( 2 )').css('color', '#457b07');
+             $('#companies h3:eq( 3 )').css('color', '#9fc2f7');
+
             $('#companies h3:eq( 0 )').on('click', function() {
-                    loadGraphData(2);
+                loadGraphData(3);
             });
             $('#companies h3:eq( 1 )').on('click', function() {
-                    loadGraphData(1);
+                loadGraphData(2);
             });  
             $('#companies h3:eq( 2 )').on('click', function() {
-                    loadGraphData(0);
+                loadGraphData(1);
+            });
+            $('#companies h3:eq( 3 )').on('click', function() {
+                loadGraphData(0);
             });
 /*
             $('#companies ul:first').find('li').append('<span class="material-icons md-18 skyblue">remove_circle</span>');
@@ -654,6 +662,7 @@
 
         let from, to;
         let now = ${ts ?: System.currentTimeMillis()};
+        let co1uuid = null, co2uuid = null;
 
         from = now - 12*3600*1000; to = now + 12*3600*1000;
 
@@ -672,7 +681,7 @@
         timeline.on('rangechanged', function(e) {
             from = e.start.getTime(); to =  e.end.getTime();
             now = Math.round((from+to)/2);
-            loadTimelineData();
+            loadTimelineData(co1uuid, co2uuid);
             // loadArticles();
             // window.loadGraphData(1);
         });
@@ -681,9 +690,13 @@
             window.location = '/view/show/${view.id}?ts=' + props.time.getTime();
         });
 
-        function loadTimelineData() {
+        function loadTimelineData(company1UUID, company2uuid) {
+            let args = '';
+            if (company1UUID) args = '&co1=' + company1UUID;
+            if (company2uuid) args += '&co2=' + company2uuid;
+
             $.ajax({
-                url: '/api/viewtimeline/${view.id}?from='+ from + '&to=' + to,
+                url: '/api/viewtimeline/${view.id}?from='+ from + '&to=' + to + args,
                 success: function(data) {
                     items.clear();
                     items.add(data.tldata);
@@ -910,6 +923,7 @@
         }
 
         function loadProjectContent(companyUUID, company2UUID) {
+            co1uuid = companyUUID; co2uuid = company2UUID;
             $.ajax({
                 url: companyUUID ? (company2UUID ?'/api/contentForEdgeInView?companyUUID='+companyUUID+'&company2UUID='+company2UUID+'&viewId=${view.id}'
                                                  :'/api/contentForCompanyInView?companyUUID='+companyUUID+'&viewId=${view.id}')
@@ -989,7 +1003,9 @@
                     }
                     $('.article').on('click', function(event) {
                         showArticle($(this).data("uuid"))
-                    })
+                    });
+
+                    loadTimelineData(companyUUID, company2UUID);
                     // $('#companies').html(html);
                 },
                 error: function(err, status) {
@@ -1077,7 +1093,7 @@
         window.loadGraphData = function(mode) {
 
             function modeFilter(d) {
-                d.mode = d.level==='watching' ? 0 : d.level === 'surfacing' ? 1 : d.level === 'tracking' ? 2 : 0;
+                d.mode = d.level==='watching' ? 0 : d.level === 'discovered' ? 1 : d.level === 'surfacing' ? 2 : d.level === 'tracking' ? 3 : 0;
                 // d.fontsize
                 return d.mode >= mode;
             }
