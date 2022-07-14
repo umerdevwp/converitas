@@ -25,7 +25,8 @@ class HttpClientService implements GrailsConfigurationAware {
     static JsonSlurper jsonSlurper = new JsonSlurper()
 
     private grails.config.Config config
-    private String server = null
+    private String beServer = null
+    private String cbServer = null
     private String credential
     private Boolean isDebug
     private Boolean verifySsl
@@ -39,8 +40,9 @@ class HttpClientService implements GrailsConfigurationAware {
     @Override
     @CompileDynamic
     void setConfiguration(Config config) {
-        if (server == null) {
-            server = config.getOrDefault("heracles.api.server", "http://localhost:8080")
+        if (beServer == null) {
+            beServer = config.getOrDefault("heracles.api.server", "http://localhost:8080")
+            cbServer = config.getOrDefault("heracles.cb.server", "http://localhost:8083")
             credential = config.getOrDefault("heracles.api.credential", "none")
             isDebug = config.getOrDefault("heracles.api.isDebug", Boolean.TRUE)
             verifySsl = config.apiProperties.getOrDefault("heracles.api.verifySsl", Boolean.FALSE)
@@ -66,7 +68,7 @@ class HttpClientService implements GrailsConfigurationAware {
      * @returns the URL of the eventing support service based on the required task.
      */
     private String getUrl(String task) {
-        server + (task.startsWith("/")?"":"/") + task/*+"?credential="+credential*/
+        (task.startsWith('cb/')?cbServer:beServer) + (task.startsWith("/")?"":"/") + task/*+"?credential="+credential*/
     }
 
 
@@ -242,7 +244,7 @@ class HttpClientService implements GrailsConfigurationAware {
      * @throws APIException - mostly for API level errors (hopefully never)
      */
     List getParamsExpectList(String task, Map params, Class clazz, boolean noException) throws IOException, APIException {
-        typedListFromJson(getParamsExpectResult(task, params, noException) as List<Map>, clazz)
+        typedListFromJson(getParamsExpectResult(task, params, noException) as List, clazz)
     }
 
     private static String urlEncode(String s) { URLEncoder.encode(s, StandardCharsets.UTF_8) }
@@ -251,10 +253,8 @@ class HttpClientService implements GrailsConfigurationAware {
         params ? '?' + params.collect { "${urlEncode(it.key)}=${urlEncode(it.value.toString())}" }.join('&') : ''
     }
 
-    private static <T> List<T> typedListFromJson(List<Map> list, Class<T> clazz) {
-        list.collect {
-            Meta.fromMap(clazz, it)
-        } as List<T>
+    private static <T> List<T> typedListFromJson(List list, Class<T> clazz) {
+        list as List<T>
     }
 
     /**

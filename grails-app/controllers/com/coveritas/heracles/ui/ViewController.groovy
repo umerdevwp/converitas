@@ -4,6 +4,8 @@ import com.coveritas.heracles.HttpClientService
 import com.coveritas.heracles.json.EntityViewEvent
 import com.coveritas.heracles.utils.Helper
 import grails.validation.ValidationException
+import groovy.json.JsonSlurper
+
 import static org.springframework.http.HttpStatus.*
 
 class ViewController {
@@ -12,7 +14,7 @@ class ViewController {
     ViewService viewService
     CompanyViewObjectService companyViewObjectService
 
-    static allowedMethods = [save: "POST", addCompany: "POST", addComment: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", updateConstraints: "POST", addCompany: "POST", addComment: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
         max = Math.min(max ?: 10, 100)
@@ -160,6 +162,97 @@ class ViewController {
             if (comment) {
                 try {
                     annotation = apiService.addComment(u, project.uuid, view?.uuid, params.companyUUID as String, params.company2UUID as String, comment)
+                } catch (ValidationException e) {
+                    respond view.errors, view:'show'
+                    return
+                }
+
+                request.withFormat {
+                    form multipartForm {
+//                        flash.message = message(code: 'default.created.message', args: [message(code: 'companyViewObject.label', default: 'CompanyViewObject'), annotation])
+                        if (url!=null) {
+                            redirect url:url
+                        } else {
+                            redirect view
+                        }
+                    }
+//                    flash.message = message(code: 'default.updated.message', args: [message(code: 'view.label', default: 'CompanyViewObject'), annotation])
+                    if (url!=null) {
+                        redirect url:url
+                    } else {
+                        redirect view
+                    }
+                }
+            } else {
+                notAllowed('default.not.updated.message')
+            }
+        } else {
+            notAllowed('default.not.updated.message')
+        }
+    }
+
+    def updateConstraints() {
+        String url = params.url
+        long viewId = params.get("view")?.id as Long
+        User u = Helper.userFromSession(session)
+        View view = View.get(viewId)
+        Project project = view.project
+        Map constraints = new JsonSlurper().parseText(params.constraints) as Map
+        def industry = params.industry
+        if (industry) {
+            Map industries = constraints['industries']
+            industries[industry] = params.weight as double
+        }
+        def category = params.category
+        if (category) {
+            Map categories = constraints['categories']
+            categories[category] = params.weight as double
+        }
+        if (project.organization==u.organization|| u.isSysAdmin()) {
+            if (constraints) {
+                try {
+                    apiService.updateConstraints(u, view, constraints)
+                } catch (ValidationException e) {
+                    respond view.errors, view:'show'
+                    return
+                }
+
+                request.withFormat {
+                    form multipartForm {
+//                        flash.message = message(code: 'default.created.message', args: [message(code: 'companyViewObject.label', default: 'CompanyViewObject'), annotation])
+                        if (url!=null) {
+                            redirect url:url
+                        } else {
+                            redirect view
+                        }
+                    }
+//                    flash.message = message(code: 'default.updated.message', args: [message(code: 'view.label', default: 'CompanyViewObject'), annotation])
+                    if (url!=null) {
+                        redirect url:url
+                    } else {
+                        redirect view
+                    }
+                }
+            } else {
+                notAllowed('default.not.updated.message')
+            }
+        } else {
+            notAllowed('default.not.updated.message')
+        }
+    }
+
+    def updateThemes() {
+        String url = params.url
+        long viewId = params.get("view")?.id as Long
+        User u = Helper.userFromSession(session)
+        View view = View.get(viewId)
+        Project project = view.project
+        List<String> themes = new JsonSlurper().parseText(params.themes) as List
+        themes.add(params.theme)
+        if (project.organization==u.organization|| u.isSysAdmin()) {
+            if (themes) {
+                try {
+                    apiService.updateThemes(u, view, themes)
                 } catch (ValidationException e) {
                     respond view.errors, view:'show'
                     return

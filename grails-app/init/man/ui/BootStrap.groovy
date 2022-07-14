@@ -1,31 +1,33 @@
 package man.ui
 
+import com.coveritas.heracles.HttpClientService
 import com.coveritas.heracles.ui.ApiService
 import com.coveritas.heracles.ui.Color
 import com.coveritas.heracles.ui.Organization
 import com.coveritas.heracles.ui.Policy
 import com.coveritas.heracles.ui.Project
+import com.coveritas.heracles.ui.RelationshipType
 import com.coveritas.heracles.ui.Role
 import com.coveritas.heracles.ui.User
 import com.coveritas.heracles.ui.View
+import grails.artefact.DomainClass
 import grails.util.Holders
-import org.hibernate.dialect.Dialect
-import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver
-import org.hibernate.engine.jdbc.dialect.spi.DialectResolver
-import org.hibernate.exception.JDBCConnectionException
+//import org.hibernate.dialect.Dialect
+//import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver
+//import org.hibernate.engine.jdbc.dialect.spi.DialectResolver
+//import org.hibernate.exception.JDBCConnectionException
 import org.springframework.context.ApplicationContext
 import org.springframework.transaction.TransactionStatus
 
 import javax.servlet.ServletContext
-import javax.sql.DataSource
-import java.sql.Connection
-import java.sql.ResultSet
-import java.sql.SQLException
-import java.sql.Statement
+//import javax.sql.DataSource
+//import java.sql.Connection
+//import java.sql.ResultSet
+//import java.sql.SQLException
+//import java.sql.Statement
 
 //@CompileStatic
 class BootStrap {
-
     def init = { ServletContext servletContext ->
         Color adminColor = null
         Color.withTransaction { TransactionStatus status ->
@@ -174,9 +176,26 @@ class BootStrap {
                 new Color([name:"DarkSlateGray", code: "#2F4F4F"]).save(update:false, failOnError:true)
                 new Color([name:"Black", code: "#000000"]).save(update:false, failOnError:true)
             }
+            if (RelationshipType.count==0) {
+                RelationshipType.saveAll(
+                        new RelationshipType(id:RelationshipType.RTID_CUSTOMER,                 name:"Customer",                 inverse:"Vendor"    ),
+                        new RelationshipType(id:RelationshipType.RTID_VENDOR,                   name:"Vendor",                   inverse:"Customer"  ),
+                        new RelationshipType(id:RelationshipType.RTID_MARKETING_PARTNER,        name:"Marketing Partner"                             ),
+                        new RelationshipType(id:RelationshipType.RTID_IMPLEMENTATION_PARTNER,   name:"Implementation Partner"                        ),
+                        new RelationshipType(id:RelationshipType.RTID_COMPETITOR,               name:"Competitor",               inverse:"Competitor"),
+                        new RelationshipType(id:RelationshipType.RTID_MANUFACTURING_PARTNER,    name:"Manufacturing Partner"                         ),
+                        new RelationshipType(id:RelationshipType.RTID_CHANNEL_PARTNER,          name:"Channel Partner"                               ),
+                        new RelationshipType(id:RelationshipType.RTID_SERVICE_SUPPORT_PARTNER,  name:"Service & Support Partner"                     ),
+                        new RelationshipType(id:RelationshipType.RTID_FINANCING_PARTNER,        name:"Financing Partner"                             ),
+                        new RelationshipType(id:RelationshipType.RTID_AGENT,                    name:"Agent"                                         ),
+                        new RelationshipType(id:RelationshipType.RTID_MARKETPLACE,              name:"Marketplace"                                   )
+                )
+                status.flush()
+            }
         }
+        boolean isFreshDB = User.list().isEmpty()
         User.withTransaction { TransactionStatus status ->
-            if (User.list().isEmpty()) {
+            if (isFreshDB) {
                 Organization.withNewTransaction { status1 ->
                     Date now = new Date()
                     Organization org = new Organization(uuid: Organization.COVERITAS_UUID, name: "CoVeritas", created: now, lastUpdated: now).save(failOnError: true)
@@ -185,18 +204,68 @@ class BootStrap {
                     User.create(User.SYS_ADMIN_UUID, "admin", org, "@dm1n", [adminRole] as Set<Role>, adminColor?:Color.findByName("FireBrick"))
                 }
             }
-            if (Policy.list().isEmpty()) {
-                Role.findAllByName(Role.ADMIN).each {Role r ->
-                    User u = r.users[0]
-                    r.grandPermission(Policy.Permission.ADMIN, u.organization)
+            User u = null
+            for (Role r in Role.findAllByName(Role.ADMIN)) {
+                u = r.users[0]
+                if (!Policy.list().isEmpty()) {
+                    break
+                }
+                r.grandPermission(Policy.Permission.ADMIN, u.organization as DomainClass)
+            }
+            status.flush()
+            ApplicationContext ctx = Holders.grailsApplication.mainContext
+            ApiService apiService = ctx.getBean(ApiService)
+            apiService.remoteProjects(u)
+            if (isFreshDB) {
+                HttpClientService httpClientService = ctx.getBean(HttpClientService)
+                Map name2usr = [:]
+                User.withTransaction { status1 ->
+                    [[name:'Paul Josefak',     colorId:94],
+                     [name:'Peter Reuschel',   colorId:90],
+                     [name:'Martina Jecker',   colorId:61],
+                     [name:'Gunther Tolkmit',  colorId:73],
+                     [name:'Ralf Meyer',       colorId: 4],
+                     [name:'Lisa Reeves',      colorId:43]].each{ Map usr ->
+                        Map<String, Object> result = httpClientService.postParamsExpectMap('user', [userUUID: u.uuid, userOrgUUID: u.organization.uuid, isAdmin: false], true)
+                        String uuid = result.uuid
+                        if (uuid) {
+                            User user = new User(usr)
+                            Date now = new Date()
+                            user.uuid = uuid
+                            user.color = Color.get(usr.colorId as long)
+                            user.organization = u.organization
+                            user.created = now
+                            user.lastUpdated = now
+                            String password = 'ch@ng3M3!'
+                            if (password != null && password.size() > 0) {
+                                user.changePassword(password)
+                            }
+                            user.roles = [Role.findByName('User')]
+                            name2usr.put( usr.name.substring(0,2).toUpperCase(), user.save())
+                        }
+                    }
+                    status1.flush()
+                }
+                Project.withTransaction { status1 ->
+                    [[project:'Nightingale', users:[name2usr['MA'],name2usr['PE']]],
+                     [project:'Blackbird',   users:[name2usr['GU'],name2usr['PA'],name2usr['RA']]],
+                     [project:'Samba',       users:[name2usr['MA'],name2usr['PE']]],
+                     [project:'Asimov',      users:[name2usr['GU'],name2usr['RA']]]].each{ Map prj ->
+                        Project p = Project.findByName(prj.project as String)
+                        p.users = prj.users
+                        p.save()
+                        p.views.each { View v ->
+                            v.users = prj.users
+                        }
+                    }
+                    status1.flush()
                 }
             }
-            ApplicationContext ctx = Holders.grailsApplication.mainContext
-            DataSource  ds = ctx.getBean(DataSource)
-            Connection c = null
-            try {
-                c = ds.connection
-                c.createStatement().executeUpdate("""alter table ma_view_object alter column viewuuid drop not null;""")
+//            DataSource  ds = ctx.getBean(DataSource)
+//            Connection c = null
+//            try {
+//                c = ds.connection
+//                c.createStatement().executeUpdate("""alter table ma_view_object alter column viewuuid drop not null;""")
 //                if (Policy.all.size()==1) {
 //                    ResultSet rs = c.createStatement().executeQuery("""select user_id, project_id from ma_project_users""")
 //                    Map<Project,Set<User>> pu = [:]
@@ -216,11 +285,11 @@ class BootStrap {
 //                } else {
 //                    c.createStatement().executeUpdate("""drop table if exists ma_project_users cascade;""")
 //                }
-            } finally {
-                if (c!=null) {
-                    c.close()
-                }
-            }
+//            } finally {
+//                if (c!=null) {
+//                    c.close()
+//                }
+//            }
 
 //                ApiService apiService = ctx.getBean(ApiService)
 //                apiService.activateAllViews()
@@ -250,6 +319,7 @@ class BootStrap {
 //                        }
 //                    }
 //                }
+            null
         }
     }
     def destroy = {

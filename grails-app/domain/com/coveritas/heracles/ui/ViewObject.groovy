@@ -10,7 +10,7 @@ class ViewObject {
     static hasMany = [annotations:Annotation]
 
     static mapping = {
-        tablePerHierarchy false
+//        tablePerHierarchy false
         table name: 'ma_view_object'
         id generator : 'sequence', params:[sequence:'seq_id_view_object_pk']
     }

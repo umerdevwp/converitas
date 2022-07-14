@@ -38,19 +38,18 @@ $(
                     });
                     if (hasEntry) {
                         $companyOptions.show();
-                        // $companyOptions.dropdown('toggle')
+                        // $industryOptions.dropdown('toggle')
                     }
                 });
             }
         });
 
-
-        $('#companyInput').val();
+        // $company.val();
         $(document.body).on('click change', '#companyOptions li' ,function(){
             let text = $(this).html();
             if (text!=='') {
-                $('#companyInput').val(text);
-                $('#companyOptions').hide();
+                $company.val(text);
+                $companyOptions.hide();
                 var uuid = $(this).attr('value');
                 $('#companyUUID').val(uuid);
                 console.log('uuid', uuid);
@@ -60,6 +59,97 @@ $(
                 $companyOptions.hide()
             }
          });
+
+        // add industry start:
+        let $industry = $("#industryInput");
+        let $industryOptions = $("#industryOptions");
+
+        // $('#addIndustry').on('click', function(event) {
+        //     event.preventDefault();
+        //     $("#addIndustryToView").show()
+        //     // location.replace("/view/addCompanyToView?uuid="+uuid+"&viewId="+viewId);
+        // });
+
+        $industry.on('input', function() {
+            const input = $(this).val();
+            $industryOptions.empty()
+            $industryOptions.hide()
+            $('#addIndButton').hide()
+            if (input) {
+                $.getJSON("/api/suggestIndustries?input=" + input, function (data) {
+                    let hasEntry = false
+                    $.each(data, function () {
+                        $industryOptions.append($("<li />").text(this));
+                        hasEntry = true
+                    });
+                    if (hasEntry) {
+                        $industryOptions.show();
+                        // $industryOptions.dropdown('toggle')
+                    }
+                });
+            }
+        });
+
+        // $('#companyInput').val();
+        $(document.body).on('click change', '#industryOptions li' ,function(){
+            let text = $(this).html();
+            if (text!=='') {
+                $industry.val(text);
+                $industryOptions.hide();
+                $('.industry').val(text);
+                console.log('industry', text);
+                $('#addIndButton').show();
+            } else {
+                $('#addIndButton').hide()
+                $industryOptions.hide()
+            }
+        });
+
+        // add category start:
+        let $category = $("#categoryInput");
+        let $categoryOptions = $("#categoryOptions");
+
+        // $('#addCategory').on('click', function(event) {
+        //     event.preventDefault();
+        //     $("#addCategoryToView").show()
+        //     // location.replace("/view/addCompanyToView?uuid="+uuid+"&viewId="+viewId);
+        // });
+
+        $category.on('input', function() {
+            const input = $(this).val();
+            $categoryOptions.empty()
+            $categoryOptions.hide()
+            $('#addCatButton').hide()
+            if (input) {
+                $.getJSON("/api/suggestCategories?input=" + input, function (data) {
+                    let hasEntry = false
+                    $.each(data, function () {
+                        $categoryOptions.append($("<li />").text(this));
+                        hasEntry = true
+                    });
+                    if (hasEntry) {
+                        $categoryOptions.show();
+                        // $categoryOptions.dropdown('toggle')
+                    }
+                });
+            }
+        });
+
+        // $('#companyInput').val();
+        $(document.body).on('click change', '#categoryOptions li' ,function(){
+            let text = $(this).html();
+            if (text!=='') {
+                $category.val(text);
+                $categoryOptions.hide();
+                $('.category').val(text);
+                console.log('category', text);
+                $('#addCatButton').show();
+            } else {
+                $('#addCatButton').hide()
+                $categoryOptions.hide()
+            }
+        });
+
 
         // function onSelChange() {
         //     return function () {
@@ -73,13 +163,13 @@ $(
         //             $('#addButton').show();
         //         } else {
         //             $('#addButton').hide()
-        //             $companyOptions.hide()
+        //             $categoryOptions.hide()
         //         }
         //     };
         // }
 
-        // $companyOptions.on('change', onSelChange());
-        // $companyOptions.on('click', onSelChange());
+        // $categoryOptions.on('change', onSelChange());
+        // $categoryOptions.on('click', onSelChange());
 
     }
 );

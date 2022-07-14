@@ -46,6 +46,47 @@ class ApiController {
         }
     }
 
+    def suggestIndustries(String input) {
+        call { User u ->
+            List<String> addIndustries = apiService.matchingIndustries(input)
+            addIndustries
+        }
+    }
+
+    def suggestCategories(String input) {
+        call { User u ->
+            List<String> addIndustries = apiService.matchingCategories(input)
+            addIndustries
+        }
+    }
+
+    def removeIndustryFromConstraints(long viewId, String industry){
+        call { User u ->
+            View view = View.get(viewId)
+            LinkedHashMap<String, Object> constraints = apiService.retrieveConstraints(u, view.project.uuid, view.uuid)
+            (constraints.industries as Map).remove(industry)
+            apiService.updateConstraints(u, view, constraints)
+        }
+    }
+
+    def removeCategoryFromConstraints(long viewId, String category){
+        call { User u ->
+            View view = View.get(viewId)
+            LinkedHashMap<String, Object> constraints = apiService.retrieveConstraints(u, view.project.uuid, view.uuid)
+            (constraints.categories as Map).remove(category)
+            apiService.updateConstraints(u, view, constraints)
+        }
+    }
+
+    def removeTheme(long viewId, String theme){
+        call { User u ->
+            View view = View.get(viewId)
+            List<String> themes = apiService.retrieveThemes(u, view.project.uuid)
+            themes.remove(theme)
+            apiService.updateThemes(u, view, themes)
+        }
+    }
+
     def viewtimeline(long id, @Nullable Long from, @Nullable Long to, @Nullable String co1, @Nullable String co2) {
         call { User u ->
             apiService.itemsForTimeline(View.get(id).uuid, from, to, co1, co2)

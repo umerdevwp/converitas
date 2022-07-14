@@ -277,7 +277,6 @@
                 UNAUTHORIZED ACCESS
             </g:else>
         </div>
-
     <!--Create Lens Modal-->
     %{-- Modal Start --}%
     <div class="modal fade" id="create-view" tabindex="-1" role="dialog" aria-labelledby="createLensModalLabel" aria-hidden="true">

@@ -35,7 +35,38 @@
             text-decoration: none;
             color: black;
         }
-        .title { 
+        .section-title {
+            padding-top: 10px;
+            padding-left: 10px;
+            margin-left: 8px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .news-insight-item {
+            text-align:left;
+        }
+        .news-insight-item ul li{
+            margin-bottom: 15px;
+            margin-left: 5px;
+            color: #171822;
+            font-size: 16px;
+            line-height: 1.8;
+            /*border-left: 4px solid #ffd46d;*/
+            padding-left: 1em;
+        }
+        .news-insight-item ul li span{
+            color:#133c74;
+        }
+        .news-insight-item ul li h3 {
+            font-size: 1em;
+            margin: 0.1em 0 0.5em 0;
+        }
+        .news-insight-item p{
+            color: #171822;
+            font-size: 12px;
+            line-height: 1.2;
+        }
+        .title {
             display: block;
             font-size: 13px;
         }
@@ -498,7 +529,7 @@
     </div>
     %{-- Modal End --}%
 
-        %{-- Modal Start --}%
+    %{-- Modal Start --}%
     <div class="modal fade" id="editProjectModal" tabindex="-1" role="dialog" aria-labelledby="editProjectModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -580,7 +611,131 @@
         </div>
     </div>
     %{-- Modal End --}%
+    %{-- Modal Start --}%
+    <div class="modal fade" id="addIndustryModal" tabindex="-1" role="dialog" aria-labelledby="addIndustryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addIndustryModalLabel">Add Industry</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <g:form url="/view/updateConstraints" method="POST" >
+                    <g:hiddenField name="view.id" value="${view.id}" />
+                    <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                    <g:hiddenField name="industry" class="industry"/>
+                    <g:hiddenField name="constraints" class="constraints" value="{}"/>
+                    <div class="modal-body">
+                        <fieldset class="form">
+                            <div class="fieldcontain required">
+                                <label for="industryInput">Industry<span class="required-indicator">*</span></label>
+                                <input id="industryInput" placeholder="Add an Industry" size="40">
+%{--                                <div style="display:inline-block;width:150px;background-color: transparent">--}%
+%{--                                </div>--}%
+                                <div class="sub-company">
+                                    <ul class="form-control list-group" id="industryOptions" style="display:none">
+                                    </ul>
+                                </div>
+                                <div class="messageSection hide">Set the selected industry for this lens</div>
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="description">Weight<span class="required-indicator">*</span></label>
+                                <input type="text" name="weight" id="weight" value="1" required="">
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button style="display: none" class="save" type="submit" id="addIndButton">Add Industry</button>
+                    </div>
+                </g:form>
+            </div>
+        </div>
+    </div>
+    %{-- Modal End --}%
+    %{-- Modal Start --}%
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <g:form url="/view/updateConstraints" method="POST" >
+                    <g:hiddenField name="view.id" value="${view.id}" />
+                    <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                    <g:hiddenField name="category" class="category"/>
+                    <g:hiddenField name="constraints" class="constraints" value="{}"/>
+                    <div class="modal-body">
+                        <fieldset class="form">
+                            <div class="fieldcontain required">
+                                <label for="categoryInput">Category<span class="required-indicator">*</span></label>
+                                <input id="categoryInput" placeholder="Add a Category" size="40">
+%{--                                <div style="display:inline-block;width:150px;background-color: transparent">--}%
+%{--                                </div>--}%
+                                <div class="sub-company">
+                                    <ul class="form-control list-group" id="categoryOptions" style="display:none">
+                                    </ul>
+                                </div>
+                                <div class="messageSection hide">Set the selected category for this lens</div>
+                            </div>
+                            <div class="fieldcontain required">
+                                <label for="description">Weight<span class="required-indicator">*</span></label>
+                                <input type="text" name="weight" id="weight" value="1" required="">
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button style="display: none" class="save" type="submit" id="addCatButton">Add Category</button>
+                    </div>
+                </g:form>
+            </div>
+        </div>
+    </div>
+    %{-- Modal End --}%
 
+    %{-- Modal Start --}%
+    <div class="modal fade" id="addThemeModal" tabindex="-1" role="dialog" aria-labelledby="addThemeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addThemeModalLabel">Add Theme</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <g:form url="/view/updateThemes" method="POST" >
+                    <g:hiddenField name="view.id" value="${view.id}" />
+                    <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                    <g:hiddenField name="themes" class="themes" value="[]"/>
+                    <div class="modal-body">
+                        <fieldset class="form">
+                            <div class="fieldcontain required">
+                                <label for="theme">Theme<span class="required-indicator">*</span></label>
+                                <input id="theme" name="theme" placeholder="Add a Theme" size="40">
+%{--                                <div style="display:inline-block;width:150px;background-color: transparent">--}%
+%{--                                </div>--}%
+                                <div class="sub-company">
+                                    <ul class="form-control list-group" id="themeOptions" style="display:none">
+                                    </ul>
+                                </div>
+                                <div class="messageSection hide">Set the selected theme for this project</div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button class="save" type="submit">Add Theme</button>
+                    </div>
+                </g:form>
+            </div>
+        </div>
+    </div>
+    %{-- Modal End --}%
 
 %{--    <script src="https://d3js.org/d3.v3.min.js"></script>--}%
 %{--    <script src="/assets/d3.layout.cloud.js"></script>--}%
@@ -772,7 +927,7 @@
             })
         }
 
-        function conmpanyDlg(uuid, companyName, action) {
+        function companyDlg(uuid, companyName, action) {
             if (confirm( "Do you want to "+action + " "+companyName+"?" )) {
                 $.ajax({
                     url: '/api/'+action+'?companyUUID='+uuid+'&viewId=${view.id}',
@@ -861,21 +1016,72 @@
             return html
         }
 
-        function formatParametersContent(content)  {
-            // todo iterate through map key tab value
-            let html= '<table class="project-table"> <tbody style="height: auto">';
-            Object.keys(content).map(function(head) {
-                const lst = content[head];
-                for (let i=0; i<lst.length; i++) {
-                    const c = lst[i];
-                    html+= '  <tr>\n'+
-                        '    <td>'+(i==0?head:'')+'</td>\n'+
-                        '    <td>'+c+'</td>\n'+
-                        '  </tr>\n';
-                }
-            });
-            html+='</tbody></table>';
+        let constraints;
+        let themes;
 
+        function formatParametersContent(content)  {
+            let html= '<div class="news-insight-item">';
+            // let html= '<table class="project-table"> <tbody style="height: auto">';
+            constraints         = content['Constraints'];
+            const industries    = constraints['industries'];
+            const categories    = constraints['categories'];
+            const employeesLower= constraints['employeesLower'];
+            const employeesUpper= constraints['employeesUpper'];
+            const country       = constraints['country'];
+            $('.constraints').val(JSON.stringify(constraints));
+            html+=  '<div class="section-title">Constraints</div>\n';
+            html+=  '<ul class="">\n';
+            html+=  '  <li>\n'+
+                    '    <h3>Industries<a data-toggle="modal" data-target="#addIndustryModal" style="cursor: pointer;"><i class="material-icons md-18 skyblue">add_circle_outline</i></a></h3>\n'+
+                    '    <table>\n'+
+                    '      <tbody>\n';
+            Object.keys(industries).map(function(key) {
+              const value = industries[key];
+              html+='        <tr><td>'+key+'</td><td>'+value+'<a class="removeindustry" data-key="'+key+'" style="cursor: pointer;"><i class="material-icons md-18 skyblue">remove_circle_outline</i></a></td></tr>\n';
+            });
+            html+=  '      </tbody>\n'+
+                    '    </table>\n'+
+                    '  </li>\n'+
+                    '  <li>\n'+
+                    '    <h3>Categories<a data-toggle="modal" data-target="#addCategoryModal" style="cursor: pointer;"><i class="material-icons md-18 skyblue">add_circle_outline</i></a></h3>\n'+
+                    '    <table>\n'+
+                    '      <tbody>\n';
+            Object.keys(categories).map(function(key) {
+              const value = categories[key];
+              html+='        <tr><td>'+key+'</td><td>'+value+'<a class="removecategory" data-key="'+key+'" style="cursor: pointer;"><i class="material-icons md-18 skyblue">remove_circle_outline</i></a></td></tr>\n';
+            });
+            html+=  '      </tbody>\n'+
+                    '    </table>\n' +
+                    '  </li>\n'+
+                    '  <li>\n'+
+                    '    <h3>Employee Count Range<a data-toggle="modal" data-target="#editEmployeesModal" style="cursor: pointer;"><i class="material-icons md-18 skyblue">mode_edit_outline</i></a></h3>\n'+
+                    '    <table>\n' +
+                    '     <tbody>\n' +
+                    '        <tr><td>from:</td><td>'+(employeesLower===null?'n/a':employeesLower)+'</td></tr>\n';
+            html+=  '        <tr><td>to:</td><td>'+(employeesUpper===null?'n/a':employeesUpper)+'</td></tr>\n' +
+                    '     </tbody>\n' +
+                    '    </table>\n' +
+                    '  </li>\n'+
+                    '  <li>\n'+
+                    '    <h3>Geography<a data-toggle="modal" data-target="#editGeographyModal" style="cursor: pointer;"><i class="material-icons md-18 skyblue">add_circle_outline</i></a></h3>\n'
+            html+=  '    <table>\n' +
+                    '     <tbody\n>';
+            html+=  '        <tr><td>Country</td><td>'+(country===null?'global':country)+'<a data-toggle="modal" data-target="#editGeographyModal" data-key="country" data-value="'+country+'" style="cursor: pointer;"><i class="material-icons md-18 skyblue">mode_edit_outline</i></a></td></tr>\n';
+            html+=  '      </tbody>\n'+
+                    '    </table>\n'+
+                    '  </li>\n';
+            html+= '<ul>\n';
+            html+= '<div class="section-title">Themes<a data-toggle="modal" data-target="#addThemeModal" style="cursor: pointer;"><i class="material-icons md-18 skyblue">add_circle_outline</i></a></div>\n';
+            themes = content['Themes'];
+            $('.themes').val(JSON.stringify(themes));
+            for (let i=0; i<themes.length; i++) {
+                const c = themes[i];
+                html+= '  <li>\n'+
+                       '    <p>'+c+'<a class="removetheme" data-theme="'+c+'" style="cursor: pointer;"><i class="material-icons md-18 skyblue">remove_circle_outline</i></a></p>\n'+
+                       '  </li>\n';
+            }
+            html+= '</ul>\n';
+            html+= '</div>\n';
             return html;
         }
 
@@ -933,6 +1139,7 @@
                     let i=0
                     // $("#btn4item").hide()
                     let actions=false
+                    let params=false
                     Object.keys(data).map(function(head) {
                         i++;
                         const content = data[head];
@@ -969,10 +1176,11 @@
                                 break;
                             case 'para':
                                 html = formatParametersContent(content);
-                                count = content.Themes.length+content.Constraints.length
+                                // count = content.Themes.length+content.Constraints.length
                                 count = -1
                                 // $("#btn4item").show();
                                 // $icon.html('settings')
+                                params = true;
                                 $icon.html('dehaze')
                                 break;
                             case 'acti':
@@ -998,7 +1206,33 @@
                     if (actions) {
                         $('.companydlg').on('click', function () {
                             let uuid = $(this).data('uuid');
-                            conmpanyDlg(uuid, compUuid2Company[uuid].name, $(this).data('action'));
+                            companyDlg(uuid, compUuid2Company[uuid].name, $(this).data('action'));
+                        })
+                    }
+                    if (params) {
+                        $('.removeindustry').on('click', function () {
+                            let industry = $(this).data('key');
+                            if (confirm('Do you want to remove the industry \"'+industry+'\" from the constraints for this lens?')) {
+                                $.getJSON("/api/removeIndustryFromConstraints?industry=" + decodeURI(industry)+'&viewId=${view.id}', function (data) {
+                                    location.reload();
+                                });
+                            }
+                        })
+                        $('.removecategory').on('click', function () {
+                            let category = $(this).data('key');
+                            if (confirm('Do you want to remove the category \"'+category+'\" from the constraints for this lens?')) {
+                                $.getJSON("/api/removeCategoryFromConstraints?category=" + decodeURI(category)+'&viewId=${view.id}', function (data) {
+                                    location.reload();
+                                });
+                            }
+                        })
+                        $('.removetheme').on('click', function () {
+                            let theme = $(this).data('key');
+                            if (confirm('Do you want to remove the theme \"'+theme+'\" from project ${project.name}?')) {
+                                $.getJSON("/api/removeTheme?theme=" + decodeURI(theme)+'&viewId=${view.id}', function (data) {
+                                    location.reload();
+                                });
+                            }
                         })
                     }
                     $('.article').on('click', function(event) {

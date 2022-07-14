@@ -38,6 +38,18 @@ class ApiService {
         response
     }
 
+    List<String> matchingIndustries(String name) {
+        Map params = [match:name]
+        List<String> response = httpClientService.getParamsExpectResult("cb/industries", params, false) as List<String>
+        response*.attribute
+    }
+
+    List<String> matchingCategories(String name) {
+        Map params = [match:name]
+        List<String> response = httpClientService.getParamsExpectResult("cb/categories", params, false) as List<String>
+        response*.attribute
+    }
+
     Map addCompanyToView(User u, Project project, View view, String companyUUID, CompanyViewObject cvo) {
         Company c = companyCache.get(companyUUID)
         if (c.id == null) {
@@ -601,7 +613,7 @@ class ApiService {
         Set<Map> comments = []
         annotations.each { Annotation a -> comments << [time:format.format(new Date(a.ts)), title:a.title, name:a.user.name?:""]}
         Map profile = [:]
-        switch (project.name) {
+/*        switch (project.name) {
             case "Asimov":
                 profile.Themes = ["Artificial Intelligence",
                                   "Machine Learning"]
@@ -611,7 +623,9 @@ class ApiService {
                                        "Industry:  All"]
                 break
             case "Nightingale":
+
                 profile.Themes = ["IT Call Center"]
+
                 profile.Constraints = ["Geography: Global",
                                        "Size:  \$10M+ Revenue",
                                        "Category:  All",
@@ -632,11 +646,12 @@ class ApiService {
                                        "Size:  \$5M+ Revenue",
                                        "Category:  Software",
                                        "Industry:  All"]
-        }
+        }*/
         List<String> description = [project.name, project.description]
         if (view!=null) {
             description.add(view.name)
             description.add(view.description)
+            profile = profileForView(user, projectUUID, view.uuid)
         }
         [
          Description: description,
@@ -650,7 +665,7 @@ class ApiService {
         List insights = []
         eves.each { EntityViewEvent e ->
             // todo change the content based on event type and state
-            Long ts = e.ts ?: System.currentTimeMillis()
+            long ts = e.ts ?: System.currentTimeMillis()
             insights.add([
                     title     : e.title,
                     time      : format.format(new Date(ts)),
@@ -773,9 +788,49 @@ class ApiService {
         ]
     }
 
+    Map profileForView(User user, String pUUID, String vUUID) {
+        LinkedHashMap<String, Object> constraints = retrieveConstraints(user, pUUID, vUUID)
+        [Constraints: constraints,
+         Themes     : retrieveThemes(user, pUUID)]
+    }
+
+    public List<String> retrieveThemes(User user, String pUUID) {
+        httpClientService.getParamsExpectList("project/themes/${user.organization.uuid}/${user.uuid}/${pUUID}", null, String, true) as List<String>
+    }
+
+    LinkedHashMap<String, Object> retrieveConstraints(User user, String pUUID, String vUUID) {
+        Map map = httpClientService.getParamsExpectMap("view/constraints/${user.organization.uuid}/${user.uuid}/${pUUID}/${vUUID}", null, true) ?: [:]
+        [
+                industries    : map.industries ?: [:],
+                categories    : map.categories ?: [:],
+                employeesLower: map.employeesLower,
+                employeesUpper: map.employeesUpper,
+                country       : map.country
+        ]
+    }
+
     List<EntityViewEvent> allEventsForProject(User user, String pUUID) {
         Map events = httpClientService.getParamsExpectMap("eve/project/${pUUID}", null, true)
         eveIt(events)
+    }
+
+    Map updateConstraints(User u, View view, Map constraints) {
+        httpClientService.postParamsExpectMap('view/constraints', [
+                userUUID   : u.uuid,
+                userOrgUUID: u.organization.uuid,
+                projectUUID: view.project.uuid,
+                viewUUID   : view.uuid,
+                constraints: constraints
+        ], false)
+    }
+
+    List updateThemes(User u, View view, List themes) {
+        httpClientService.postParamsExpectList('project/themes', [
+                userUUID   : u.uuid,
+                userOrgUUID: u.organization.uuid,
+                projectUUID: view.project.uuid,
+                themes: themes
+        ], String)
     }
 
     List<EntityViewEvent> allEventsForView(User user, String vUUID) {
