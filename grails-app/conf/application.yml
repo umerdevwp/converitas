@@ -95,7 +95,7 @@ management:
 
 heracles:
     cb:
-        server: "http://localhost:8083"
+        server: "https://test.coveritas.com"
     api:
 #        server: "http://10.97.140.242:8081"
         server: "http://localhost:8081"
