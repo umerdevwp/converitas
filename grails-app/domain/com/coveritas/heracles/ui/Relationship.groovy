@@ -13,7 +13,7 @@ class Relationship {
 
     static constraints = {
         srcCompanyUUID      nullable: false
-        dstCompanyUUID      nullable: false, blank: false, unique: ['srcCompanyUUID']
+        dstCompanyUUID      nullable: false, blank: false, unique: ['srcCompanyUUID','type']
         organizationUUID    nullable: true
         type                nullable: false
     }

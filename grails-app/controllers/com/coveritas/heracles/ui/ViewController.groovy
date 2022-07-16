@@ -191,6 +191,43 @@ class ViewController {
         }
     }
 
+    def addRelationship(String url, View view, Long relationshipTypeId, String srcCompanyUUID, String dstCompanyUUID) {
+        User u = Helper.userFromSession(session)
+        Project project = view.project
+        Relationship relationship = new Relationship(organizationUUID:u.organization.uuid,
+                type: RelationshipType.get(relationshipTypeId),
+                srcCompanyUUID:srcCompanyUUID,
+                dstCompanyUUID:dstCompanyUUID)
+        if (project.organization==u.organization|| u.isSysAdmin()) {
+            try {
+                Relationship.withTransaction { status ->
+                    relationship.save(failOnError: true, flush: true, update: false)
+                }
+            } catch (Exception e) {
+                log.warn("Failed to persist",e)
+                respond view.errors, view:'show'
+                return
+            }
+
+            request.withFormat {
+                form multipartForm {
+                    if (url!=null) {
+                        redirect url:url
+                    } else {
+                        redirect view
+                    }
+                }
+                if (url!=null) {
+                    redirect url:url
+                } else {
+                    redirect view
+                }
+            }
+        } else {
+            notAllowed('default.not.updated.message')
+        }
+    }
+
     def updateConstraints() {
         String url = params.url
         long viewId = params.get("view")?.id as Long

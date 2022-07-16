@@ -78,6 +78,15 @@ class ApiController {
         }
     }
 
+    def removeRelationship(long id){
+        call { User u ->
+            Relationship.withTransaction {status ->
+                Relationship.get(id).delete()
+                []
+            }
+        }
+    }
+
     def removeTheme(long viewId, String theme){
         call { User u ->
             View view = View.get(viewId)

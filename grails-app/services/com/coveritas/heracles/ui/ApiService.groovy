@@ -707,7 +707,10 @@ class ApiService {
         List profile = companyProfile(companyUUID)
         Map actions = [name: searchFor(profile, 'Name'),
                        uuid:companyUUID,
-                       level:view.companies[companyUUID]]
+                       level:view.companies[companyUUID],
+                       relationships:Relationship.findAllByDstCompanyUUIDOrSrcCompanyUUID(companyUUID,companyUUID).collect({
+                           [type:it.type.name, srcCompanyUUID:it.srcCompanyUUID, dstCompanyUUID:it.dstCompanyUUID, id:it.id]
+                       })]
         [
          "Company Details":profile,
          Insights:insights,
