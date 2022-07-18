@@ -501,7 +501,7 @@ class ApiService {
             Company company = cvo.company
             result.add( [name:company.canonicalName, uuid:company.uuid] )
         }
-        result.sort({ Map<String,String> a, Map<String,String> b -> (a.name.compareToIgnoreCase(b.name))})
+        result.sort({ Map<String,String> a, Map<String,String> b -> (a.name?.compareToIgnoreCase(b.name)?:-1)})
     }
 
     boolean addCompanyToView(User user, String companyUUID, long viewId) {
