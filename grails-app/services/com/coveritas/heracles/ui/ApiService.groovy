@@ -200,6 +200,7 @@ class ApiService {
     }
 
     ViewResp remoteViewCompaniesWithRadar(long lvId, long userId) {
+        updateRvcCache(lvId)
         ViewReq viewReq = new ViewReq(lvId, userId)
         rvcCache.get(viewReq)
     }
@@ -234,7 +235,7 @@ class ApiService {
     }
 
     LoadingCache<ViewReq, ViewResp> rvcCache = Caffeine.newBuilder()
-            .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
+            .maximumSize(100).expireAfterWrite(30, TimeUnit.SECONDS)
             .build({ ViewReq viewReq -> remoteViewCompanies(viewReq)})
 
     ViewResp remoteViewCompanies(ViewReq viewReq) {
