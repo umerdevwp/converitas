@@ -8,6 +8,7 @@ import com.coveritas.heracles.utils.Meta
 import grails.gorm.transactions.Transactional
 import io.micronaut.caffeine.cache.Caffeine
 import io.micronaut.caffeine.cache.LoadingCache
+import org.springframework.lang.Nullable
 import org.springframework.util.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
@@ -199,6 +200,7 @@ class ApiService {
     }
 
     ViewResp remoteViewCompaniesWithRadar(long lvId, long userId) {
+        updateRvcCache(lvId)
         ViewReq viewReq = new ViewReq(lvId, userId)
         rvcCache.get(viewReq)
     }
@@ -233,7 +235,7 @@ class ApiService {
     }
 
     LoadingCache<ViewReq, ViewResp> rvcCache = Caffeine.newBuilder()
-            .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
+            .maximumSize(100).expireAfterWrite(30, TimeUnit.SECONDS)
             .build({ ViewReq viewReq -> remoteViewCompanies(viewReq)})
 
     ViewResp remoteViewCompanies(ViewReq viewReq) {
@@ -488,8 +490,7 @@ class ApiService {
         ["companies" : [
               "Tracked" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.TRACKING),
               "Surfaced" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.SURFACING),
-              "Emerging" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.DISCOVERED),
-              "Linked" : [radar:response.radar]
+              "Emerging" : sortedCanonicalNamesFilteredByLevel(cvos, CompanyViewObject.DISCOVERED)
             ]
         ]
     }
@@ -1032,10 +1033,11 @@ class ApiService {
      * @param maxdepth
      * @return
      */
-    Map<String, List> newGraph(User user, View view, Long from, Long to, Integer maxdepth) {
+    Map<String, List> newGraph(User user, @Nullable Integer mode, @Nullable String uuid, View view, Long from, Long to, Integer maxdepth) {
         Project project = view.project
         Organization org = project.organization
-        def graphData =httpClientService.getParamsExpectResult("/view/graph/${org.uuid}/${user.uuid}/${project.uuid}/${view.uuid}", null, true)
+        String args = mode != null ? "mode=$mode" : "uuid=$uuid"
+        def graphData =httpClientService.getParamsExpectResult("/view/graph/${org.uuid}/${user.uuid}/${project.uuid}/${view.uuid}?$args", null, true)
 
         graphData
 //        Map<String, Object> params = [:] as Map<String, Object>

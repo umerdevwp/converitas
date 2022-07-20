@@ -123,9 +123,7 @@
         #companies h3:nth-child(3) {
              color: #457b07;
         }
-        #companies h3:nth-child(4) {
-            color: #9fc2f7;
-        }
+
         .companies-wrapper {
             background-color: #FFF;
         }
@@ -819,32 +817,22 @@
             });
             pageURL = window.location.href;
             $('.url').val(pageURL);
-            setTimeout(() => {    
-            $('#companies h3:eq(0)').css('color', '#ea3223');                 
-             $('#companies h3:eq( 1 )').css('color', '#f2a83b'); 
-             $('#companies h3:eq( 2 )').css('color', '#457b07');
-             $('#companies h3:eq( 3 )').css('color', '#9fc2f7');
+             setTimeout(() => {
+                $('#companies h3:eq(0)').css('color', '#ea3223');
+                 $('#companies h3:eq( 1 )').css('color', '#f2a83b');
+                 $('#companies h3:eq( 2 )').css('color', '#457b07');
 
-            $('#companies h3:eq( 0 )').on('click', function() {
-                loadGraphData(3);
-            });
-            $('#companies h3:eq( 1 )').on('click', function() {
-                loadGraphData(2);
-            });  
-            $('#companies h3:eq( 2 )').on('click', function() {
-                loadGraphData(1);
-            });
-            $('#companies h3:eq( 3 )').on('click', function() {
-                loadGraphData(0);
-            });
-/*
-            $('#companies ul:first').find('li').append('<span class="material-icons md-18 skyblue">remove_circle</span>');
-            $('#companies ul:first').find('li').append('<span class="material-icons md-18 skyblue">hide_source</span>');
-            
-            $('#companies ul:eq(1)').find('li').append('<span class="material-icons md-18 skyblue">add_circle</span>');
-*/
-            }, "2000");
+                $('#companies h3:eq( 0 )').on('click', function() {
+                    loadGraphData(3);
+                });
+                $('#companies h3:eq( 1 )').on('click', function() {
+                    loadGraphData(2);
+                });
+                $('#companies h3:eq( 2 )').on('click', function() {
+                    loadGraphData(1);
+                });
 
+                }, "2000");
         });
 
         let from, to;
@@ -938,9 +926,9 @@
                         level = 'surfacing'
                     });
                     $('#companies').html(html);
-                    $('#companies ul:last-child').css('display', 'none');
                     $('.loadcompany').on('click', function() {
                         loadProjectContent($(this).data('uuid'));
+                        loadGraphData(null, $(this).data('uuid'))
                     });
 /*
                     $('.companydlg').on('click', function() {
@@ -1374,30 +1362,25 @@
             },
             physics: {
                 barnesHut: {
-                    gravitationalConstant: -10000
+                    gravitationalConstant: -50000
                 },
                 solver: 'repulsion',
                 repulsion: {
                     springLength: 250,
                     nodeDistance: 150,
-                    springConstant:0.01
-                }
+                    springConstant:0.01,
+                    damping: 0.2
+                },
+                maxVelocity: 20,
+                minVelocity: 1
             }
         };
         const graphContainer = document.getElementById('graph');
-        let ts = '', qts = '';
 
-        if (null != now) {
-            ts = "&ts=" + now;
-            qts = "?ts=" + now + '&viewId=${view.id}';
-        }
-
-        window.loadGraphData = function(mode) {
-
-            function modeFilter(d) {
-                d.mode = d.level==='watching' ? 0 : d.level === 'discovered' ? 1 : d.level === 'surfacing' ? 2 : d.level === 'tracking' ? 3 : 0;
-                // d.fontsize
-                return d.mode >= mode;
+        window.loadGraphData = function(mode, uuid) {
+            let qts = mode ? '?mode=' + mode : "?uuid=" + uuid;
+            if (null != now) {
+                qts = qts + '&ts=' + now + '&viewId=${view.id}';
             }
 
             $.ajax({
@@ -1409,7 +1392,7 @@
                 },
                 success: function (data) {
                     console.log('data:', data);
-                    const filteredNodes = data.nodes.filter(modeFilter);
+                    const filteredNodes = data.nodes;
                     const id2node = filteredNodes.reduce(function(map, node) {
                         map[node.id] = node;
                         return map;
@@ -1424,14 +1407,15 @@
                         edges: data.edges
                     }, graphOptions);
 
-                    network.on('click', function (properties) {
+                    network.on('doubleClick', function (properties) {
                         let haveNode = false; // Manage code continuation after window_location
 
                         if ([] !== properties.items) {
                             let id = properties.nodes[0];
                             if (id2node[id]) {
                                 haveNode = true;
-                                loadProjectContent(id)
+                                loadProjectContent(id);
+                                loadGraphData(null, id)
                             }
                         }
                         if ([] !== properties.edges && !haveNode)
@@ -1459,7 +1443,7 @@
             })
         }
 
-        loadGraphData(2);
+        loadGraphData(3);
 
         setInterval(
             function() {
