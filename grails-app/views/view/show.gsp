@@ -240,7 +240,22 @@
         .dropdown-content a:hover {background-color: #ddd}
 
         /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-        .show {display:block;}        
+        .show {display:block;}  
+        
+        #categoryOptions,
+        #industryOptions {
+            position: absolute;
+            overflow: scroll;
+            height: 150px;
+            width: 288px;          
+        }
+
+        #categoryOptions li,
+        #industryOptions li {
+            list-style: none;
+            padding-left: 10px;
+            padding-bottom: 5px;
+        }
         </style>
     </head>
     <body>
