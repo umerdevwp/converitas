@@ -501,7 +501,7 @@ class ApiService {
             Company company = cvo.company
             result.add( [name:company.canonicalName, uuid:company.uuid] )
         }
-        result.sort({ Map<String,String> a, Map<String,String> b -> (a.name.compareToIgnoreCase(b.name))})
+        result.sort({ Map<String,String> a, Map<String,String> b -> (a.name?.compareToIgnoreCase(b.name)?:-1)})
     }
 
     boolean addCompanyToView(User user, String companyUUID, long viewId) {
@@ -707,7 +707,10 @@ class ApiService {
         List profile = companyProfile(companyUUID)
         Map actions = [name: searchFor(profile, 'Name'),
                        uuid:companyUUID,
-                       level:view.companies[companyUUID]]
+                       level:view.companies[companyUUID],
+                       relationships:Relationship.findAllByDstCompanyUUIDOrSrcCompanyUUID(companyUUID,companyUUID).collect({
+                           [type:it.type.name, srcCompanyUUID:it.srcCompanyUUID, dstCompanyUUID:it.dstCompanyUUID, id:it.id]
+                       })]
         [
          "Company Details":profile,
          Insights:insights,

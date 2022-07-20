@@ -269,12 +269,6 @@
             <div class="col-sm-6">
                 <h2>Company Association</h2>
                 <td style="width:50%; padding-left: 5px; max-height:600px; border: solid 1px #ccc">
-                    <%-- <div class="tabs">
-                        <button class="showButtons selectedTab" onclick="loadGraphData(2)">Tracking</button>
-                        <button class="showButtons" onclick="loadGraphData(1)">Surfaced</button>
-                        <button class="showButtons" onclick="loadGraphData(0)">Watched</button>
-                    </div> --%>
-                    <%-- <h2 class="modeHeading"><span id="mode"></span> Companies</h2> --%>
                     <div class="spinnerWrapper hide">
                         <div class="spinner">Loading...</div>
                     </div>
@@ -283,7 +277,6 @@
                 </td>
             </div>
             <div class="col-sm-4">
-%{--                <h2>${project.name} > <a class="back-link" style="cursor: pointer;color: #336699"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>--}%
                 <h2><a href="/project/show/${project.id}">${project.name}</a> <a href="#" class="dropbtn" >&gt;</a> <a class="back-link" href="#"><span id="breadcrumb">${view.name}</span></a><span id="bcCompanySelected"> > <span id="breadcrumb1"></span></h2>
                 <div class="dropdown">
                     <g:set var="views" value="${View.findAllByProject(project)}"/>
@@ -397,11 +390,9 @@
                     <g:form method="POST" url="/view/addCompany">
                         <div class="modal-body">
                             <fieldset class="form">
-                                %{--<f:all bean="companyViewObject"/>--}%
                                 <g:hiddenField name="view.id" value="${this.view.id}"/>
                                 <g:hiddenField name="level" value="${CompanyViewObject.TRACKING}"/>
                                 <g:hiddenField name="url" value="" class="url"/>
-                                %{--<f:field bean="companyViewObject" property="company"/>--}%
                                 <div class="fieldcontain required">
                                     <label for="companyUUID">Company<span class="required-indicator">*</span></label>
                                     <input id="companyInput" placeholder="Add a Company" size="40">
@@ -427,11 +418,8 @@
                             </fieldset>
                         </div>
                         <div class="modal-footer">
-%{--                            <fieldset class="showButtons">--}%
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button style="display: none" class="save" type="submit" id="addButton">Add Company</button>
-%{--                            </fieldset>--}%
-    %{--                        <input type="submit" name="create" class="btn btn-primary" value="Done">--}%
                         </div>
                     </g:form>
                 </div>
@@ -461,7 +449,6 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-%{--                        <input type="submit" name="create" class="btn btn-primary" value="Done">--}%
                     </div>
                 </div>
             </div>
@@ -469,271 +456,301 @@
         %{-- Modal End --}%
 
         %{-- Modal Start --}%
-    <div class="modal fade" id="editLensModal" tabindex="-1" role="dialog" aria-labelledby="editLensModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editLensModalLabel">Edit Lens</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+        <div class="modal fade" id="editLensModal" tabindex="-1" role="dialog" aria-labelledby="editLensModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editLensModalLabel">Edit Lens</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <g:form url="/view/update" method="PUT" >
+                        <g:hiddenField name="version" value="${view.version}" />
+                        <g:hiddenField name="project.id" value="${project.id}" />
+                        <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                        <g:hiddenField name="id" value="${view.id}" />
+                        <g:hiddenField name="uuid" value="${view.uuid}" />
+                        <div class="modal-body">
+                            <fieldset class="form">
+                                <div class="fieldcontain required">
+                                    <label for="name">Name<span class="required-indicator">*</span></label>
+                                    <input type="text" name="name" value="${view.name}" required="">
+                                </div>
+                                <div class="fieldcontain required">
+                                    <label for="description">Description<span class="required-indicator">*</span>
+                                    </label>
+                                    <textarea name="description" value="" required="" cols="40" rows="5" id="description">${view.description}</textarea>
+                                </div>
+                                <div class="fieldcontain">
+                                    <label>Users</label>
+                                    <select name="users" multiple="">
+                                        <g:set var="viewUserIds" value="${view.users*.id}"/>
+                                        <g:each in="${User.findAllByOrganization(project.organization)}" var="user">
+                                            <g:if test="${user.id in viewUserIds}">
+                                                <option selected="selected" value="${user.id}">${user.toString()}</option>
+                                            </g:if>
+                                            <g:else>
+                                                <option value="${user.id}">${user.toString()}</option>
+                                            </g:else>
+                                        </g:each>
+                                    </select>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <input type="submit" class="btn btn-primary" value="Update">
+                        </div>
+                    </g:form>
                 </div>
-                <g:form url="/view/update" method="PUT" >
-                    <g:hiddenField name="version" value="${view.version}" />
-                    <g:hiddenField name="project.id" value="${project.id}" />
-                    <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
-                    <g:hiddenField name="id" value="${view.id}" />
-                    <g:hiddenField name="uuid" value="${view.uuid}" />
-                    <div class="modal-body">
-                        <fieldset class="form">
-                            <div class="fieldcontain required">
-                                <label for="name">Name<span class="required-indicator">*</span></label>
-                                <input type="text" name="name" value="${view.name}" required="">
-                            </div>
-%{--
-                            <div class="fieldcontain required">
-                                <label for="description">Description<span class="required-indicator">*</span></label>
-                                <input type="text" name="description" value="${view.description}" required="">
-                            </div>
---}%
-                            <div class="fieldcontain required">
-                                <label for="description">Description<span class="required-indicator">*</span>
-                                </label>
-                                <textarea name="description" value="" required="" cols="40" rows="5" id="description">${view.description}</textarea>
-                            </div>
-                            <div class="fieldcontain">
-                                <label>Users</label>
-                                <select name="users" multiple="">
-                                    <g:set var="viewUserIds" value="${view.users*.id}"/>
-                                    <g:each in="${User.findAllByOrganization(project.organization)}" var="user">
-                                        <g:if test="${user.id in viewUserIds}">
-                                            <option selected="selected" value="${user.id}">${user.toString()}</option>
-                                        </g:if>
-                                        <g:else>
-                                            <option value="${user.id}">${user.toString()}</option>
-                                        </g:else>
-                                    </g:each>
-                                </select>
-                            </div>
-                        </fieldset>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <input type="submit" class="btn btn-primary" value="Update">
-                    </div>
-                </g:form>
             </div>
         </div>
-    </div>
-    %{-- Modal End --}%
+        %{-- Modal End --}%
 
-    %{-- Modal Start --}%
-    <div class="modal fade" id="editProjectModal" tabindex="-1" role="dialog" aria-labelledby="editProjectModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editProjectModalLabel">Edit Project</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <g:form url="/project/update" method="PUT" >
-                    <g:hiddenField name="version" value="${project.version}" />
-                    <g:hiddenField name="id" value="${project.id}" />
-                    <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
-                    <g:hiddenField name="uuid" value="${project.uuid}" />
-                    <g:hiddenField name="organization" value="${project.organization.id}" />
-                    <div class="modal-body">
-                        <fieldset class="form">
-                            <div class="fieldcontain required">
-                                <label for="name">Name<span class="required-indicator">*</span></label>
-                                <input type="text" name="name" value="${project.name}" required="">
-                            </div>
-                            <div class="fieldcontain required">
-                                <label for="description">Description<span class="required-indicator">*</span>
-                                </label>
-                                <textarea name="description" value="" required="" cols="40" rows="5">${project.description}</textarea>
-                            </div>
-%{--
-                            <div class="fieldcontain required">
-                                <label for="description">Description<span class="required-indicator">*</span></label>
-                                <input type="text" name="description" value="${project.description}" required="">
-                            </div>
---}%
-                            <div class="fieldcontain required">
-                                <label for="color.id">Color</label>
-                                <select name="color.id" id="color"≥>
-                                    <option value="">-Choose your color-</option>
-                                    <g:each in="${colors}" var="color">
-                                        <g:if test="${color.id==(project.color?.id?:-1)}">
-                                            <option selected="selected" value="${color.id}" style="background-color: ${color.code} !important" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>
-                                        </g:if>
-                                        <g:else>
-                                            <option value="${color.id}" style="background-color: ${color.code} !important" data-color="${color.code}">${color.name}</option>
-                                        </g:else>
-                                    </g:each>
-                                </select>
-                                <div id="colorSample"></div>
-                                <script type="module">
-                                    let $color = $("#color");
-                                    let $sample = $("#colorSample");
-                                    $color.on('change', function(){
-                                        const selected = $color.find(":selected");
-                                        $sample.html(selected.text());
-                                        $sample.css('background-color', selected.data('color'))
-                                    })
-                                </script>
-                            </div>
-                            <div class="fieldcontain">
-                                <label>Users</label>
-                                <select name="users" multiple="">
-                                    <g:set var="projectUserIds" value="${project.users*.id}"/>
-                                    <g:each in="${User.findAllByOrganization(project.organization)}" var="user">
-                                        <g:if test="${user.id in projectUserIds}">
-                                            <option selected="selected" value="${user.id}">${user.toString()}</option>
-                                        </g:if>
-                                        <g:else>
-                                            <option value="${user.id}">${user.toString()}</option>
-                                        </g:else>
-                                    </g:each>
-                                </select>
-                            </div>
-                        </fieldset>
+        %{-- Modal Start --}%
+        <div class="modal fade" id="editProjectModal" tabindex="-1" role="dialog" aria-labelledby="editProjectModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProjectModalLabel">Edit Project</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <input type="submit" class="btn btn-primary" value="Update">
-                    </div>
-                </g:form>
-            </div>
-        </div>
-    </div>
-    %{-- Modal End --}%
-    %{-- Modal Start --}%
-    <div class="modal fade" id="addIndustryModal" tabindex="-1" role="dialog" aria-labelledby="addIndustryModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addIndustryModalLabel">Add Industry</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <g:form url="/view/updateConstraints" method="POST" >
-                    <g:hiddenField name="view.id" value="${view.id}" />
-                    <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
-                    <g:hiddenField name="industry" class="industry"/>
-                    <g:hiddenField name="constraints" class="constraints" value="{}"/>
-                    <div class="modal-body">
-                        <fieldset class="form">
-                            <div class="fieldcontain required">
-                                <label for="industryInput">Industry<span class="required-indicator">*</span></label>
-                                <input id="industryInput" placeholder="Add an Industry" size="40">
-%{--                                <div style="display:inline-block;width:150px;background-color: transparent">--}%
-%{--                                </div>--}%
-                                <div class="sub-company">
-                                    <ul class="form-control list-group" id="industryOptions" style="display:none">
-                                    </ul>
+                    <g:form url="/project/update" method="PUT" >
+                        <g:hiddenField name="version" value="${project.version}" />
+                        <g:hiddenField name="id" value="${project.id}" />
+                        <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                        <g:hiddenField name="uuid" value="${project.uuid}" />
+                        <g:hiddenField name="organization" value="${project.organization.id}" />
+                        <div class="modal-body">
+                            <fieldset class="form">
+                                <div class="fieldcontain required">
+                                    <label for="name">Name<span class="required-indicator">*</span></label>
+                                    <input type="text" name="name" value="${project.name}" required="">
                                 </div>
-                                <div class="messageSection hide">Set the selected industry for this lens</div>
-                            </div>
-                            <div class="fieldcontain required">
-                                <label for="description">Weight<span class="required-indicator">*</span></label>
-                                <input type="text" name="weight" id="weight" value="1" required="">
-                            </div>
-                        </fieldset>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button style="display: none" class="save" type="submit" id="addIndButton">Add Industry</button>
-                    </div>
-                </g:form>
-            </div>
-        </div>
-    </div>
-    %{-- Modal End --}%
-    %{-- Modal Start --}%
-    <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <g:form url="/view/updateConstraints" method="POST" >
-                    <g:hiddenField name="view.id" value="${view.id}" />
-                    <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
-                    <g:hiddenField name="category" class="category"/>
-                    <g:hiddenField name="constraints" class="constraints" value="{}"/>
-                    <div class="modal-body">
-                        <fieldset class="form">
-                            <div class="fieldcontain required">
-                                <label for="categoryInput">Category<span class="required-indicator">*</span></label>
-                                <input id="categoryInput" placeholder="Add a Category" size="40">
-%{--                                <div style="display:inline-block;width:150px;background-color: transparent">--}%
-%{--                                </div>--}%
-                                <div class="sub-company">
-                                    <ul class="form-control list-group" id="categoryOptions" style="display:none">
-                                    </ul>
+                                <div class="fieldcontain required">
+                                    <label for="description">Description<span class="required-indicator">*</span>
+                                    </label>
+                                    <textarea name="description" value="" required="" cols="40" rows="5">${project.description}</textarea>
                                 </div>
-                                <div class="messageSection hide">Set the selected category for this lens</div>
-                            </div>
-                            <div class="fieldcontain required">
-                                <label for="description">Weight<span class="required-indicator">*</span></label>
-                                <input type="text" name="weight" id="weight" value="1" required="">
-                            </div>
-                        </fieldset>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button style="display: none" class="save" type="submit" id="addCatButton">Add Category</button>
-                    </div>
-                </g:form>
+                                <div class="fieldcontain required">
+                                    <label for="color.id">Color</label>
+                                    <select name="color.id" id="color"≥>
+                                        <option value="">-Choose your color-</option>
+                                        <g:each in="${colors}" var="color">
+                                            <g:if test="${color.id==(project.color?.id?:-1)}">
+                                                <option selected="selected" value="${color.id}" style="background-color: ${color.code} !important" onload="$(this).css('background', $(this).data('color'))">${color.name}</option>
+                                            </g:if>
+                                            <g:else>
+                                                <option value="${color.id}" style="background-color: ${color.code} !important" data-color="${color.code}">${color.name}</option>
+                                            </g:else>
+                                        </g:each>
+                                    </select>
+                                    <div id="colorSample"></div>
+                                    <script type="module">
+                                        let $color = $("#color");
+                                        let $sample = $("#colorSample");
+                                        $color.on('change', function(){
+                                            const selected = $color.find(":selected");
+                                            $sample.html(selected.text());
+                                            $sample.css('background-color', selected.data('color'))
+                                        })
+                                    </script>
+                                </div>
+                                <div class="fieldcontain">
+                                    <label>Users</label>
+                                    <select name="users" multiple="">
+                                        <g:set var="projectUserIds" value="${project.users*.id}"/>
+                                        <g:each in="${User.findAllByOrganization(project.organization)}" var="user">
+                                            <g:if test="${user.id in projectUserIds}">
+                                                <option selected="selected" value="${user.id}">${user.toString()}</option>
+                                            </g:if>
+                                            <g:else>
+                                                <option value="${user.id}">${user.toString()}</option>
+                                            </g:else>
+                                        </g:each>
+                                    </select>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <input type="submit" class="btn btn-primary" value="Update">
+                        </div>
+                    </g:form>
+                </div>
             </div>
         </div>
-    </div>
-    %{-- Modal End --}%
+        %{-- Modal End --}%
+        %{-- Modal Start --}%
+        <div class="modal fade" id="addIndustryModal" tabindex="-1" role="dialog" aria-labelledby="addIndustryModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addIndustryModalLabel">Add Industry</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <g:form url="/view/updateConstraints" method="POST" >
+                        <g:hiddenField name="view.id" value="${view.id}" />
+                        <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                        <g:hiddenField name="industry" class="industry"/>
+                        <g:hiddenField name="constraints" class="constraints" value="{}"/>
+                        <div class="modal-body">
+                            <fieldset class="form">
+                                <div class="fieldcontain required">
+                                    <label for="industryInput">Industry<span class="required-indicator">*</span></label>
+                                    <input id="industryInput" placeholder="Add an Industry" size="40">
+    %{--                                <div style="display:inline-block;width:150px;background-color: transparent">--}%
+    %{--                                </div>--}%
+                                    <div class="sub-company">
+                                        <ul class="form-control list-group" id="industryOptions" style="display:none">
+                                        </ul>
+                                    </div>
+                                    <div class="messageSection hide">Set the selected industry for this lens</div>
+                                </div>
+                                <div class="fieldcontain required">
+                                    <label for="description">Weight<span class="required-indicator">*</span></label>
+                                    <input type="text" name="weight" id="weight" value="1" required="">
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button style="display: none" class="save" type="submit" id="addIndButton">Add Industry</button>
+                        </div>
+                    </g:form>
+                </div>
+            </div>
+        </div>
+        %{-- Modal End --}%
+        %{-- Modal Start --}%
+        <div class="modal fade" id="addRelationshipModal" tabindex="-1" role="dialog" aria-labelledby="addRelationshipModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addRelationshipModalLabel">Add Relationship</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <g:form url="/view/addRelationship" method="POST" >
+                        <g:hiddenField name="view.id" value="${view.id}" />
+                        <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                        <g:hiddenField name="srcCompanyUUID" id="srcCompanyUUID" value=""/>
+                        <div class="modal-body">
+                            <fieldset class="form">
+                                <div class="fieldcontain required">
+                                    <label for="description">Company<span class="required-indicator">*</span></label>
+                                    <input type="text" readonly id="srcCompany" required="">
+                                </div>
+                                <div class="fieldcontain required">
+                                    <label for="relationshipTypeId">is<span class="required-indicator">*</span></label>
+                                    <g:select name="relationshipTypeId" from="${com.coveritas.heracles.ui.RelationshipType.findAll(/*sort:"name"*/)}" optionKey="id" optionValue="name"/>
+                                </div>
+                                <div class="fieldcontain required">
+                                    <label for="dstCompanyUUID">of<span class="required-indicator">*</span></label>
+                                    <select name="dstCompanyUUID" id="dstCompanyUUID">
+%{--                                        <option value="uuid">canonicalName</option>--}%
+                                    </select>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button class="save" type="submit">Add Relationship</button>
+                        </div>
+                    </g:form>
+                </div>
+            </div>
+        </div>
+        %{-- Modal End --}%
 
-    %{-- Modal Start --}%
-    <div class="modal fade" id="addThemeModal" tabindex="-1" role="dialog" aria-labelledby="addThemeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addThemeModalLabel">Add Theme</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <g:form url="/view/updateThemes" method="POST" >
-                    <g:hiddenField name="view.id" value="${view.id}" />
-                    <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
-                    <g:hiddenField name="themes" class="themes" value="[]"/>
-                    <div class="modal-body">
-                        <fieldset class="form">
-                            <div class="fieldcontain required">
-                                <label for="theme">Theme<span class="required-indicator">*</span></label>
-                                <input id="theme" name="theme" placeholder="Add a Theme" size="40">
-%{--                                <div style="display:inline-block;width:150px;background-color: transparent">--}%
-%{--                                </div>--}%
-                                <div class="sub-company">
-                                    <ul class="form-control list-group" id="themeOptions" style="display:none">
-                                    </ul>
+        %{-- Modal Start --}%
+        <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <g:form url="/view/updateConstraints" method="POST" >
+                        <g:hiddenField name="view.id" value="${view.id}" />
+                        <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                        <g:hiddenField name="category" class="category"/>
+                        <g:hiddenField name="constraints" class="constraints" value="{}"/>
+                        <div class="modal-body">
+                            <fieldset class="form">
+                                <div class="fieldcontain required">
+                                    <label for="categoryInput">Category<span class="required-indicator">*</span></label>
+                                    <input id="categoryInput" placeholder="Add a Category" size="40">
+    %{--                                <div style="display:inline-block;width:150px;background-color: transparent">--}%
+    %{--                                </div>--}%
+                                    <div class="sub-company">
+                                        <ul class="form-control list-group" id="categoryOptions" style="display:none">
+                                        </ul>
+                                    </div>
+                                    <div class="messageSection hide">Set the selected category for this lens</div>
                                 </div>
-                                <div class="messageSection hide">Set the selected theme for this project</div>
-                            </div>
-                        </fieldset>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button class="save" type="submit">Add Theme</button>
-                    </div>
-                </g:form>
+                                <div class="fieldcontain required">
+                                    <label for="description">Weight<span class="required-indicator">*</span></label>
+                                    <input type="text" name="weight" id="weight" value="1" required="">
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button style="display: none" class="save" type="submit" id="addCatButton">Add Category</button>
+                        </div>
+                    </g:form>
+                </div>
             </div>
         </div>
-    </div>
-    %{-- Modal End --}%
+        %{-- Modal End --}%
+
+        %{-- Modal Start --}%
+        <div class="modal fade" id="addThemeModal" tabindex="-1" role="dialog" aria-labelledby="addThemeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addThemeModalLabel">Add Theme</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <g:form url="/view/updateThemes" method="POST" >
+                        <g:hiddenField name="view.id" value="${view.id}" />
+                        <g:hiddenField name="url" class="url" value="/view/show/${view.id}" />
+                        <g:hiddenField name="themes" class="themes" value="[]"/>
+                        <div class="modal-body">
+                            <fieldset class="form">
+                                <div class="fieldcontain required">
+                                    <label for="theme">Theme<span class="required-indicator">*</span></label>
+                                    <input id="theme" name="theme" placeholder="Add a Theme" size="40">
+    %{--                                <div style="display:inline-block;width:150px;background-color: transparent">--}%
+    %{--                                </div>--}%
+                                    <div class="sub-company">
+                                        <ul class="form-control list-group" id="themeOptions" style="display:none">
+                                        </ul>
+                                    </div>
+                                    <div class="messageSection hide">Set the selected theme for this project</div>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button class="save" type="submit">Add Theme</button>
+                        </div>
+                    </g:form>
+                </div>
+            </div>
+        </div>
+        %{-- Modal End --}%
 
 %{--    <script src="https://d3js.org/d3.v3.min.js"></script>--}%
 %{--    <script src="/assets/d3.layout.cloud.js"></script>--}%
@@ -1096,22 +1113,50 @@
 
         function formatActionsContent(content)  {
             // todo untrack/track/ignore/
-            let html= '';
-            html+='<div>';
+            let html= '<div class="news-insight-item">\n' +
+                      '  <h3>Actions</h3>\n' +
+                      '  <br>\n'+
+                      '  <ul class="">' +
+                      '    <li>';
             let company = compUuid2Company[content.uuid]
             if (company.level==='tracking') {
-                html += '<button class="btn btn-primary companydlg" data-action="untrack" data-uuid="' + company.uuid + '"><span class="material-icons md-18">remove_circle</span>Untrack</button>';
+              html += '      <button class="btn btn-primary companydlg" data-action="untrack" data-uuid="' + company.uuid + '"><span class="material-icons md-18">remove_circle</span>Untrack</button>';
             } else {
-                html += '<button class="btn btn-primary companydlg" data-action="track" data-uuid="' + company.uuid + '"><span class="material-icons md-18">add_circle</span>Track</button>';
+              html += '      <button class="btn btn-primary companydlg" data-action="track" data-uuid="' + company.uuid + '"><span class="material-icons md-18">add_circle</span>Track</button>';
             }
-            html+='</div>';
-            html+='<div>';
-            html += '<button class="btn btn-primary companydlg" data-action="ignore" data-uuid="' + company.uuid + '"><span class="material-icons md-18">hide_source</span>Ignore</button>';
-            html+='</div>';
-            html+='<div>';
-            //todo list with possible relationships and tracked companies
-            //todo form to persist relationship as event (should stay timeless/always be present in graph)
-            html+='</div>';
+            html   += '    </li>';
+            html   += '    <li>';
+            html   += '      <button class="btn btn-primary companydlg" data-action="ignore" data-uuid="' + company.uuid + '"><span class="material-icons md-18">hide_source</span>Ignore</button>';
+            html   += '    </li>';
+            const relationships = content['relationships'];
+            $('#srcCompanyUUID').val(content.uuid);
+            $('#srcCompany').val(compUuid2Company[content.uuid].name);
+            const $dstCompanyUUID = $('#dstCompanyUUID');
+            $dstCompanyUUID.empty()
+            let hasEntry = false;
+            $.each(compUuid2Company, function(k, c) {
+                if (k!==content.uuid) {
+                    $dstCompanyUUID.append("<option value='" + c.uuid + "'>" + c.name + "</option>");
+                    hasEntry = true
+                }
+            });
+            if (hasEntry) {
+              html += '    <li>\n' +
+                      '      <h3>Relationships<a data-toggle="modal" data-target="#addRelationshipModal" style="cursor: pointer;"><i class="material-icons md-18 skyblue">add_circle_outline</i></a></h3>\n';
+              if (relationships!==undefined) {
+                html+='      <table>\n'+
+                      '        <tbody>\n';
+                $.each(relationships, function(key) {
+                  const value = this;
+                  html+='          <tr><td>'+compUuid2Company[value.srcCompanyUUID].name+'</td><td>is '+value.type+' of</td><td>'+compUuid2Company[value.dstCompanyUUID].name+'<a class="removerelationship" data-key="'+value.id+'" style="cursor: pointer;"><i class="material-icons md-18 skyblue">remove_circle_outline</i></a></td></tr>\n';
+                });
+                html+='        </tbody>\n'+
+                      '      </table>\n';
+              }
+              html += '    </li>\n';
+            }
+            html   += '  </ul>\n' +
+                      '</div>';
 
             return html;
         }
@@ -1195,6 +1240,14 @@
                         $('.companydlg').on('click', function () {
                             let uuid = $(this).data('uuid');
                             companyDlg(uuid, compUuid2Company[uuid].name, $(this).data('action'));
+                        })
+                        $('.removerelationship').on('click', function () {
+                            let id = $(this).data('key');
+                            if (confirm('Do you want to remove this relationship?')) {
+                                $.getJSON("/api/removeRelationship?id=" + id, function (data) {
+                                    location.reload();
+                                });
+                            }
                         })
                     }
                     if (params) {
