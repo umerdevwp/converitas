@@ -190,11 +190,12 @@ class ApiController {
         }
     }
 
-    def activecompanygraph( long viewId, @Nullable Long ts, @Nullable Long from, @Nullable Long to) {
+    def activecompanygraph( long viewId, @Nullable Integer mode, @Nullable String uuid, @Nullable Long ts, @Nullable Long from, @Nullable Long to) {
         call { User user ->
             ///view/graph/org-uuid/user-uuid/project-uuid/view-uuid
             View view = View.get(viewId)
-            apiService.newGraph(user, view, from, to, null)
+            log.info "$mode"
+            apiService.newGraph(user, mode, uuid, view, from, to, null)
         }
     }
 
