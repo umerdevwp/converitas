@@ -665,15 +665,17 @@ class ApiService {
     public List formatInsights(List<EntityViewEvent> eves) {
         List insights = []
         eves.each { EntityViewEvent e ->
-            // todo change the content based on event type and state
-            long ts = e.ts ?: System.currentTimeMillis()
-            insights.add([
-                    title     : e.title,
-                    time      : format.format(new Date(ts)),
-                    type      : e.type,
-                    state     : e.state,
-                    entityUUID: e.entityUUID
-            ])
+            if (e.type!='trending') {
+                // todo change the content based on event type and state
+                long ts = e.ts ?: System.currentTimeMillis()
+                insights.add([
+                        title     : e.title,
+                        time      : format.format(new Date(ts)),
+                        type      : e.type,
+                        state     : e.state,
+                        entityUUID: e.entityUUID
+                ])
+            }
         }
         insights
     }

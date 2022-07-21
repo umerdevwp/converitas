@@ -992,19 +992,19 @@
         }
 
         function formatInsightsContent(content)     {
-            let html= '<table class="project-table"> <tbody style="height: auto">';
+            let html  = '<table class="project-table"> <tbody style="height: auto">';
             for (let i=0; i<content.length; i++) {
-                const c = content[i];
-                html+= '  <tr  style="height: auto">\n'+
-                    '    <td>'+c['time']+'</td>\n'
-                    if (c['type']==='article') {
-                     html+= '    <td><a data-uuid="' + c['state'] + '" data-toggle="modal" data-target="#articleModal" class="article" href="#">' + c['title'] + '</a></td>\n'
-                    } else {
-                        html+= '    <td>' + c['title'] + '</td>\n'
-                    }
-                    html += '  </tr>\n'
+              const c = content[i];
+              html   += '  <tr  style="height: auto">\n'+
+                        '    <td>'+c['time']+'</td>\n'
+              // if (c['type']==='article') {
+                html += '    <td><a data-uuid="' + c['state'] + '" data-toggle="modal" data-target="#articleModal" class="article" href="#">' + c['title'] + '</a></td>\n'
+              // } else {
+              //   html += '    <td>' + c['title'] + '</td>\n'
+              // }
+              html   += '  </tr>\n'
             }
-            html+='</tbody></table>';
+            html     += '</tbody></table>';
 
             return html;
         }
