@@ -6,7 +6,6 @@
         <meta charset="utf-8" />
         <g:set var="entityName" value="${message(code: 'view.label', default: 'View')}" />
         <title>View ${view}</title>
-        <asset:stylesheet src="vis-timeline-graph2d.min.css"/>
 %{--        <asset:stylesheet src="vis-network.min.css"/>--}%
         <style>
         .container-fluid.background-color {
@@ -264,9 +263,6 @@
                 <li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
                 <li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
             </ul>
-        </div>
-        <div id="timeLine" role="navigation">
-            <div id="time_line"></div>
         </div>
         <div class="container-fluid background-color">
             <g:if test="${flash.message}">
@@ -774,7 +770,6 @@
     <script src="/assets/tempcolor.js"></script>
 
     <script type="module">
-        import "/assets/vis-timeline-graph2d.min.js";
         import "/assets/vis-network.min.js";
 
         setTimeout(() => {
@@ -808,31 +803,13 @@
         }
 
         const refreshInterval = 60000;
-        let pageURL = '';
 
         $( document ).ready(() => {
 
             $('.back-link').on('click', function(){
                 loadProjectContent();
             });
-            pageURL = window.location.href;
-            $('.url').val(pageURL);
-             setTimeout(() => {
-                $('#companies h3:eq(0)').css('color', '#ea3223');
-                 $('#companies h3:eq( 1 )').css('color', '#f2a83b');
-                 $('#companies h3:eq( 2 )').css('color', '#457b07');
-
-                $('#companies h3:eq( 0 )').on('click', function() {
-                    loadGraphData(3);
-                });
-                $('#companies h3:eq( 1 )').on('click', function() {
-                    loadGraphData(2);
-                });
-                $('#companies h3:eq( 2 )').on('click', function() {
-                    loadGraphData(1);
-                });
-
-                }, "2000");
+            $('.url').val(window.location.href);
         });
 
         let from, to;
@@ -841,52 +818,6 @@
 
         from = now - 12*3600*1000; to = now + 12*3600*1000;
 
-        // Timeline ---------------------------------------------------------------------------------------------------------
-        const items = new vis.DataSet();
-
-        const container = document.getElementById('time_line');
-        const options = {
-            editable: false,
-            height: 150,
-            maxHeight: 300
-        };
-
-        const timeline  = new vis.Timeline(container, items, options);
-
-        timeline.on('rangechanged', function(e) {
-            from = e.start.getTime(); to =  e.end.getTime();
-            now = Math.round((from+to)/2);
-            loadTimelineData(co1uuid, co2uuid);
-            // loadArticles();
-            // window.loadGraphData(1);
-        });
-
-        timeline.on('doubleClick', function(props) {
-            window.location = '/view/show/${view.id}?ts=' + props.time.getTime();
-        });
-
-        function loadTimelineData(company1UUID, company2uuid) {
-            let args = '';
-            if (company1UUID) args = '&co1=' + company1UUID;
-            if (company2uuid) args += '&co2=' + company2uuid;
-
-            $.ajax({
-                url: '/api/viewtimeline/${view.id}?from='+ from + '&to=' + to + args,
-                success: function(data) {
-                    items.clear();
-                    items.add(data.tldata);
-                    timeline.setOptions( {start: from, end: to});
-                    timeline.setCurrentTime(now);
-                    $('#now').html('[' + timeConverter(new Date(now).getTime(), 2) + ' <a href=\'/view/show/${view.id}\'> - <span style=\'color:pink\'>Now</span></a>' + ']');
-                },
-                error: function(err, status) {
-                    if (err.status===403) {
-                        location.replace("/auth/login?url="+window.location.href);
-                    }
-                    alert(err.responseJSON.message);
-                }
-            })
-        }
 
         const compUuid2Company = {}
         function loadCompanyStatus() {
@@ -929,6 +860,19 @@
                     $('.loadcompany').on('click', function() {
                         loadProjectContent($(this).data('uuid'));
                         loadGraphData(null, $(this).data('uuid'))
+                    });
+                    $('#companies h3:eq(0)').css('color', '#ea3223');
+                    $('#companies h3:eq( 1 )').css('color', '#f2a83b');
+                    $('#companies h3:eq( 2 )').css('color', '#457b07');
+
+                    $('#companies h3:eq( 0 )').on('click', function() {
+                        loadGraphData(3);
+                    });
+                    $('#companies h3:eq( 1 )').on('click', function() {
+                        loadGraphData(2);
+                    });
+                    $('#companies h3:eq( 2 )').on('click', function() {
+                        loadGraphData(1);
                     });
 /*
                     $('.companydlg').on('click', function() {
@@ -1294,9 +1238,6 @@
                     $('.article').on('click', function(event) {
                         showArticle($(this).data("uuid"))
                     });
-
-                    loadTimelineData(companyUUID, company2UUID);
-                    // $('#companies').html(html);
                 },
                 error: function(err, status) {
                     console.log(err);
@@ -1335,9 +1276,7 @@
         }
 
         window.search = function() {
-            const range = timeline.getWindow();
-            const from = range.start.getTime(), to = range.end.getTime();
-            window.location = encodeURI('/system/query?query=' + $('#q').val() + '&from=' + from + '&to=' + to);
+            window.location = encodeURI('/system/query?query=' + $('#q').val());
         }
 
         //###########################################   S T A R T   G R A P H   ########################################
@@ -1453,7 +1392,6 @@
 
         //#############################################   E N D   G R A P H   ##########################################
 
-        loadTimelineData();
         loadCompanyStatus();
         loadProjectContent(undefined);
 

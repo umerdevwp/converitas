@@ -203,7 +203,6 @@ class ApiController {
         call { User user ->
             ///view/graph/org-uuid/user-uuid/project-uuid/view-uuid
             View view = View.get(viewId)
-            log.info "$mode"
             apiService.newGraph(user, mode, uuid, view, from, to, null)
         }
     }
