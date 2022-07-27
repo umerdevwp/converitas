@@ -252,10 +252,12 @@ class BootStrap {
                      [project:'Samba',       users:[name2usr['MA'],name2usr['PE']]],
                      [project:'Asimov',      users:[name2usr['GU'],name2usr['RA']]]].each{ Map prj ->
                         Project p = Project.findByName(prj.project as String)
-                        p.users = prj.users
-                        p.save()
-                        p.views.each { View v ->
-                            v.users = prj.users
+                        if (p) {
+                            p.users = prj.users
+                            p.save()
+                            p.views.each { View v ->
+                                v.users = prj.users
+                            }
                         }
                     }
                     status1.flush()

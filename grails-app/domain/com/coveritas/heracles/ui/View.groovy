@@ -23,6 +23,27 @@ class View {
     Set<ViewObject> viewObjects = []
     private Set<User> users = null
 
+/*
+    def onLoad(){
+        viewObjects = ViewObject.findAllByView(this) as Set
+        annotations = []
+        companies = [:]
+        companyViewObjects = []
+        viewObjects.each { ViewObject vo ->
+            if (vo instanceof Annotation) {
+                annotations << vo as Annotation
+            } else if (vo instanceof CompanyViewObject) {
+                CompanyViewObject cvo = vo as CompanyViewObject
+                companyViewObjects << cvo
+                if (!cvo.company.deleted) {
+                    companies[cvo.company] = cvo.level
+                }
+            }
+            annotations.addAll(vo.annotations)
+        }
+    }
+*/
+
     void addViewObject(ViewObject vo) {
         if (vo) {
             viewObjects.add(vo)
@@ -59,7 +80,6 @@ class View {
     static constraints = {
         uuid nullable: false, blank: false, unique: true
         name nullable: false, unique: ['project']
-
     }
 
     static transients = ['companies', 'viewObjects', 'companyViewObjects', 'annotations', 'projUUID', 'users', 'organization', 'recalcUsers']

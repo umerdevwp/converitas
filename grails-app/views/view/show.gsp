@@ -803,13 +803,15 @@
         }
 
         const refreshInterval = 60000;
+        let pageURL = '';
 
         $( document ).ready(() => {
 
             $('.back-link').on('click', function(){
                 loadProjectContent();
             });
-            $('.url').val(window.location.href);
+            pageURL = window.location.href;
+            $('.url').val(pageURL);
         });
 
         let from, to;

@@ -235,7 +235,7 @@ class ApiService {
     }
 
     LoadingCache<ViewReq, ViewResp> rvcCache = Caffeine.newBuilder()
-            .maximumSize(100).expireAfterWrite(30, TimeUnit.SECONDS)
+            .maximumSize(100).expireAfterWrite(30, TimeUnit.MINUTES)
             .build({ ViewReq viewReq -> remoteViewCompanies(viewReq)})
 
     ViewResp remoteViewCompanies(ViewReq viewReq) {
