@@ -22,6 +22,28 @@ appender('STDOUT', ConsoleAppender) {
     }
 }
 
+def WEBAPP_DIR = "."
+
+appender('ROLLING', RollingFileAppender) {
+
+    rollingPolicy(TimeBasedRollingPolicy) {
+        FileNamePattern = "${WEBAPP_DIR}/log/uiserver-%d{yyyy-MM-dd}.zip"
+        maxHistory = 7
+    }
+
+    encoder(PatternLayoutEncoder) {
+        charset = StandardCharsets.UTF_8
+
+        pattern =
+                '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} ' + // Date
+                        '%clr(%5p) ' + // Log level
+                        '%clr(---){faint} %clr([%15.15t]){faint} ' + // Thread
+                        '%clr(%-40.40logger{39}){cyan} %clr(:){faint} ' + // Logger
+                        '%m%n%wex' // Message
+    }
+}
+
+
 def targetDir = BuildSettings.TARGET_DIR
 if (Environment.isDevelopmentMode() && targetDir != null) {
     appender("FULL_STACKTRACE", FileAppender) {
@@ -35,4 +57,4 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
 }
 //root(DEBUG, ['STDOUT'])
-root(INFO, ['STDOUT'])
+root(INFO, ['STDOUT', 'ROLLING'])

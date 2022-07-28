@@ -244,7 +244,11 @@ class HttpClientService implements GrailsConfigurationAware {
      * @throws APIException - mostly for API level errors (hopefully never)
      */
     List getParamsExpectList(String task, Map params, Class clazz, boolean noException) throws IOException, APIException {
-        typedListFromJson(getParamsExpectResult(task, params, noException) as List, clazz)
+        def result = getParamsExpectResult(task, params, noException)
+        if (result instanceof Map) {
+            result = []
+        }
+        typedListFromJson(result as List, clazz)
     }
 
     private static String urlEncode(String s) { URLEncoder.encode(s, StandardCharsets.UTF_8) }
