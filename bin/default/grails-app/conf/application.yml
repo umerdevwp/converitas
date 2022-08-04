@@ -1,0 +1,181 @@
+---
+grails:
+    profile: web
+    codegen:
+        defaultPackage: man.ui
+    gorm:
+        reactor:
+            # Whether to translate GORM events into Reactor events
+            # Disabled by default for performance reasons
+            events: false
+server:
+    port: 9081
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+spring:
+    jmx:
+        unique-names: true
+    main:
+        banner-mode: "off"
+    groovy:
+        template:
+            check-template-location: false
+    devtools:
+        restart:
+            additional-exclude:
+                - '*.gsp'
+                - '**/*.gsp'
+                - '*.gson'
+                - '**/*.gson'
+                - 'logback.groovy'
+                - '*.properties'
+management:
+    endpoints:
+        enabled-by-default: false
+
+---
+grails:
+    mime:
+        disable:
+            accept:
+                header:
+                    userAgents:
+                        - Gecko
+                        - WebKit
+                        - Presto
+                        - Trident
+        types:
+            all: '*/*'
+            atom: application/atom+xml
+            css: text/css
+            csv: text/csv
+            form: application/x-www-form-urlencoded
+            html:
+              - text/html
+              - application/xhtml+xml
+            js: text/javascript
+            json:
+              - application/json
+              - text/json
+            multipartForm: multipart/form-data
+            pdf: application/pdf
+            rss: application/rss+xml
+            text: text/plain
+            hal:
+              - application/hal+json
+              - application/hal+xml
+            xml:
+              - text/xml
+              - application/xml
+    urlmapping:
+        cache:
+            maxsize: 1000
+    controllers:
+        defaultScope: singleton
+    converters:
+        encoding: UTF-8
+    views:
+        default:
+            codec: html
+        gsp:
+            encoding: UTF-8
+            htmlcodec: xml
+            codecs:
+                expression: html
+                scriptlet: html
+                taglib: none
+                staticparts: none
+management:
+    endpoints:
+        jmx:
+            unique-names: true
+
+heracles:
+    cb:
+        server: "https://test.coveritas.com"
+    api:
+#        server: "http://10.97.140.242:8081"
+        server: "http://localhost:8081"
+#        server: "https://sharp-skunk-65.loca.lt"
+        credential: "http://localhost:8081"
+        isDebug: true
+        verifySsl: false
+---
+hibernate:
+    cache:
+        queries: false
+#        use_second_level_cache: true
+        use_second_level_cache: false
+        use_query_cache: false
+#        region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+dataSource:
+    pooled: true
+    jmxExport: true
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    dialect: POSTGRES
+
+environments:
+    development:
+        dataSource:
+            dbCreate: create-drop
+#            dbCreate: update
+            url: "jdbc:postgresql://localhost:5432/man-ui?reWriteBatchedInserts=true&ssl=false"
+#            url: "jdbc:postgresql://localhost:5432/man-ui1?reWriteBatchedInserts=true&ssl=false"
+            numThreads: 5
+            maxConnections: 5
+            minConnections: 1
+#        dataSources:
+#            mad:
+#                dbCreate: validate
+#                url: "jdbc:postgresql://localhost:5432/mad?reWriteBatchedInserts=true&ssl=false"
+#                numThreads: 5
+#                maxConnections: 5
+#                minConnections: 1
+    test:
+        dataSource:
+            dbCreate: create-drop
+#            dbCreate: update
+            url: "jdbc:postgresql://localhost:5432/man-ui?reWriteBatchedInserts=true&ssl=false"
+#            url: "jdbc:postgresql://localhost:5432/man-ui1?reWriteBatchedInserts=true&ssl=false"
+            numThreads: 5
+            maxConnections: 5
+            minConnections: 1
+#        dataSources:
+#            mad:
+#                dbCreate: validate
+#                url: "jdbc:postgresql://localhost:5432/mad?reWriteBatchedInserts=true&ssl=false"
+#                numThreads: 5
+#                maxConnections: 5
+#                minConnections: 1
+    production:
+        dataSource:
+            dbCreate: create-drop
+#            dbCreate: update
+            url: "jdbc:postgresql://localhost:5432/man-ui?reWriteBatchedInserts=true&ssl=false"
+#            url: "jdbc:postgresql://localhost:5432/man-ui1?reWriteBatchedInserts=true&ssl=false"
+            numThreads: 5
+            maxConnections: 5
+            minConnections: 1
+#        dataSources:
+#            mad:
+#                dbCreate: validate
+#                url: "jdbc:postgresql://localhost:5432/mad?reWriteBatchedInserts=true&ssl=false"
+#                numThreads: 5
+#                maxConnections: 5
+#                minConnections: 1
+
+logger:
+    levels:
+        com:
+            coveritas:
+                heracles: INFO
+
+        io:
+            micronaut:
+                context:
+                    condition: INFO

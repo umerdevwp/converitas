@@ -1,0 +1,16 @@
+/*
+ * Skypack CDN - d3@7.1.1
+ *
+ * Learn more:
+ *   📙 Package Documentation: https://www.skypack.dev/view/d3
+ *   📘 Skypack Documentation: https://www.skypack.dev/docs
+ *
+ * Pinned URL: (Optimized for Production)
+ *   ▶️ Normal: https://cdn.skypack.dev/pin/d3@v7.1.1-Z3g9C0nmLPBGe43BeBXC/mode=imports/optimized/d3.js
+ *   ⏩ Minified: https://cdn.skypack.dev/pin/d3@v7.1.1-Z3g9C0nmLPBGe43BeBXC/mode=imports,min/optimized/d3.js
+ *
+ */
+
+// Browser-Optimized Imports (Don't directly import the URLs below in your application!)
+export * from 'd3.v7.min.js';
+export {default} from 'd3.v7.min.js';
