@@ -389,6 +389,8 @@ const mapNodeSize = (nodes, propertyName, visualRange) => {
 
       graph.on('node:click', (evt) => {
         const { item } = evt;
+        console.log("SINGLECLKID: "+evt.item.getModel().id);
+        console.log("SINGLELABEL: "+evt.item.getModel().label);
         //graph.setItemState(item, 'selected', true);
         var x = document.getElementById("g6-text-container");
             if (x.style.display === "none") {
@@ -407,7 +409,8 @@ const mapNodeSize = (nodes, propertyName, visualRange) => {
               });
       });
       graph.on('node:dblclick', (evt) => {
-        console.log("DBLCLK: "+evt.item.getModel().id)
+        console.log("DBLCLK: "+evt.item.getModel().id);
+        console.log("DBLLABEL: "+evt.item.getModel().label);
         const { item } = evt;
         graph.setItemState(item, 'selected', false);
       });
