@@ -407,6 +407,7 @@ const mapNodeSize = (nodes, propertyName, visualRange) => {
               });
       });
       graph.on('node:dblclick', (evt) => {
+        console.log("DBLCLK: "+evt.item.getModel().id)
         const { item } = evt;
         graph.setItemState(item, 'selected', false);
       });
